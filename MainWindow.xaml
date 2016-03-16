@@ -1,0 +1,129 @@
+﻿<!-- ===================================================================
+ License:
+    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    MainWindow.xaml
+    
+    Copyright(C) 2015 - 2016  Christopher Whitley    
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.If not, see<http://www.gnu.org/licenses/> .
+  =================================================================== -->
+
+
+
+
+
+
+<Controls:MetroWindow x:Class="DiscerningEye.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:prop="clr-namespace:DiscerningEye.Properties"
+                      xmlns:local="clr-namespace:DiscerningEye"
+                      mc:Ignorable="d"
+                      xmlns:vm="clr-namespace:DiscerningEye.ViewModel"
+                      xmlns:Views="clr-namespace:DiscerningEye.View"
+                      xmlns:tb="http://www.hardcodet.net/taskbar"
+                      WindowState="Maximized"
+                      Title="Discerning Eye" 
+                      Height="1080" 
+                      Icon="pack://application:,,,/DiscerningEye;component/Resources/icon.ico"
+                      ShowIconOnTitleBar="False"
+                      Width="1920">
+    <Controls:MetroWindow.RightWindowCommands>
+        <Controls:WindowCommands>
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}Current Eorzea Time: {0:00}:{1:00;00}">
+                        <Binding ElementName="AlarmsView" Path="DataContext.EorzeaClock.CurrentTimeEorzea.Hour" />
+                        <Binding ElementName="AlarmsView" Path="DataContext.EorzeaClock.CurrentTimeEorzea.Minute" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+            <Button Content="Settings"
+                    Command="{Binding SettingsCommand}"/>
+        </Controls:WindowCommands>
+
+    </Controls:MetroWindow.RightWindowCommands>
+
+
+
+
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:FlyoutsControl.LayoutTransform>
+                <ScaleTransform ScaleX="{Binding Source={StaticResource Settings}, Path=UIScale}" ScaleY="{Binding Source={StaticResource Settings}, Path=UIScale}" />
+            </Controls:FlyoutsControl.LayoutTransform>
+            <Controls:Flyout IsOpen="{Binding IsSettingsOpen}"
+                             Position="Right"
+                             Width="400">
+                <Views:SettingsView Margin="10,0,10,10" />
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+    <Grid Margin="4">
+        <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}"  ScaleY="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}" />
+        </Grid.LayoutTransform>
+
+        <tb:TaskbarIcon x:Name="notificationIcon"
+                    Visibility="Visible"
+                    IconSource="pack://application:,,,/DiscerningEye;component/Resources/icon.ico"
+                    ToolTipText="Discerning Eye (Double click to open application)"
+                    MenuActivation="RightClick">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Application Settings">
+                        <MenuItem Header="Enable Alarms" 
+                              IsCheckable="True"
+                              IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableAlarms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <MenuItem Header="Enable Early Warning" 
+                              IsCheckable="True"
+                              IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableEarlyWarning, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Separator/>
+                        <MenuItem Header="Enable Taskbar Ballon Popups" 
+                              IsCheckable="True"
+                              IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableBallonTip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <MenuItem Header="Enable Notification Tone" 
+                              IsCheckable="True"
+                              IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableNotificationTone, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <MenuItem Header="Enable Text-To-Speech" 
+                              IsCheckable="True"
+                              IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableTextToSpeech, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </MenuItem>
+                    <MenuItem Header="Visit Github Page" 
+                              Command="{Binding GitHubCommand}"/>
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+
+        <TabControl TabStripPlacement="Left" BorderThickness="2,0,0,0"
+                    Controls:TabControlHelper.Transition="Right">
+            <TabControl.BorderBrush>
+                <SolidColorBrush Color="{DynamicResource AccentColor}"/>
+            </TabControl.BorderBrush>
+            <TabItem Header="Dictionary">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto">
+                    <Views:GatheringItemListView Margin="10,0,10,10" />
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Alarms">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto">
+                    <Views:AlarmsView x:Name="AlarmsView" Margin="10,0,10,10" />
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Controls:MetroWindow>
