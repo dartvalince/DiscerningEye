@@ -51,6 +51,7 @@ namespace DiscerningEye.Model
                 if (this._isSet == value) return;
                 this._isSet = value;
                 if (value) this.Armed = true;
+                OnPropertyChanged("IsSet");
             }
         }
 

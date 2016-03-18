@@ -30,221 +30,66 @@
              xmlns:p="clr-namespace:DiscerningEye.Properties"
              xmlns:local="clr-namespace:DiscerningEye.View"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="1000">
+             d:DesignHeight="800" d:DesignWidth="1280">
 
 
     <UserControl.Resources>
-        <!--<CollectionViewSource x:Key="MinerViewSource" 
-                              IsLiveFilteringRequested="True" />
-        <CollectionViewSource x:Key="BotanyViewSource" 
-                              IsLiveFilteringRequested="True" />-->
+        <CollectionViewSource x:Key="AlarmViewSource" 
+                              IsLiveFilteringRequested="True"
+                              IsLiveSortingRequested="True"
+                              Source="{Binding AlarmItemCollection}"
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+            <CollectionViewSource.GroupDescriptions>
+                <dat:PropertyGroupDescription PropertyName="Job" />
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Job" Direction="Ascending" />
+                <!--<scm:SortDescription PropertyName="NextSpawn" Direction="Ascending" />-->
+                <scm:SortDescription PropertyName="Name" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+
+        <CollectionViewSource x:Key="SetAlarmsViewSource" 
+                              IsLiveFilteringRequested="True"
+                              IsLiveSortingRequested="True"
+                              Source="{Binding AlarmItemCollection}"
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+            <CollectionViewSource.GroupDescriptions>
+                <dat:PropertyGroupDescription PropertyName="Job" />
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Job" Direction="Ascending" />
+                <scm:SortDescription PropertyName="NextSpawn" Direction="Ascending" />
+                <scm:SortDescription PropertyName="Name" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+        <Style x:Key="CheckBoxSelectTypeStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
+            <Setter Property="Command" Value="{Binding DataContext.RefreshSchedulViewCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+        </Style>
 
     </UserControl.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
-            <RowDefinition Height="500" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
-        <!-- Alarms List -->
-        <GroupBox Header="Miner Alarms (Sorted by Next Spawn)"
-                  Grid.Column="0"
-                  Grid.Row="1"
-                  Grid.ColumnSpan="1"
-                  Width="auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <DataGrid Grid.Row="1"
-                          Name="dgAlarms"
-                          ItemsSource="{Binding MinerViewSource}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsSynchronizedWithCurrentItem="True"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserReorderColumns="False"
-                          CanUserResizeColumns="False"
-                          CanUserResizeRows="False"
-                          CanUserSortColumns="False"
-                          SelectionMode="Single"
-                          GridLinesVisibility="All">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Set Alarm">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Name"
-                                            Binding="{Binding Name}" 
-                                            Width="auto"/>
-                        <DataGridTemplateColumn Header="Availible In"
-                                                Width="auto"
-                                                SortDirection="Ascending">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock>
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                                <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
-                                                <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
-                                                <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <!--<DataGridTextColumn Header="Next Spawn"
-                                            Width="auto"
-                                            Binding="{Binding NextSpawn}" >
-                        </DataGridTextColumn>-->
-                        <DataGridTextColumn Header="Start"
-                                            Binding="{Binding StartTime}" 
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="End"
-                                            Binding="{Binding EndTime}" 
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Region"
-                                            Binding="{Binding Region}" 
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Zone"
-                                            Binding="{Binding Zone}" 
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Job"
-                                            Binding="{Binding Job}" 
-                                            Width="auto"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Header="Botanist Alarms (Sorted by Next Spawn)"
-                  Grid.Column="1"
-                  Grid.ColumnSpan="2"
-                  Grid.Row="1"
-                  Width="auto">
-            <DataGrid Grid.Row="1"
-                          Name="dgBotanyAlarms"
-                          ItemsSource="{Binding BotanyViewSource}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsSynchronizedWithCurrentItem="True"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserReorderColumns="False"
-                          CanUserResizeColumns="False"
-                          CanUserResizeRows="False"
-                          CanUserSortColumns="False"
-                          SelectionMode="Single"
-                          GridLinesVisibility="All">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Set Alarm">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Name"
-                                            Binding="{Binding Name}" 
-                                            Width="auto"/>
-                    <DataGridTemplateColumn Header="Availible In"
-                                                Width="auto"
-                                                SortDirection="Ascending">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock>
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                            <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
-                                            <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
-                                            <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <!--<DataGridTextColumn Header="Next Spawn"
-                                            Width="auto"
-                                            Binding="{Binding NextSpawn}" >
-                        </DataGridTextColumn>-->
-                    <DataGridTextColumn Header="Start"
-                                            Binding="{Binding StartTime}" 
-                                            Width="auto"/>
-                    <DataGridTextColumn Header="End"
-                                            Binding="{Binding EndTime}" 
-                                            Width="auto"/>
-                    <DataGridTextColumn Header="Region"
-                                            Binding="{Binding Region}" 
-                                            Width="auto"/>
-                    <DataGridTextColumn Header="Zone"
-                                            Binding="{Binding Zone}" 
-                                            Width="auto"/>
-                    <DataGridTextColumn Header="Job"
-                                            Binding="{Binding Job}" 
-                                            Width="auto"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
-
-
-        <!-- Alarms Search -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <GroupBox Grid.Row="0"
-                  Grid.Column="0"
-                  Header="Search Alarms">
+                  Grid.Column="1"
+                  Header="Alarm Schedules">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
                     <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock TextWrapping="WrapWithOverflow"
-                           Text="Enter the full or partial item name here to filter the alarms list by the search" />
-                <TextBox Grid.Row="1" 
-                         Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
-                         Margin="5, 10"
-                         Width="auto"
-                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Grid.Row="0"
-                  Grid.Column="1"
-                  Header="Alarm Profiles">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
                     <RowDefinition Height="10"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
@@ -257,29 +102,341 @@
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
                            Grid.ColumnSpan="4"
-                           TextWrapping="Wrap"
-                           Text="Alarm profiles are a snapshot of the alarms you have checked.  From here you can create a new one, update the current one, or delete a previously saved one" />
+                           Text="Selecte schedule from dropdown to load"/>
                 <ComboBox Grid.Row="1"
                           Grid.Column="0"
-                          Grid.ColumnSpan="3"/>
-
-                <Button Grid.Row="1"
-                        Grid.Column="3"
-                        Content="Load Selected Profile" />
+                          Grid.ColumnSpan="4"
+                          ItemsSource="{Binding AlarmProfileCollection}"
+                          SelectedValue="{Binding SelectedProfile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          />
 
                 <Button Grid.Row="3"
                         Grid.Column="0"
-                        Content="Create New Profile" />
-
+                        Content="Load Selected Schedule" 
+                        Command="{Binding LoadProfileCommand}"/>
                 <Button Grid.Row="3"
                         Grid.Column="1"
-                        Content="Update Current Profile" />
+                        Margin="0,0,5,0" 
+                        Content="Save Schedule" 
+                        Command="{Binding CreateNewProfileCommand}"/>
 
                 <Button Grid.Row="3"
                         Grid.Column="2"
-                        Content="Delete Current Profile" />
+                        Margin="0,0,5,0" 
+                        Content="Update Schedule"
+                        Command="{Binding UpdateProfileCommand}"/>
+
+                <Button Grid.Row="3"
+                        Grid.Column="3" 
+                        Content="Delete Schedule" 
+                        Command="{Binding DeleteCurrentProfileCommand}"/>
+            </Grid>
+        </GroupBox>
+        
+        <GroupBox Grid.Row="0"
+                  Grid.Column="0"
+                  Header="Search Alarms">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90*" />
+                    <ColumnDefinition Width="10*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                         Grid.Column="0"
+                         Grid.ColumnSpan="2"
+                         Text="Search for an item in the alarms list" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="0"
+                         Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
+                         Margin="0,0,5,0"
+                         Controls:TextBoxHelper.ClearTextButton="True"
+                         AcceptsReturn="False"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Row="1"
+                        Grid.Column="1" Content="Search"
+                        IsDefault="True"
+                        Command="{Binding SearchAlarmsCommand}" />
+            </Grid>
+        </GroupBox>
+                         
+        <GroupBox Grid.Row="2"
+                  Grid.Column="0"
+                      Header="Alarms"
+                      HeaderStringFormat="Alarms List"
+                      Width="auto"
+                      Height="auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                    <DataGrid Grid.Row="0"
+                          Grid.Column="0"
+                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          IsSynchronizedWithCurrentItem="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserReorderColumns="False"
+                          CanUserResizeColumns="False"
+                          CanUserResizeRows="False"
+                          CanUserSortColumns="True"
+                          SelectionMode="Single"
+                          GridLinesVisibility="All">
+                        <DataGrid.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.ContainerStyle>
+                                    <Style TargetType="{x:Type GroupItem}">
+                                        <Setter Property="Margin" Value="0,0,0,5" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                    <Expander IsExpanded="True">
+                                                        <Expander.Header>
+                                                            <DockPanel>
+                                                                <TextBlock Text="{Binding Path=Name}" />
+                                                            </DockPanel>
+                                                        </Expander.Header>
+                                                        <Expander.Content>
+                                                            <ItemsPresenter />
+                                                        </Expander.Content>
+                                                    </Expander>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </GroupStyle.ContainerStyle>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header=""
+                                                Width="auto"
+                                                SortMemberPath="IsSet">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                              HorizontalAlignment="Center" 
+                                              BorderBrush="Black"
+                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                              HorizontalAlignment="Center" 
+                                              BorderBrush="Black" 
+                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Name"
+                                            Binding="{Binding Name}" 
+                                            SortMemberPath="Name"
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+
+                            <DataGridTextColumn Header="Start"
+                                            Binding="{Binding StartTime}" 
+                                            SortMemberPath="StartTime"
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                            <DataGridTextColumn Header="End"
+                                            SortMemberPath="EndTime"
+                                            Binding="{Binding EndTime}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                            <DataGridTextColumn Header="Region"
+                                            SortMemberPath="Region"
+                                            Binding="{Binding Region}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                            <DataGridTextColumn Header="Zone"
+                                            SortMemberPath="Zone"
+                                            Binding="{Binding Zone}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                            <DataGridTextColumn Header="Slot"
+                                            SortMemberPath="Zone"
+                                            Binding="{Binding Slot}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                
+            </Grid>
+        </GroupBox>
+
+
+        <GroupBox Grid.Row="2"
+                  Grid.Column="1"
+                      Header="Scheduled Alarms"
+                      Width="auto"
+                      Height="auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Remove All Alarms From Schedule"
+                        Command="{Binding RemoveAllAlarmsCommand}"/>
+                <DataGrid Grid.Row="1"
+                          Grid.Column="0"
+                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          IsSynchronizedWithCurrentItem="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          CanUserReorderColumns="False"
+                          CanUserResizeColumns="False"
+                          CanUserResizeRows="False"
+                          CanUserSortColumns="False"
+                          SelectionMode="Single"
+                          GridLinesVisibility="All">
+                    <DataGrid.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header=""
+                                                Width="auto"
+                                                SortMemberPath="IsSet">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                              HorizontalAlignment="Center" 
+                                              BorderBrush="Black"
+                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+
+
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                              
+                                              HorizontalAlignment="Center" 
+                                              BorderBrush="Black" 
+                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Name"
+                                            Binding="{Binding Name}" 
+                                            SortMemberPath="Name"
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                        <DataGridTemplateColumn Header="Availible In"
+                                                Width="auto"
+                                                SortMemberPath="NextSpawn">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Text">
+                                                    <Setter.Value>
+                                                        <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                                            <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
+                                                            <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
+                                                            <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
+                                                        </MultiBinding>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSet}" Value="False">
+                                                        <Setter Property="Text" Value="{x:Null}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <!--<DataGridTextColumn Header="Start"
+                                            Binding="{Binding StartTime}" 
+                                            SortMemberPath="StartTime"
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                        <DataGridTextColumn Header="End"
+                                            SortMemberPath="EndTime"
+                                            Binding="{Binding EndTime}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>-->
+                        <DataGridTextColumn Header="Region"
+                                            SortMemberPath="Region"
+                                            Binding="{Binding Region}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                        <DataGridTextColumn Header="Zone"
+                                            SortMemberPath="Zone"
+                                            Binding="{Binding Zone}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                        <DataGridTextColumn Header="Slot"
+                                            SortMemberPath="Zone"
+                                            Binding="{Binding Slot}" 
+                                            TextBlock.TextAlignment="Center"
+                                            Width="auto"/>
+                    </DataGrid.Columns>
+                </DataGrid>
 
             </Grid>
         </GroupBox>
+
+
+
     </Grid>
+       
+
+
+    <!-- Alarms List -->
+
+
+
+        <!-- TO DO:
+             Figure out method of filtering across both datagrids from single 
+            search box. Until then, this section is commented out :( -->
+        <!-- Alarms Search -->
+
 </UserControl>

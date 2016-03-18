@@ -25,6 +25,7 @@ namespace DiscerningEye
             
             window.DataContext = viewModel;
             window.Show();
+            DiscerningEye.App.Current.Exit += Current_Exit;
 
             DiscerningEye.Properties.Settings.Default.PropertyChanged += Default_PropertyChanged;
 
@@ -33,12 +34,18 @@ namespace DiscerningEye
 
         }
 
+        private void Current_Exit(object sender, ExitEventArgs e)
+        {
+            DiscerningEye.Properties.Settings.Default.Save();
+        }
+
         private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme")
             {
                 ChangeApplicationTheme();
             }
+
         }
 
         private void ChangeApplicationTheme()

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    SaveSettingsCommand.cs
+    DoNotDisturbCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,17 +20,19 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using DiscerningEye.ViewModel;
+using MahApps.Metro;
 using System;
+using System.Windows;
 using System.Windows.Input;
 
-namespace DiscerningEye.Commands
+namespace DiscerningEye.Commands.AlarmViewModelCommands
 {
-    public class SaveSettingsCommand : ICommand
+    public class UpdateAlarmProfileCommand : ICommand
     {
-        private MainWindowViewModel _viewModel;
 
-        public SaveSettingsCommand(MainWindowViewModel viewModel)
+        private ViewModel.AlarmsViewModel _viewModel;
+
+        public UpdateAlarmProfileCommand(ViewModel.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }
@@ -43,15 +45,12 @@ namespace DiscerningEye.Commands
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return _viewModel.CanAdjustSelectedProfile;
         }
 
         public void Execute(object parameter)
         {
-            _viewModel.SaveSettings();
+            _viewModel.UpdateCurrentProfile();
         }
-
-
-
     }
 }

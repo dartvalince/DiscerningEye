@@ -34,6 +34,11 @@ using System.Speech;
 using System.Speech.Synthesis;
 using NAudio;
 using NAudio.Wave;
+using System.IO;
+using MahApps.Metro.Controls.Dialogs;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Windows.Input;
 
 namespace DiscerningEye.ViewModel
 {
@@ -44,8 +49,8 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         private AlarmItemRepository _alarmItemRepository;
         private ObservableCollection<Model.AlarmItem> _alarmItemCollection;
-        private ICollectionView _minerViewSource;
-        private ICollectionView _botanyViewSource;
+        private ObservableCollection<Model.AlarmProfile> _alarmProfileCollection;
+        private Model.AlarmProfile _selectedProfile;
         private string _searchText;
         private Utilities.ClockController _eorzeaClock;
         private System.Timers.Timer _updateTimer;
@@ -65,47 +70,43 @@ namespace DiscerningEye.ViewModel
         /// </remarks>
         public ObservableCollection<Model.AlarmItem> AlarmItemCollection
         {
-            get { return this._alarmItemCollection; }
+            get {
+                
+                return this._alarmItemCollection; }
             set
             {
                 if (this._alarmItemCollection == value) return;
                 this._alarmItemCollection = value;
                 OnPropertyChanged("AlarmItemCollection");
+                
+
+
             }
         }
 
-        //public CollectionViewSource MinerViewSource
-        //{
-        //    get { return this._minerViewSource; }
-        //    set
-        //    {
-        //        if (this._minerViewSource == value) return;
-        //        this._minerViewSource = value;
-        //        OnPropertyChanged("MinerViewSource");
-        //    }
-        //}
-
-        public ICollectionView MinerViewSource
+        public ObservableCollection<Model.AlarmProfile> AlarmProfileCollection
         {
-            get { return this._minerViewSource; }
+            get { return this._alarmProfileCollection; }
             set
             {
-                if (this._minerViewSource == value) return;
-                this._minerViewSource = value;
-                OnPropertyChanged("MinerViewSource");
+                if (this._alarmProfileCollection == value) return;
+                this._alarmProfileCollection = value;
+                OnPropertyChanged("AlarmProfileCollection");
             }
         }
 
-        public ICollectionView BotanyViewSource
+        public Model.AlarmProfile SelectedProfile
         {
-            get { return this._botanyViewSource; }
+            get { return this._selectedProfile; }
             set
             {
-                if (this._botanyViewSource == value) return;
-                this._botanyViewSource = value;
-                OnPropertyChanged("BotanyViewSource");
+                if (this._selectedProfile == value) return;
+                this._selectedProfile = value;
+                OnPropertyChanged("SelectedProfile");
             }
         }
+
+
 
 
 
@@ -122,8 +123,8 @@ namespace DiscerningEye.ViewModel
             {
                 if (this._searchText == value) return;
                 this._searchText = value;
-                this.FilterView(value);
                 OnPropertyChanged("SearchText");
+                if (value == "") this.SearchAlarmsCommand.Execute(null);
             }
         }
 
@@ -160,7 +161,62 @@ namespace DiscerningEye.ViewModel
                 this._updateTimer = value;
             }
         }
-       
+
+
+        public bool CanAdjustSelectedProfile
+        {
+            get
+            {
+                if (this.SelectedProfile == null) return false;
+                else return true;
+            }
+        }
+
+
+
+        public ICommand CreateNewProfileCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand LoadProfileCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand UpdateProfileCommand
+        {
+            get;
+            private set;
+        }
+
+
+        public ICommand SearchAlarmsCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand DeleteCurrentProfileCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand RefreshSchedulViewCommand
+        {
+            get;
+            private set;
+        }
+
+
+        public ICommand RemoveAllAlarmsCommand
+        {
+            get;
+            private set;
+        }
 
         //=========================================================
         //  Constructor
@@ -171,6 +227,13 @@ namespace DiscerningEye.ViewModel
         public AlarmsViewModel()
         {
             AlarmsView.View.Loaded += View_Loaded;
+            this.CreateNewProfileCommand = new Commands.AlarmViewModelCommands.CreateAlarmProfileComand(this);
+            this.LoadProfileCommand = new Commands.AlarmViewModelCommands.LoadAlarmProfileCommand(this);
+            this.UpdateProfileCommand = new Commands.AlarmViewModelCommands.UpdateAlarmProfileCommand(this);
+            this.SearchAlarmsCommand = new Commands.AlarmViewModelCommands.SearchAlarmsCommand(this);
+            this.DeleteCurrentProfileCommand = new Commands.AlarmViewModelCommands.DeleteAlarmProfileCommand(this);
+            this.RefreshSchedulViewCommand = new Commands.AlarmViewModelCommands.RefreshScheduleViewCommand(this);
+            this.RemoveAllAlarmsCommand = new Commands.AlarmViewModelCommands.RemoveAllAlarmsCommand(this);
             this._isLoaded = false;
 
         }
@@ -188,40 +251,23 @@ namespace DiscerningEye.ViewModel
             if (_alarmItemRepository == null)
                 _alarmItemRepository = new AlarmItemRepository();
 
-
+            this.SearchText = "";
+            
             //  Initilize the AlarmItemCollection
             this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
 
-            MinerViewSource = CollectionViewSource.GetDefaultView(this.AlarmItemCollection);
-            MinerViewSource.Filter = new Predicate<object>(x =>
-                                                               ((Model.AlarmItem)x).Job.ToLower().Contains("min"));
 
-
-            BotanyViewSource = CollectionViewSource.GetDefaultView(this.AlarmItemCollection);
-            BotanyViewSource.Filter = new Predicate<object>(x =>
-                                                               ((Model.AlarmItem)x).Job.ToLower().Contains("bot"));
-
-
-
-
-            //((CollectionViewSource)AlarmsView.View.FindResource("MinerViewSource")).Source = this.AlarmItemCollection;
-            //((CollectionViewSource)AlarmsView.View.FindResource("MinerViewSource")).Filter += MinerViewModel_Filter;
-
-            //((CollectionViewSource)AlarmsView.View.FindResource("BotanyViewSource")).Source = this.AlarmItemCollection;
-            //((CollectionViewSource)AlarmsView.View.FindResource("BotanyViewSource")).Filter += BotanyViewModel_Filter;
+            //  Initilize the Alarm Profiles
+            this.AlarmProfileCollection = new ObservableCollection<Model.AlarmProfile>((new AlarmProfileRepository()).GetAlarmProfiles());
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmsViewModel_Filter;
+            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter += SetAlarmsViewSource_Filter;
 
 
 
 
 
 
-            //////ICollectionView collectionView = CollectionViewSource.GetDefaultView(this.AlarmItemCollection);
-            //////collectionView.SortDescriptions.Add(new SortDescription("NextSpawn.Hours", ListSortDirection.Ascending));
-            //////collectionView.SortDescriptions.Add(new SortDescription("NextSpawn.Minutes", ListSortDirection.Ascending));
-            //////collectionView.SortDescriptions.Add(new SortDescription("NextSpawn.Seconds", ListSortDirection.Ascending));
-            ////////collectionView.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
-            //////var view = (ICollectionViewLiveShaping)CollectionViewSource.GetDefaultView(this.AlarmItemCollection);
-            //////view.IsLiveSorting = true;
+
 
 
             // Initilize the update timer
@@ -239,25 +285,26 @@ namespace DiscerningEye.ViewModel
 
             this._isLoaded = true;
         }
-
-        private void BotanyViewModel_Filter(object sender, FilterEventArgs e)
+        private void AlarmsViewModel_Filter(object sender, FilterEventArgs e)
         {
             Model.AlarmItem i = e.Item as Model.AlarmItem;
             if (i != null)
             {
                 if (this.SearchText == null) this.SearchText = "";
-                e.Accepted = i.Job.ToLower().Contains("bot") && i.Name.ToLower().Contains(this.SearchText);
+                e.Accepted = i.Name.ToLower().Contains(this.SearchText.ToLower());
             }
         }
 
-        private void MinerViewModel_Filter(object sender, FilterEventArgs e)
+        private void SetAlarmsViewSource_Filter(object sender, FilterEventArgs e)
         {
             Model.AlarmItem i = e.Item as Model.AlarmItem;
-            if(i != null)
+            if (i != null)
             {
-                e.Accepted = i.Job.ToLower().Contains("min");
+                if (this.SearchText == null) this.SearchText = "";
+                e.Accepted = i.IsSet == true;
             }
         }
+
 
 
 
@@ -284,6 +331,7 @@ namespace DiscerningEye.ViewModel
 
         private void UpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            
 
             //  Get the current eorzea time span
             TimeSpan currentEorzeaTimeSpan = this.EorzeaClock.GetEorzeaTimeSpan();
@@ -312,8 +360,6 @@ namespace DiscerningEye.ViewModel
                 //  without it triggering over and over until the hour has passed.  So we will
                 //  check to see if the current eorzea time is > than the alarm time and if so
                 //  we just arm it
-
-
                 #region CheckIfReArm
                 if (currentEorzeaTimeSpan > alarmInfo.StartTime)
                 {
@@ -331,39 +377,43 @@ namespace DiscerningEye.ViewModel
 
 
                 #region CalculateTimeTillSpawn
-                //  Get the time difference between the alarm time and eorzea time
-                TimeSpan timeDiff;
-                TimeSpan nextEorzeaSpawn;
-                if (alarmInfo.StartTime.Equals(new TimeSpan(0, 0, 0)))
+                if (alarmInfo.IsSet)
                 {
-                    timeDiff = (new TimeSpan(24, 0, 0)).Subtract(currentEorzeaTimeSpan);
-                }
-                else
-                {
-                    timeDiff = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                }
+                    //  Get the time difference between the alarm time and eorzea time
+                    TimeSpan timeDiff;
+                    TimeSpan nextEorzeaSpawn;
+                    if (alarmInfo.StartTime.Equals(new TimeSpan(0, 0, 0)))
+                    {
+                        timeDiff = (new TimeSpan(24, 0, 0)).Subtract(currentEorzeaTimeSpan);
+                    }
+                    else
+                    {
+                        timeDiff = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
+                    }
 
 
 
-                if (alarmInfo.StartTime > currentEorzeaTimeSpan)
-                {
-                    //alarmInfo.TimeTillSpawnEorzea = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                    nextEorzeaSpawn = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                }
-                else
-                {
-                    //alarm.TimeTillSpawnEorzea = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarm.StartTime));
-                    nextEorzeaSpawn = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarmInfo.StartTime));
-                }
-                long earthTicks =nextEorzeaSpawn.Ticks / (long)Utilities.ClockController.EORZEA_MULTIPLIER;
-                alarmInfo.NextSpawn = new TimeSpan(earthTicks);
+                    if (alarmInfo.StartTime > currentEorzeaTimeSpan)
+                    {
+                        //alarmInfo.TimeTillSpawnEorzea = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
+                        nextEorzeaSpawn = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
+                    }
+                    else
+                    {
+                        //alarm.TimeTillSpawnEorzea = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarm.StartTime));
+                        nextEorzeaSpawn = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarmInfo.StartTime));
+                    }
+                    long earthTicks = nextEorzeaSpawn.Ticks / (long)Utilities.ClockController.EORZEA_MULTIPLIER;
+                    alarmInfo.NextSpawn = new TimeSpan(earthTicks);
 
-                //  Check if the NexSpawn time is 0h 0m and 0s.  If so, and fullZeroExists is false
-                //  set fullZeroExists to true
-                //if (alarmInfo.NextSpawn == new TimeSpan(0, 0, 0) && fullZeroExists == false)
-                //{
-                //    fullZeroExists = true;
-                //}
+                    //  Check if the NexSpawn time is 0h 0m and 0s.  If so, and fullZeroExists is false
+                    //  set fullZeroExists to true
+                    //if (alarmInfo.NextSpawn == new TimeSpan(0, 0, 0) && fullZeroExists == false)
+                    //{
+                    //    fullZeroExists = true;
+                    //}
+                }
+                
                 #endregion CalculateTimeTillSpawn
 
 
@@ -412,8 +462,6 @@ namespace DiscerningEye.ViewModel
 
                         earlyWarningMessages.Add(earlyWarningMessage);
 
-                        //MainWindow.View.notificationIcon.ShowBalloonTip("Discerning Eye: Early Warning", earlyWarningMessage, Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
-
 
 
                     }
@@ -445,7 +493,6 @@ namespace DiscerningEye.ViewModel
                 //  Push the alarmInfo back into the alarmItem
                 alarmItem.Armed = alarmInfo.Armed;
                 alarmItem.EarlyWarningIssued = alarmInfo.EarlyWarningIssued;
-                //alarmItem.NextSpawn = alarmInfo.NextSpawn.ToString(@"d\huh\:h\h\:m\m\:s\s", System.Globalization.CultureInfo.InvariantCulture);
                 alarmItem.NextSpawn = alarmInfo.NextSpawn;
 
 
@@ -486,7 +533,7 @@ namespace DiscerningEye.ViewModel
                         synth.SpeakAsync(notificationMessage.ToString());
                 }
 
-                if(Properties.Settings.Default.EnableNotificationTone)
+                if(Properties.Settings.Default.EnableNotificationTone && File.Exists(Properties.Settings.Default.NotificationToneUri))
                 {
                     if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
                     {
@@ -547,32 +594,142 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         //  Methods
         //=========================================================
-        private void FilterView(string filterText)
+        public void SearchAlarms()
         {
-            //if (view.CanFilter)
-            //{
-            //    view.Filter = item =>
-            //    {
-            //        Model.AlarmItem vItem = item as Model.AlarmItem;
-            //        if (vItem == null) return false;
-            //        return vItem.Name.ToLower().Contains(this.SearchText.ToLower());
-            //    };
-            //}
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter -= AlarmsViewModel_Filter;
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmsViewModel_Filter;
         }
 
-        public void CreateNewProfile()
+        public async void LoadProfile()
         {
+            foreach(Model.AlarmItem profileAlarm in this.SelectedProfile.Alarms)
+            {
+                foreach(Model.AlarmItem collectionAlarm in this.AlarmItemCollection)
+                {
+                    if (profileAlarm.Name == collectionAlarm.Name && profileAlarm.StartTime == collectionAlarm.StartTime)
+                    {
+                        collectionAlarm.EarlyWarningIssued = false;
+                        collectionAlarm.Armed = true;
+                        collectionAlarm.IsSet = profileAlarm.IsSet;
+                    }
+                }
+            }
+
+            this.RefreshScheduleView();
+
+
+            MetroDialogSettings settings = new MetroDialogSettings();
+            settings.AffirmativeButtonText = "Ok";
+            settings.AnimateHide = true;
+            settings.AnimateShow = true;
+            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            await MainWindow.View.ShowMessageAsync("Schedule Loaded ", string.Format("Schedule \"{0}\" has been loaded.", this.SelectedProfile.Name), MessageDialogStyle.Affirmative, settings);
+        }
+
+        public async void CreateNewProfile()
+        {
+            //  Ensure a profile with the same name doens't already exist
+            
+            
+            MetroDialogSettings settings = new MetroDialogSettings();
+            settings.AffirmativeButtonText = "Create";
+            settings.AnimateHide = true;
+            settings.AnimateShow = true;
+            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            settings.NegativeButtonText = "Cancel";
+            string profileName = await MainWindow.View.ShowInputAsync("Create New Schedule", "Enter the name you would like to use for the new schedule", settings);
+
+            var list = this.AlarmProfileCollection.Where(ap => ap.Name == profileName);
+
+            if (list.Count() > 0)
+            {
+                settings.AffirmativeButtonText = "Ok";
+                await MainWindow.View.ShowMessageAsync("Create Schedule Error", "Cannot create a profile with the same name as an existing one", MessageDialogStyle.Affirmative, settings);
+
+            }
+            else
+            {
+
+                if (profileName == null) return;
+                Model.AlarmProfile profile = new Model.AlarmProfile(this.AlarmItemCollection.ToList());
+
+                if (profileName.Length > 0)
+                {
+                    profile.Name = profileName;
+                    AlarmProfileRepository.Save(profile);
+                }
+
+                this.AlarmProfileCollection.Add(profile);
+                settings.AffirmativeButtonText = "Ok";
+                await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Profile has been created and saved for {0}", profileName), MessageDialogStyle.Affirmative, settings);
+                this.AlarmProfileCollection = new ObservableCollection<Model.AlarmProfile>((new AlarmProfileRepository()).GetAlarmProfiles());
+                this.SelectedProfile = this.AlarmProfileCollection.Where(p => p.Name == profile.Name).First();
+            }
+
+            
+
 
         }
 
-        public void UpdateCurrentProfile()
+        public async void UpdateCurrentProfile()
         {
+            if (this.SelectedProfile == null) return;
+
+
+
+
+
+            string profilename = this.SelectedProfile.Name;
+            Model.AlarmProfile profile = new Model.AlarmProfile(this.AlarmItemCollection.ToList());
+            profile.Name = profilename;
+
+            this.AlarmProfileCollection.Remove(this.AlarmProfileCollection.Where(p => p.Name == this.SelectedProfile.Name).First());
+            this.AlarmProfileCollection.Add(profile);
+            this.SelectedProfile = null;
+            this.SelectedProfile = profile;
+            AlarmProfileRepository.Save(this.SelectedProfile);
+
+            MetroDialogSettings settings = new MetroDialogSettings();
+            settings.AffirmativeButtonText = "Ok";
+            settings.AnimateHide = true;
+            settings.AnimateShow = true;
+            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            await MainWindow.View.ShowMessageAsync("Schedule Updated ", string.Format("Schedule \"{0}\" has been updated.", profile.Name), MessageDialogStyle.Affirmative, settings);
 
         }
 
-        public void DeleteCurrentProfile()
-        {
 
+        public async void DeleteCurrentProfile()
+        {
+            string profileName = this.SelectedProfile.Name;
+            AlarmProfileRepository.Delete(this.SelectedProfile);
+            
+            this.AlarmProfileCollection.Remove(this.AlarmProfileCollection.Where(profile => profile.Name == this.SelectedProfile.Name).First());
+            this.SelectedProfile = null;
+            this.RemoveAllAlarms();
+
+
+            MetroDialogSettings settings = new MetroDialogSettings();
+            settings.AffirmativeButtonText = "Ok";
+            settings.AnimateHide = true;
+            settings.AnimateShow = true;
+            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            await MainWindow.View.ShowMessageAsync("Schedule Deleted ", string.Format("Schedule \"{0}\" has been deleted.", profileName), MessageDialogStyle.Affirmative, settings);
+
+        }
+
+        public void RefreshScheduleView()
+        {
+            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).View.Refresh();
+        }
+
+        public void RemoveAllAlarms()
+        {
+            foreach(Model.AlarmItem alarmItem in this.AlarmItemCollection)
+            {
+                alarmItem.IsSet = false;
+            }
+            this.RefreshScheduleView();
         }
     }
 }

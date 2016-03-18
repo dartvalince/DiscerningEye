@@ -149,6 +149,9 @@
                         <TextBlock TextWrapping="WrapWithOverflow"
                                    Text="Adjust the settings for how to be notified that an alarm has triggered" 
                                    Margin="5,0,0,10"/>
+                        <CheckBox Content="Do Not Disturb Mode (No Notifications)"
+                                  Margin="5,5"
+                                  IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=DoNotDisturb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <CheckBox Content="Enable Taskbar Ballon Popups"
                                   Margin="5,5"
                                   IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableBallonTip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

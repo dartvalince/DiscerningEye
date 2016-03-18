@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("DiscerningEye")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
+[assembly: AssemblyCompany("DiscerningEye")]
 [assembly: AssemblyProduct("DiscerningEye")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2016")]
+[assembly: AssemblyCopyright("Copyright © Christopher Whitley 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

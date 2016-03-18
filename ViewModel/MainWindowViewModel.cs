@@ -42,27 +42,20 @@ namespace DiscerningEye.ViewModel
 
 
         ObservableCollection<ViewModelBase> _viewModels;
-        private bool _isSettingsOpen;
+        private bool _isGatheringDictionaryOpen;
 
 
         //================================================================
         //  Properties
         //================================================================
-        /// <summary>
-        /// Gets or sets boolean value representing if the Settings flyout is open
-        /// </summary>
-        /// <remarks>
-        /// This is bound to the IsOpen property of the settings flyout on MainWindow.xaml
-        /// </remarks>
-        public bool IsSettingsOpen
+        public bool IsGatheringDictionaryOpen
         {
-            get { return this._isSettingsOpen; }
+            get { return this._isGatheringDictionaryOpen; }
             set
             {
-                if (this._isSettingsOpen == value) return;
-                this._isSettingsOpen = value;
-                if (value == false) this.SettingsSaveCommand.Execute(null);
-                OnPropertyChanged("IsSettingsOpen");
+                if (this._isGatheringDictionaryOpen == value) return;
+                this._isGatheringDictionaryOpen = value;
+                OnPropertyChanged("IsGatheringDictionaryOpen");
             }
         }
 
@@ -120,7 +113,23 @@ namespace DiscerningEye.ViewModel
             private set;
         }
 
+        public ICommand MinimalNotificationCommand
+        {
+            get;
+            private set;
+        }
 
+        public ICommand AllNotificationsCommand
+        {
+            get;
+            private set;
+        }
+
+        public ICommand OpenGatheringDictionaryCommand
+        {
+            get;
+            private set;
+        }
 
 
 
@@ -136,9 +145,10 @@ namespace DiscerningEye.ViewModel
         public MainWindowViewModel()
         {
 
-            SettingsCommand = new OpenSettingsCommand(this);
-            SettingsSaveCommand = new SaveSettingsCommand(this);
-            GitHubCommand = new LaunchGithubPageCommand(this);
+            this.GitHubCommand = new LaunchGithubPageCommand(this);
+            this.MinimalNotificationCommand = new MinimalNotificationsCommand(this);
+            this.AllNotificationsCommand = new AllNotificationsCommand(this);
+            this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
             MainWindowViewModel.ViewModel = this;
         }
 
@@ -147,25 +157,32 @@ namespace DiscerningEye.ViewModel
         //  Functions
         //================================================================
 
-        /// <summary>
-        /// Opens the settings flyout on MainWindow.xaml
-        /// </summary>
-        public void OpenSettings()
+        public void OpenGatheringDictionary()
         {
-            IsSettingsOpen = true;
-        }
-
-        /// <summary>
-        /// Saves the applicaitons settings
-        /// </summary>
-        public void SaveSettings()
-        {
-            Properties.Settings.Default.Save();
+            this.IsGatheringDictionaryOpen = true;
         }
 
         public void LaunchGithubPage()
         {
             System.Diagnostics.Process.Start("https://github.com/dartvalince");
+        }
+
+        public void MinimalNotifications()
+        {
+            Properties.Settings.Default.EnableAlarms = true;
+            Properties.Settings.Default.EnableBallonTip = true;
+            Properties.Settings.Default.EnableEarlyWarning = true;
+            Properties.Settings.Default.EnableNotificationTone = false;
+            Properties.Settings.Default.EnableTextToSpeech = false;
+        }
+
+        public void AllNotifications()
+        {
+            Properties.Settings.Default.EnableAlarms = true;
+            Properties.Settings.Default.EnableBallonTip = true;
+            Properties.Settings.Default.EnableEarlyWarning = true;
+            Properties.Settings.Default.EnableNotificationTone = true;
+            Properties.Settings.Default.EnableTextToSpeech = true;
         }
 
 

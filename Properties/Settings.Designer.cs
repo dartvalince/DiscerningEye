@@ -322,5 +322,17 @@ namespace DiscerningEye.Properties {
                 this["GroupingPropertyList"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DoNotDisturb {
+            get {
+                return ((bool)(this["DoNotDisturb"]));
+            }
+            set {
+                this["DoNotDisturb"] = value;
+            }
+        }
     }
 }

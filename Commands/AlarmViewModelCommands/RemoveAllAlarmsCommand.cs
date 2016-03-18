@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    OpenSettingsCommand.cs
+    DoNotDisturbCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,19 +20,21 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using DiscerningEye.ViewModel;
+using MahApps.Metro;
 using System;
+using System.Windows;
 using System.Windows.Input;
 
-namespace DiscerningEye.Commands
+namespace DiscerningEye.Commands.AlarmViewModelCommands
 {
-    public class OpenSettingsCommand : ICommand
+    public class RemoveAllAlarmsCommand : ICommand
     {
-        private MainWindowViewModel _viewModel;
-            
-        public OpenSettingsCommand(MainWindowViewModel viewModel)
+
+        private ViewModel.AlarmsViewModel _viewModel;
+
+        public RemoveAllAlarmsCommand(ViewModel.AlarmsViewModel viewModel)
         {
-            _viewModel = viewModel; 
+            _viewModel = viewModel;
         }
 
         public event EventHandler CanExecuteChanged
@@ -48,7 +50,7 @@ namespace DiscerningEye.Commands
 
         public void Execute(object parameter)
         {
-            _viewModel.OpenSettings();
+            _viewModel.RemoveAllAlarms();
         }
     }
 }

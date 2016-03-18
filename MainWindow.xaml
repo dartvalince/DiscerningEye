@@ -52,8 +52,8 @@
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>
-            <Button Content="Settings"
-                    Command="{Binding SettingsCommand}"/>
+            <Button Content="Gathering Dictionary"
+                    Command="{Binding OpenGatheringDictionaryCommand}" />
         </Controls:WindowCommands>
 
     </Controls:MetroWindow.RightWindowCommands>
@@ -66,26 +66,40 @@
             <Controls:FlyoutsControl.LayoutTransform>
                 <ScaleTransform ScaleX="{Binding Source={StaticResource Settings}, Path=UIScale}" ScaleY="{Binding Source={StaticResource Settings}, Path=UIScale}" />
             </Controls:FlyoutsControl.LayoutTransform>
-            <Controls:Flyout IsOpen="{Binding IsSettingsOpen}"
+            <Controls:Flyout IsOpen="{Binding IsGatheringDictionaryOpen}"
                              Position="Right"
-                             Width="400">
-                <Views:SettingsView Margin="10,0,10,10" />
+                             Theme="Inverse"
+                             Width="600">
+                <Views:GatheringItemListView Margin="10,0,10,10" />
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
     <Grid Margin="4">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="400"/>
+        </Grid.ColumnDefinitions>
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}"  ScaleY="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}" />
         </Grid.LayoutTransform>
-
         <tb:TaskbarIcon x:Name="notificationIcon"
                     Visibility="Visible"
                     IconSource="pack://application:,,,/DiscerningEye;component/Resources/icon.ico"
-                    ToolTipText="Discerning Eye (Double click to open application)"
+                    ToolTipText="Discerning Eye"
                     MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Application Settings">
+                        <MenuItem Header="Enable Only Miniaml Notifications"
+                                  IsCheckable="False"
+                                  Command="{Binding MinimalNotificationCommand}"/>
+                        <MenuItem Header="Enable All Notifications"
+                                  IsCheckable="False"
+                                  Command="{Binding AllNotificationsCommand}"/>
+                        <Separator />
+                        <MenuItem Header="Do Not Disturb Mode"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=DoNotDisturb, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <MenuItem Header="Enable Alarms" 
                               IsCheckable="True"
                               IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableAlarms, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -108,22 +122,13 @@
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
+        <Views:AlarmsView x:Name="AlarmsView" Grid.Column="0"
+                          Margin="10,0,10,10"/>
+        <Views:SettingsView Grid.Column="1"
+                            Margin="10,0,10,10" />
 
-        <TabControl TabStripPlacement="Left" BorderThickness="2,0,0,0"
-                    Controls:TabControlHelper.Transition="Right">
-            <TabControl.BorderBrush>
-                <SolidColorBrush Color="{DynamicResource AccentColor}"/>
-            </TabControl.BorderBrush>
-            <TabItem Header="Dictionary">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto">
-                    <Views:GatheringItemListView Margin="10,0,10,10" />
-                </ScrollViewer>
-            </TabItem>
-            <TabItem Header="Alarms">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="auto">
-                    <Views:AlarmsView x:Name="AlarmsView" Margin="10,0,10,10" />
-                </ScrollViewer>
-            </TabItem>
-        </TabControl>
+
+
+
     </Grid>
 </Controls:MetroWindow>
