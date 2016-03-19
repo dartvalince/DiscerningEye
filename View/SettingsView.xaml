@@ -1,6 +1,6 @@
 ﻿<!-- ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     SettingsView.xaml
     
     Copyright(C) 2015 - 2016  Christopher Whitley    
@@ -188,6 +188,19 @@
                                     Grid.Column="2"
                                     Content="Browse" 
                                     Command="{Binding SelectFileCommand}"/>
+                            <StackPanel Grid.Row="2"
+                                        Grid.Column="0"
+                                        Orientation="Horizontal">
+                                <Controls:NumericUpDown Minimum="0"
+                                                    Maximum="100"
+                                                    Value="{Binding Source={x:Static prop:Settings.Default}, Path=NotificationToneVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    HideUpDownButtons="True"
+                                                    Margin="0,0"/>
+                                <TextBlock TextWrapping="WrapWithOverflow"
+                                           VerticalAlignment="Center"
+                                           Text="Notification Tone Volume"
+                                       Margin="5,0"/>
+                            </StackPanel>
                             <Button Grid.Row="2"
                                     Grid.Column="2"
                                     Content="{Binding TestButtonText}"
@@ -217,6 +230,19 @@
                         <TextBox Text="{Binding Source={x:Static prop:Settings.Default}, Path=ItemAvailableMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5,5"
                                  Controls:TextBoxHelper.Watermark="{}{item} is available to be gathered in {zone}"/>
+
+                        <StackPanel Margin="5,5"
+                                    Orientation="Horizontal">
+                            <Controls:NumericUpDown Minimum="0"
+                                                    Maximum="100"
+                                                    Value="{Binding Source={x:Static prop:Settings.Default}, Path=TextToSpeechVolume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    HideUpDownButtons="True"
+                                                    Margin="0,0"/>
+                            <TextBlock TextWrapping="WrapWithOverflow"
+                                           VerticalAlignment="Center"
+                                           Text="Text-To-Speech Volume"
+                                       Margin="5,0"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>

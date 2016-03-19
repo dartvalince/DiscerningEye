@@ -1,6 +1,6 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     AlarmsViewModel.cs
 
 
@@ -23,21 +23,16 @@
 
 using DiscerningEye.DataAccess;
 using DiscerningEye.View;
+using MahApps.Metro.Controls.Dialogs;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Text;
-using System.Windows;
-using System.Windows.Data;
-using System.Speech;
-using System.Speech.Synthesis;
-using NAudio;
-using NAudio.Wave;
 using System.IO;
-using MahApps.Metro.Controls.Dialogs;
-using System.Threading.Tasks;
 using System.Linq;
+using System.Speech.Synthesis;
+using System.Text;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace DiscerningEye.ViewModel
@@ -49,15 +44,15 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         private AlarmItemRepository _alarmItemRepository;
         private ObservableCollection<Model.AlarmItem> _alarmItemCollection;
-        private ObservableCollection<Model.AlarmProfile> _alarmProfileCollection;
-        private Model.AlarmProfile _selectedProfile;
+        private ObservableCollection<Model.AlarmSchedule> _alarmScheduleCollection;
+        private Model.AlarmSchedule _selectedSchedule;
         private string _searchText;
         private Utilities.ClockController _eorzeaClock;
         private System.Timers.Timer _updateTimer;
         private bool _isLoaded;
         private IWavePlayer _waveOutDevice;
         private AudioFileReader _audioFileReader;
-        private SpeechSynthesizer synth;
+        private SpeechSynthesizer _synth;
 
         //=========================================================
         //  Properties
@@ -84,31 +79,39 @@ namespace DiscerningEye.ViewModel
             }
         }
 
-        public ObservableCollection<Model.AlarmProfile> AlarmProfileCollection
+        /// <summary>
+        /// Gets or sets the observablecollection of Model.AlarmSchedul
+        /// </summary>
+        /// <remarks>
+        /// This is bound ot the ItemSource property of the combobox on the AlarmView
+        /// </remarks>
+        public ObservableCollection<Model.AlarmSchedule> AlarmScheduleCollection
         {
-            get { return this._alarmProfileCollection; }
+            get { return this._alarmScheduleCollection; }
             set
             {
-                if (this._alarmProfileCollection == value) return;
-                this._alarmProfileCollection = value;
-                OnPropertyChanged("AlarmProfileCollection");
+                if (this._alarmScheduleCollection == value) return;
+                this._alarmScheduleCollection = value;
+                OnPropertyChanged("AlarmScheduleCollection");
             }
         }
 
-        public Model.AlarmProfile SelectedProfile
+        /// <summary>
+        /// Gets or sets the current selected Model.AlarmSchedule
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the SelectedValue property of the combobox on the AlarmView
+        /// </remarks>
+        public Model.AlarmSchedule SelectedSchedule
         {
-            get { return this._selectedProfile; }
+            get { return this._selectedSchedule; }
             set
             {
-                if (this._selectedProfile == value) return;
-                this._selectedProfile = value;
-                OnPropertyChanged("SelectedProfile");
+                if (this._selectedSchedule == value) return;
+                this._selectedSchedule = value;
+                OnPropertyChanged("SelectedSchedule");
             }
         }
-
-
-
-
 
         /// <summary>
         /// Gets or sets the serach text
@@ -162,56 +165,85 @@ namespace DiscerningEye.ViewModel
             }
         }
 
-
-        public bool CanAdjustSelectedProfile
+        /// <summary>
+        /// Gets or Sets the Boolean value used to determine if a schedule can be adjusted
+        /// </summary>
+        /// <remarks>
+        /// This is used by the various ICommands for the CanExecute for the buttons on the AlarmView that deal
+        /// with schedule loading, creating, updating and deleting
+        /// </remarks>
+        public bool CanAdjustSelectedSchedule
         {
             get
             {
-                if (this.SelectedProfile == null) return false;
+                if (this.SelectedSchedule == null) return false;
                 else return true;
             }
         }
 
 
 
-        public ICommand CreateNewProfileCommand
+
+        //=========================================================
+        //  ICommands
+        //=========================================================
+        /// <summary>
+        /// Gets or sets the ICommand used to create a new schedule
+        /// </summary>
+        public ICommand CreateNewScheduleCommand
         {
             get;
             private set;
         }
 
-        public ICommand LoadProfileCommand
+        /// <summary>
+        /// Gets or sets the Icommand used to load the selected schedule
+        /// </summary>
+        public ICommand LoadScheduleCommand
         {
             get;
             private set;
         }
 
-        public ICommand UpdateProfileCommand
+        /// <summary>
+        /// Gets or sets the ICommand used to update the selected schedule
+        /// </summary>
+        public ICommand UpdateScheduleCommand
         {
             get;
             private set;
         }
 
-
+        /// <summary>
+        /// Gets or sets the ICommand used to search the alarms
+        /// </summary>
         public ICommand SearchAlarmsCommand
         {
             get;
             private set;
         }
 
-        public ICommand DeleteCurrentProfileCommand
+        /// <summary>
+        /// Gets or sets the ICommand used to delete the current selected schedule
+        /// </summary>
+        public ICommand DeleteCurrentScheduleCommand
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets the ICommand to use to refresh the scheduled alarms view
+        /// </summary>
         public ICommand RefreshSchedulViewCommand
         {
             get;
             private set;
         }
 
-
+        /// <summary>
+        /// Gets or sets the ICommand used to remove all alarms from the schedule alarms view
+        /// </summary>
         public ICommand RemoveAllAlarmsCommand
         {
             get;
@@ -227,11 +259,11 @@ namespace DiscerningEye.ViewModel
         public AlarmsViewModel()
         {
             AlarmsView.View.Loaded += View_Loaded;
-            this.CreateNewProfileCommand = new Commands.AlarmViewModelCommands.CreateAlarmProfileComand(this);
-            this.LoadProfileCommand = new Commands.AlarmViewModelCommands.LoadAlarmProfileCommand(this);
-            this.UpdateProfileCommand = new Commands.AlarmViewModelCommands.UpdateAlarmProfileCommand(this);
+            this.CreateNewScheduleCommand = new Commands.AlarmViewModelCommands.CreateAlarmScheduleComand(this);
+            this.LoadScheduleCommand = new Commands.AlarmViewModelCommands.LoadAlarmScheduleCommand(this);
+            this.UpdateScheduleCommand = new Commands.AlarmViewModelCommands.UpdateAlarmScheduleCommand(this);
             this.SearchAlarmsCommand = new Commands.AlarmViewModelCommands.SearchAlarmsCommand(this);
-            this.DeleteCurrentProfileCommand = new Commands.AlarmViewModelCommands.DeleteAlarmProfileCommand(this);
+            this.DeleteCurrentScheduleCommand = new Commands.AlarmViewModelCommands.DeleteAlarmScheduleCommand(this);
             this.RefreshSchedulViewCommand = new Commands.AlarmViewModelCommands.RefreshScheduleViewCommand(this);
             this.RemoveAllAlarmsCommand = new Commands.AlarmViewModelCommands.RemoveAllAlarmsCommand(this);
             this._isLoaded = false;
@@ -255,20 +287,16 @@ namespace DiscerningEye.ViewModel
             
             //  Initilize the AlarmItemCollection
             this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
-
-
-            //  Initilize the Alarm Profiles
-            this.AlarmProfileCollection = new ObservableCollection<Model.AlarmProfile>((new AlarmProfileRepository()).GetAlarmProfiles());
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmsViewModel_Filter;
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmViewSource_Filter;
             ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter += SetAlarmsViewSource_Filter;
 
 
+            //  Initilize the Alarm Schedules Collection
+            this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
 
 
-
-
-
-
+            //  Initilize the Eorzea Clock
+            this.EorzeaClock = new Utilities.ClockController();
 
             // Initilize the update timer
             this.UpdateTimer = new System.Timers.Timer();
@@ -277,15 +305,26 @@ namespace DiscerningEye.ViewModel
             this.UpdateTimer.Elapsed += UpdateTimer_Elapsed;
             this.UpdateTimer.Start();
 
-            _waveOutDevice = new WaveOut();
-            _waveOutDevice.PlaybackStopped += _waveOutDevice_PlaybackStopped;
-            this.EorzeaClock = new Utilities.ClockController();
-            synth = new SpeechSynthesizer();
 
+            //  Initilize the sound player
+            _waveOutDevice = new WaveOut();
+            
+            //  Initilize the text-to-speech object
+            _synth = new SpeechSynthesizer();
 
             this._isLoaded = true;
         }
-        private void AlarmsViewModel_Filter(object sender, FilterEventArgs e)
+
+
+        //=========================================================
+        //  Events
+        //=========================================================
+        /// <summary>
+        /// Filter event used for the AlarmViewSource
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AlarmViewSource_Filter(object sender, FilterEventArgs e)
         {
             Model.AlarmItem i = e.Item as Model.AlarmItem;
             if (i != null)
@@ -295,6 +334,11 @@ namespace DiscerningEye.ViewModel
             }
         }
 
+        /// <summary>
+        /// Filter event used for the SetAlarmsViewSource
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SetAlarmsViewSource_Filter(object sender, FilterEventArgs e)
         {
             Model.AlarmItem i = e.Item as Model.AlarmItem;
@@ -305,14 +349,6 @@ namespace DiscerningEye.ViewModel
             }
         }
 
-
-
-
-
-
-        //=========================================================
-        //  Events
-        //=========================================================
         /// <summary>
         /// AlarmInfo struct used to temporaraly hold data about an alarm item
         /// during the UpdateTimer_Elapsed event
@@ -329,6 +365,11 @@ namespace DiscerningEye.ViewModel
             public bool EarlyWarningIssued;
         }
 
+        /// <summary>
+        /// Elapsed event for the update timer. Main logic of view model occurs here
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void UpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             
@@ -406,12 +447,6 @@ namespace DiscerningEye.ViewModel
                     long earthTicks = nextEorzeaSpawn.Ticks / (long)Utilities.ClockController.EORZEA_MULTIPLIER;
                     alarmInfo.NextSpawn = new TimeSpan(earthTicks);
 
-                    //  Check if the NexSpawn time is 0h 0m and 0s.  If so, and fullZeroExists is false
-                    //  set fullZeroExists to true
-                    //if (alarmInfo.NextSpawn == new TimeSpan(0, 0, 0) && fullZeroExists == false)
-                    //{
-                    //    fullZeroExists = true;
-                    //}
                 }
                 
                 #endregion CalculateTimeTillSpawn
@@ -485,20 +520,10 @@ namespace DiscerningEye.ViewModel
 
                 }
 
-
-
-
-
-
                 //  Push the alarmInfo back into the alarmItem
                 alarmItem.Armed = alarmInfo.Armed;
                 alarmItem.EarlyWarningIssued = alarmInfo.EarlyWarningIssued;
                 alarmItem.NextSpawn = alarmInfo.NextSpawn;
-
-
-
-
-
             }
 
 
@@ -529,8 +554,11 @@ namespace DiscerningEye.ViewModel
 
                 if (Properties.Settings.Default.EnableTextToSpeech)
                 {
-                    if (synth.State == SynthesizerState.Ready)
-                        synth.SpeakAsync(notificationMessage.ToString());
+                    if (_synth.State == SynthesizerState.Ready)
+                    {
+                        _synth.Volume = Properties.Settings.Default.TextToSpeechVolume;
+                        _synth.SpeakAsync(notificationMessage.ToString());
+                    }
                 }
 
                 if(Properties.Settings.Default.EnableNotificationTone && File.Exists(Properties.Settings.Default.NotificationToneUri))
@@ -539,20 +567,14 @@ namespace DiscerningEye.ViewModel
                     {
 
                         _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
+                        _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
                         _waveOutDevice.Init(_audioFileReader);
                         _waveOutDevice.Play();
                     }
-                }
-                    
-                    
+                }     
             }
 
             this.UpdateTimer.Start();
-        }
-
-        private void _waveOutDevice_PlaybackStopped(object sender, StoppedEventArgs e)
-        {
-
         }
 
 
@@ -564,15 +586,23 @@ namespace DiscerningEye.ViewModel
         protected override void OnDispose()
         {
             this.AlarmItemCollection.Clear();
-            if (this.synth != null)
+            this.AlarmScheduleCollection.Clear();
+
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter -= AlarmViewSource_Filter;
+            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter -= SetAlarmsViewSource_Filter;
+
+            this.UpdateTimer.Stop();
+            this.UpdateTimer.Elapsed -= UpdateTimer_Elapsed;
+            this.UpdateTimer.Dispose();
+
+            if (this._synth != null)
             {
-                this.synth.SpeakAsyncCancelAll();
-                this.synth = null;
+                this._synth.SpeakAsyncCancelAll();
+                this._synth = null;
             }
 
             if (_waveOutDevice != null)
             {
-                _waveOutDevice.PlaybackStopped -= _waveOutDevice_PlaybackStopped;
                 _waveOutDevice.Stop();
             }
             if (_audioFileReader != null)
@@ -594,23 +624,29 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         //  Methods
         //=========================================================
+        /// <summary>
+        /// Refreshes the AlarmsViewSource which updates the filter
+        /// </summary>
         public void SearchAlarms()
         {
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter -= AlarmsViewModel_Filter;
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmsViewModel_Filter;
+            if (!this._isLoaded) return;
+            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).View.Refresh();
         }
 
-        public async void LoadProfile()
+        /// <summary>
+        /// Loads the Selecte Schedule
+        /// </summary>
+        public async void LoadSchedule()
         {
-            foreach(Model.AlarmItem profileAlarm in this.SelectedProfile.Alarms)
+            foreach(Model.AlarmItem scheduleAlarm in this.SelectedSchedule.Alarms)
             {
                 foreach(Model.AlarmItem collectionAlarm in this.AlarmItemCollection)
                 {
-                    if (profileAlarm.Name == collectionAlarm.Name && profileAlarm.StartTime == collectionAlarm.StartTime)
+                    if (scheduleAlarm.Name == collectionAlarm.Name && scheduleAlarm.StartTime == collectionAlarm.StartTime)
                     {
                         collectionAlarm.EarlyWarningIssued = false;
                         collectionAlarm.Armed = true;
-                        collectionAlarm.IsSet = profileAlarm.IsSet;
+                        collectionAlarm.IsSet = scheduleAlarm.IsSet;
                     }
                 }
             }
@@ -623,47 +659,47 @@ namespace DiscerningEye.ViewModel
             settings.AnimateHide = true;
             settings.AnimateShow = true;
             settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Loaded ", string.Format("Schedule \"{0}\" has been loaded.", this.SelectedProfile.Name), MessageDialogStyle.Affirmative, settings);
+            await MainWindow.View.ShowMessageAsync("Schedule Loaded ", string.Format("Schedule \"{0}\" has been loaded.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
         }
 
-        public async void CreateNewProfile()
+        /// <summary>
+        /// Creates a new schedule based on the current selected alarms
+        /// </summary>
+        public async void CreateNewSchedule()
         {
-            //  Ensure a profile with the same name doens't already exist
-            
-            
             MetroDialogSettings settings = new MetroDialogSettings();
             settings.AffirmativeButtonText = "Create";
             settings.AnimateHide = true;
             settings.AnimateShow = true;
             settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
             settings.NegativeButtonText = "Cancel";
-            string profileName = await MainWindow.View.ShowInputAsync("Create New Schedule", "Enter the name you would like to use for the new schedule", settings);
+            string scheduleName = await MainWindow.View.ShowInputAsync("Create New Schedule", "Enter the name you would like to use for the new schedule", settings);
 
-            var list = this.AlarmProfileCollection.Where(ap => ap.Name == profileName);
+            var list = this.AlarmScheduleCollection.Where(ap => ap.Name == scheduleName);
 
             if (list.Count() > 0)
             {
                 settings.AffirmativeButtonText = "Ok";
-                await MainWindow.View.ShowMessageAsync("Create Schedule Error", "Cannot create a profile with the same name as an existing one", MessageDialogStyle.Affirmative, settings);
+                await MainWindow.View.ShowMessageAsync("Create Schedule Error", "Cannot create a sachedule with the same name as an existing one", MessageDialogStyle.Affirmative, settings);
 
             }
             else
             {
 
-                if (profileName == null) return;
-                Model.AlarmProfile profile = new Model.AlarmProfile(this.AlarmItemCollection.ToList());
+                if (scheduleName == null) return;
+                Model.AlarmSchedule schedule = new Model.AlarmSchedule(this.AlarmItemCollection.ToList());
 
-                if (profileName.Length > 0)
+                if (scheduleName.Length > 0)
                 {
-                    profile.Name = profileName;
-                    AlarmProfileRepository.Save(profile);
+                    schedule.Name = scheduleName;
+                    AlarmScheduleRepository.Save(schedule);
                 }
 
-                this.AlarmProfileCollection.Add(profile);
+                this.AlarmScheduleCollection.Add(schedule);
                 settings.AffirmativeButtonText = "Ok";
-                await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Profile has been created and saved for {0}", profileName), MessageDialogStyle.Affirmative, settings);
-                this.AlarmProfileCollection = new ObservableCollection<Model.AlarmProfile>((new AlarmProfileRepository()).GetAlarmProfiles());
-                this.SelectedProfile = this.AlarmProfileCollection.Where(p => p.Name == profile.Name).First();
+                await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Schedule has been created and saved for {0}", scheduleName), MessageDialogStyle.Affirmative, settings);
+                this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+                this.SelectedSchedule = this.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
             }
 
             
@@ -671,41 +707,71 @@ namespace DiscerningEye.ViewModel
 
         }
 
-        public async void UpdateCurrentProfile()
+
+
+        /// <summary>
+        /// Creates a new schedule based on an existing schedule
+        /// </summary>
+        public void CreateNewSchedule(Model.AlarmSchedule schedule)
         {
-            if (this.SelectedProfile == null) return;
+            var list = this.AlarmScheduleCollection.Where(ap => ap.Name == schedule.Name);
+
+            if (list.Count() > 0)
+            {
+                return;
+            }
+            else
+            {
+
+                if (schedule.Name == null) return;
+
+                if (schedule.Name.Length > 0)
+                {
+                    AlarmScheduleRepository.Save(schedule);
+                }
+
+                this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+                this.SelectedSchedule = this.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
+            }
 
 
 
 
+        }
 
-            string profilename = this.SelectedProfile.Name;
-            Model.AlarmProfile profile = new Model.AlarmProfile(this.AlarmItemCollection.ToList());
-            profile.Name = profilename;
+        /// <summary>
+        /// Updates the current selected schedule with the current selected alarms
+        /// </summary>
+        public async void UpdateCurrentSchedule()
+        {
+            if (this.SelectedSchedule == null) return;
 
-            this.AlarmProfileCollection.Remove(this.AlarmProfileCollection.Where(p => p.Name == this.SelectedProfile.Name).First());
-            this.AlarmProfileCollection.Add(profile);
-            this.SelectedProfile = null;
-            this.SelectedProfile = profile;
-            AlarmProfileRepository.Save(this.SelectedProfile);
+            string scheduleName = this.SelectedSchedule.Name;
+            this.AlarmScheduleCollection.Where(p => p.Name == this.SelectedSchedule.Name).First().Alarms = new List<Model.AlarmItem>(this.AlarmItemCollection.ToList());
+            AlarmScheduleRepository.Save(this.SelectedSchedule);
+            this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+            this.SelectedSchedule = this.AlarmScheduleCollection.Where(s => s.Name == scheduleName).First();
 
             MetroDialogSettings settings = new MetroDialogSettings();
             settings.AffirmativeButtonText = "Ok";
             settings.AnimateHide = true;
             settings.AnimateShow = true;
             settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Updated ", string.Format("Schedule \"{0}\" has been updated.", profile.Name), MessageDialogStyle.Affirmative, settings);
+            await MainWindow.View.ShowMessageAsync("Schedule Updated ", string.Format("Schedule \"{0}\" has been updated.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
 
         }
 
 
-        public async void DeleteCurrentProfile()
+        /// <summary>
+        /// Deletes the current selected schedule
+        /// </summary>
+        public async void DeleteCurrentSchedule()
         {
-            string profileName = this.SelectedProfile.Name;
-            AlarmProfileRepository.Delete(this.SelectedProfile);
+            string scheduleName = this.SelectedSchedule.Name;
+            AlarmScheduleRepository.Delete(this.SelectedSchedule);
             
-            this.AlarmProfileCollection.Remove(this.AlarmProfileCollection.Where(profile => profile.Name == this.SelectedProfile.Name).First());
-            this.SelectedProfile = null;
+            this.AlarmScheduleCollection.Remove(this.AlarmScheduleCollection.Where(schedule => schedule.Name == this.SelectedSchedule.Name).First());
+            this.SelectedSchedule = null;
             this.RemoveAllAlarms();
 
 
@@ -714,15 +780,22 @@ namespace DiscerningEye.ViewModel
             settings.AnimateHide = true;
             settings.AnimateShow = true;
             settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Deleted ", string.Format("Schedule \"{0}\" has been deleted.", profileName), MessageDialogStyle.Affirmative, settings);
+            await MainWindow.View.ShowMessageAsync("Schedule Deleted ", string.Format("Schedule \"{0}\" has been deleted.", scheduleName), MessageDialogStyle.Affirmative, settings);
 
         }
 
+        /// <summary>
+        /// Refreshes the SetAlarmsViewSource View
+        /// </summary>
         public void RefreshScheduleView()
         {
             ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).View.Refresh();
         }
 
+
+        /// <summary>
+        /// Sets all alarms IsSet property to false
+        /// </summary>
         public void RemoveAllAlarms()
         {
             foreach(Model.AlarmItem alarmItem in this.AlarmItemCollection)

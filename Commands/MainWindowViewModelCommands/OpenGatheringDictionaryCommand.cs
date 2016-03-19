@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    OpenSettingsCommand.cs
+    DiscerningEye - FFXIV Gathering Companion App
+    OpenGatheringDictionaryCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    ChangeThemeCommand.cs
+    DiscerningEye - FFXIV Gathering Companion App
+    LoadAlarmScheduleCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,20 +20,17 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using MahApps.Metro;
-using Microsoft.Win32;
 using System;
-using System.Windows;
 using System.Windows.Input;
 
-namespace DiscerningEye.Commands
+namespace DiscerningEye.Commands.AlarmViewModelCommands
 {
-    public class SelectNotificationFileCommand : ICommand
+    public class LoadAlarmScheduleCommand : ICommand
     {
 
-        private ViewModel.SettingsViewModel _viewModel;
+        private ViewModel.AlarmsViewModel _viewModel;
 
-        public SelectNotificationFileCommand(ViewModel.SettingsViewModel viewModel)
+        public LoadAlarmScheduleCommand(ViewModel.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }
@@ -46,17 +43,12 @@ namespace DiscerningEye.Commands
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return _viewModel.CanAdjustSelectedSchedule;
         }
 
         public void Execute(object parameter)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "MP3 (*.mp3)|*.mp3";
-            if((bool)ofd.ShowDialog())
-            {
-                Properties.Settings.Default.NotificationToneUri = ofd.FileName;
-            }
+            _viewModel.LoadSchedule(); ;
         }
     }
 }

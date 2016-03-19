@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    DoNotDisturbCommand.cs
+    DiscerningEye - FFXIV Gathering Companion App
+    SearchAlarmsCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,9 +20,7 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using MahApps.Metro;
 using System;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DiscerningEye.Commands.AlarmViewModelCommands

@@ -1,6 +1,6 @@
 ﻿<!-- ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     AlarmsView.xaml
     
     Copyright(C) 2015 - 2016  Christopher Whitley    
@@ -26,7 +26,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              xmlns:p="clr-namespace:DiscerningEye.Properties"
              xmlns:local="clr-namespace:DiscerningEye.View"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -47,7 +46,6 @@
             </CollectionViewSource.GroupDescriptions>
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="Job" Direction="Ascending" />
-                <!--<scm:SortDescription PropertyName="NextSpawn" Direction="Ascending" />-->
                 <scm:SortDescription PropertyName="Name" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
@@ -106,34 +104,34 @@
                 <ComboBox Grid.Row="1"
                           Grid.Column="0"
                           Grid.ColumnSpan="4"
-                          ItemsSource="{Binding AlarmProfileCollection}"
-                          SelectedValue="{Binding SelectedProfile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ItemsSource="{Binding AlarmScheduleCollection}"
+                          SelectedValue="{Binding SelectedSchedule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           DisplayMemberPath="Name"
                           />
 
                 <Button Grid.Row="3"
                         Grid.Column="0"
                         Content="Load Selected Schedule" 
-                        Command="{Binding LoadProfileCommand}"/>
+                        Command="{Binding LoadScheduleCommand}"/>
                 <Button Grid.Row="3"
                         Grid.Column="1"
                         Margin="0,0,5,0" 
                         Content="Save Schedule" 
-                        Command="{Binding CreateNewProfileCommand}"/>
+                        Command="{Binding CreateNewScheduleCommand}"/>
 
                 <Button Grid.Row="3"
                         Grid.Column="2"
                         Margin="0,0,5,0" 
                         Content="Update Schedule"
-                        Command="{Binding UpdateProfileCommand}"/>
+                        Command="{Binding UpdateScheduleCommand}"/>
 
                 <Button Grid.Row="3"
                         Grid.Column="3" 
                         Content="Delete Schedule" 
-                        Command="{Binding DeleteCurrentProfileCommand}"/>
+                        Command="{Binding DeleteCurrentScheduleCommand}"/>
             </Grid>
         </GroupBox>
-        
+
         <GroupBox Grid.Row="0"
                   Grid.Column="0"
                   Header="Search Alarms">
@@ -166,7 +164,7 @@
                         Command="{Binding SearchAlarmsCommand}" />
             </Grid>
         </GroupBox>
-                         
+
         <GroupBox Grid.Row="2"
                   Grid.Column="0"
                       Header="Alarms"
@@ -180,7 +178,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                    <DataGrid Grid.Row="0"
+                <DataGrid Grid.Row="0"
                           Grid.Column="0"
                           ItemsSource="{Binding Source={StaticResource AlarmViewSource}}"
                           AutoGenerateColumns="False"
@@ -194,87 +192,87 @@
                           CanUserSortColumns="True"
                           SelectionMode="Single"
                           GridLinesVisibility="All">
-                        <DataGrid.GroupStyle>
-                            <GroupStyle>
-                                <GroupStyle.ContainerStyle>
-                                    <Style TargetType="{x:Type GroupItem}">
-                                        <Setter Property="Margin" Value="0,0,0,5" />
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                    <Expander IsExpanded="True">
-                                                        <Expander.Header>
-                                                            <DockPanel>
-                                                                <TextBlock Text="{Binding Path=Name}" />
-                                                            </DockPanel>
-                                                        </Expander.Header>
-                                                        <Expander.Content>
-                                                            <ItemsPresenter />
-                                                        </Expander.Content>
-                                                    </Expander>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </GroupStyle.ContainerStyle>
-                            </GroupStyle>
-                        </DataGrid.GroupStyle>
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header=""
+                    <DataGrid.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header=""
                                                 Width="auto"
                                                 SortMemberPath="IsSet">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                               HorizontalAlignment="Center" 
                                               BorderBrush="Black"
                                               Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                                <DataGridTemplateColumn.CellEditingTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                               HorizontalAlignment="Center" 
                                               BorderBrush="Black" 
                                               Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellEditingTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Name"
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Name"
                                             Binding="{Binding Name}" 
                                             SortMemberPath="Name"
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
 
-                            <DataGridTextColumn Header="Start"
+                        <DataGridTextColumn Header="Start"
                                             Binding="{Binding StartTime}" 
                                             SortMemberPath="StartTime"
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
-                            <DataGridTextColumn Header="End"
+                        <DataGridTextColumn Header="End"
                                             SortMemberPath="EndTime"
                                             Binding="{Binding EndTime}" 
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
-                            <DataGridTextColumn Header="Region"
+                        <DataGridTextColumn Header="Region"
                                             SortMemberPath="Region"
                                             Binding="{Binding Region}" 
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
-                            <DataGridTextColumn Header="Zone"
+                        <DataGridTextColumn Header="Zone"
                                             SortMemberPath="Zone"
                                             Binding="{Binding Zone}" 
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
-                            <DataGridTextColumn Header="Slot"
+                        <DataGridTextColumn Header="Slot"
                                             SortMemberPath="Zone"
                                             Binding="{Binding Slot}" 
                                             TextBlock.TextAlignment="Center"
                                             Width="auto"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    </DataGrid.Columns>
+                </DataGrid>
 
-                
+
             </Grid>
         </GroupBox>
 
@@ -393,16 +391,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <!--<DataGridTextColumn Header="Start"
-                                            Binding="{Binding StartTime}" 
-                                            SortMemberPath="StartTime"
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="End"
-                                            SortMemberPath="EndTime"
-                                            Binding="{Binding EndTime}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>-->
                         <DataGridTextColumn Header="Region"
                                             SortMemberPath="Region"
                                             Binding="{Binding Region}" 
@@ -427,16 +415,4 @@
 
 
     </Grid>
-       
-
-
-    <!-- Alarms List -->
-
-
-
-        <!-- TO DO:
-             Figure out method of filtering across both datagrids from single 
-            search box. Until then, this section is commented out :( -->
-        <!-- Alarms Search -->
-
 </UserControl>

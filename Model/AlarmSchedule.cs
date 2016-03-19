@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    Type.cs
+    AlarmSchedule.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,20 +20,49 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DiscerningEye.Model.XIVDBSharp
+namespace DiscerningEye.Model
 {
-    [DataContract]
-    public class Type
+    public class AlarmSchedule
     {
-        [DataMember(EmitDefaultValue = true)]
-        public string id { get; set; }
 
+        /// <summary>
+        /// Gets or set the name of the alarm schedule
+        /// </summary>
         [DataMember(EmitDefaultValue = true)]
-        public string name { get; set; }
+        public string Name { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the List of AlarmItems
+        /// </summary>
         [DataMember(EmitDefaultValue = true)]
-        public string patch { get; set; }
+        public List<AlarmItem> Alarms { get; set; }
+
+        /// <summary>
+        /// Gets or sets the file path string of the saved schedule
+        /// </summary>
+        [DataMember(EmitDefaultValue = true)]
+        public string Path { get; set; }
+
+        public AlarmSchedule()
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a new instance of AlarmSchedule
+        /// </summary>
+        /// <param name="alarms"></param>
+        public AlarmSchedule(List<Model.AlarmItem> alarms)
+        {
+            this.Alarms = alarms;
+        }
+
+       
+
     }
 }

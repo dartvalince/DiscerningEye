@@ -1,6 +1,6 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     MainWindowViewModel.cs
 
 
@@ -21,9 +21,6 @@
   =================================================================== */
 
 
-using DiscerningEye.Commands;
-using DiscerningEye.DataAccess;
-using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -35,12 +32,7 @@ namespace DiscerningEye.ViewModel
         //================================================================
         //  Fields
         //================================================================
-        //readonly GatheringItemRepository _gatheringItemRepository;
-        public static MainWindowViewModel ViewModel;
-
-
-
-
+        //public static MainWindowViewModel ViewModel;
         ObservableCollection<ViewModelBase> _viewModels;
         private bool _isGatheringDictionaryOpen;
 
@@ -145,11 +137,11 @@ namespace DiscerningEye.ViewModel
         public MainWindowViewModel()
         {
 
-            this.GitHubCommand = new LaunchGithubPageCommand(this);
-            this.MinimalNotificationCommand = new MinimalNotificationsCommand(this);
-            this.AllNotificationsCommand = new AllNotificationsCommand(this);
+            this.GitHubCommand = new Commands.LaunchGithubPageCommand(this);
+            this.MinimalNotificationCommand = new Commands.TaskBarCommands.MinimalNotificationsCommand(this);
+            this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
             this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
-            MainWindowViewModel.ViewModel = this;
+            //MainWindowViewModel.ViewModel = this;
         }
 
 

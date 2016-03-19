@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    ChangeThemeCommand.cs
+    DiscerningEye - FFXIV Gathering Companion App
+    SelectNotificationFileCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,19 +20,18 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using MahApps.Metro;
+using Microsoft.Win32;
 using System;
-using System.Windows;
 using System.Windows.Input;
 
-namespace DiscerningEye.Commands
+namespace DiscerningEye.Commands.SettingsViewModelCommands
 {
-    public class ChangeThemeCommand : ICommand
+    public class SelectNotificationFileCommand : ICommand
     {
 
         private ViewModel.SettingsViewModel _viewModel;
 
-        public ChangeThemeCommand(ViewModel.SettingsViewModel viewModel)
+        public SelectNotificationFileCommand(ViewModel.SettingsViewModel viewModel)
         {
             _viewModel = viewModel;
         }
@@ -50,11 +49,12 @@ namespace DiscerningEye.Commands
 
         public void Execute(object parameter)
         {
-            var theme = ThemeManager.DetectAppStyle(Application.Current);
-
-            ThemeManager.ChangeAppStyle(Application.Current,
-                ThemeManager.GetAccent((string)Properties.Settings.Default["UIAccent"]),
-                ThemeManager.GetAppTheme((string)Properties.Settings.Default["UIAppTheme"]));
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "MP3 (*.mp3)|*.mp3";
+            if((bool)ofd.ShowDialog())
+            {
+                Properties.Settings.Default.NotificationToneUri = ofd.FileName;
+            }
         }
     }
 }

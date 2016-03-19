@@ -1,6 +1,6 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     SettingsViewModel.cs
 
 
@@ -22,12 +22,10 @@
 
 
 
-using DiscerningEye.Commands;
 using DiscerningEye.Model;
-using System.Diagnostics;
-using System.Windows.Input;
-using NAudio;
+using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
+using System.Windows.Input;
 
 namespace DiscerningEye.ViewModel
 {
@@ -36,9 +34,7 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         //  Private Fields
         //=========================================================
-        private SettingModel _settingsModel;
         private string _testButtonText;
-
         private string _uiAccentSelectedValue;
         private string _uiAppThemeSelectedValue;
         private IWavePlayer _waveOutDevice;
@@ -49,23 +45,6 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         //  Properties
         //=========================================================
-        /// <summary>
-        /// Gets the Settings instance
-        /// </summary>
-        public SettingModel SettingsModel
-        {
-            get { return _settingsModel; }
-            set
-            {
-                if (this._settingsModel == value)
-                    return;
-                this._settingsModel = value;
-                OnPropertyChanged("SettingsModel");
-
-
-            }
-        }
-        
         /// <summary>
         /// Gets or sets the selected UI Accent Value
         /// </summary>
@@ -136,12 +115,11 @@ namespace DiscerningEye.ViewModel
         /// </summary>
         public SettingsViewModel()
         {
-            _settingsModel = new SettingModel();
             this.TestButtonText = "Test Sound";
             this.UIAccentSelectedValue = Properties.Settings.Default.UIAccent;
             this.UIAppThemeSelectedValue = Properties.Settings.Default.UIAppTheme;
-            this.SelectFileCommand = new SelectNotificationFileCommand(this);
-            this.TestNotificationCommand = new TestNotificationSoundCommand(this);
+            this.SelectFileCommand = new Commands.SettingsViewModelCommands.SelectNotificationFileCommand(this);
+            this.TestNotificationCommand = new Commands.SettingsViewModelCommands.TestNotificationSoundCommand(this);
             _waveOutDevice = new WaveOut();
             _waveOutDevice.PlaybackStopped += _waveOutDevice_PlaybackStopped;
         }
@@ -172,12 +150,12 @@ namespace DiscerningEye.ViewModel
 
         protected override void OnDispose()
         {
-            
+
             if (_waveOutDevice != null)
             {
                 _waveOutDevice.PlaybackStopped -= _waveOutDevice_PlaybackStopped;
                 _waveOutDevice.Stop();
-                
+
             }
             if (_audioFileReader != null)
             {
@@ -191,7 +169,6 @@ namespace DiscerningEye.ViewModel
             }
 
 
-            _settingsModel = null;
             this.UIAccentSelectedValue = null;
             this.UIAppThemeSelectedValue = null;
             this.SelectFileCommand = null;
@@ -205,12 +182,24 @@ namespace DiscerningEye.ViewModel
         //=========================================================
         //  Methods
         //=========================================================
-        public void TestNotificationSound()
+        public async void TestNotificationSound()
         {
+            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
+            {
+                MetroDialogSettings settings = new MetroDialogSettings();
+                settings.AffirmativeButtonText = "Ok";
+                settings.AnimateHide = true;
+                settings.AnimateShow = true;
+                settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                await MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
+                return;
+            }
+            
             if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
             {
 
                 _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
+                _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
                 _waveOutDevice.Init(_audioFileReader);
                 _waveOutDevice.Play();
                 this.TestButtonText = "Cancel Test";

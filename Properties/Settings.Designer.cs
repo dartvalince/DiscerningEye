@@ -334,5 +334,29 @@ namespace DiscerningEye.Properties {
                 this["DoNotDisturb"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int NotificationToneVolume {
+            get {
+                return ((int)(this["NotificationToneVolume"]));
+            }
+            set {
+                this["NotificationToneVolume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int TextToSpeechVolume {
+            get {
+                return ((int)(this["TextToSpeechVolume"]));
+            }
+            set {
+                this["TextToSpeechVolume"] = value;
+            }
+        }
     }
 }

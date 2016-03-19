@@ -1,6 +1,6 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
+    DiscerningEye - FFXIV Gathering Companion App
     GatheringItemViewModel.cs
 
 
@@ -21,15 +21,11 @@
   =================================================================== */
 
 
-using DiscerningEye.Commands;
 using DiscerningEye.DataAccess;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace DiscerningEye.ViewModel
 {

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
-    DiscerningEye - FFXIV Gathering Dictionary and Alarm
-    DoNotDisturbCommand.cs
+    DiscerningEye - FFXIV Gathering Companion App
+    TestNotificationSoundCommand.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,19 +20,17 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using MahApps.Metro;
 using System;
-using System.Windows;
 using System.Windows.Input;
 
-namespace DiscerningEye.Commands.AlarmViewModelCommands
+namespace DiscerningEye.Commands.SettingsViewModelCommands
 {
-    public class LoadAlarmProfileCommand : ICommand
+    public class TestNotificationSoundCommand : ICommand
     {
 
-        private ViewModel.AlarmsViewModel _viewModel;
+        private ViewModel.SettingsViewModel _viewModel;
 
-        public LoadAlarmProfileCommand(ViewModel.AlarmsViewModel viewModel)
+        public TestNotificationSoundCommand(ViewModel.SettingsViewModel viewModel)
         {
             _viewModel = viewModel;
         }
@@ -45,12 +43,12 @@ namespace DiscerningEye.Commands.AlarmViewModelCommands
 
         public bool CanExecute(object parameter)
         {
-            return _viewModel.CanAdjustSelectedProfile;
+            return true;
         }
 
         public void Execute(object parameter)
         {
-            _viewModel.LoadProfile(); ;
+            _viewModel.TestNotificationSound();
         }
     }
 }
