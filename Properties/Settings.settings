@@ -127,5 +127,8 @@
     <Setting Name="TextToSpeechVolume" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
+    <Setting Name="ReleasesUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://github.com/Dartvalince/DiscerningEye</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

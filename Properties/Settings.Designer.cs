@@ -358,5 +358,17 @@ namespace DiscerningEye.Properties {
                 this["TextToSpeechVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://github.com/Dartvalince/DiscerningEye")]
+        public string ReleasesUrl {
+            get {
+                return ((string)(this["ReleasesUrl"]));
+            }
+            set {
+                this["ReleasesUrl"] = value;
+            }
+        }
     }
 }

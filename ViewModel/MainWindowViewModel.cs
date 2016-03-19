@@ -21,6 +21,7 @@
   =================================================================== */
 
 
+
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
@@ -141,8 +142,8 @@ namespace DiscerningEye.ViewModel
             this.MinimalNotificationCommand = new Commands.TaskBarCommands.MinimalNotificationsCommand(this);
             this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
             this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
-            //MainWindowViewModel.ViewModel = this;
         }
+
 
 
         //================================================================
@@ -176,6 +177,9 @@ namespace DiscerningEye.ViewModel
             Properties.Settings.Default.EnableNotificationTone = true;
             Properties.Settings.Default.EnableTextToSpeech = true;
         }
+
+
+
 
 
     }
