@@ -23,6 +23,7 @@
 
 using DiscerningEye.ViewModel;
 using MahApps.Metro;
+using Squirrel;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -36,6 +37,15 @@ namespace DiscerningEye
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+
+            Task.Run(async () =>
+            {
+                using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/Dartvalince/DiscerningEye"))
+                {
+                    await mgr.Result.UpdateApp();
+                }
+            });
 
             MainWindow window = new DiscerningEye.MainWindow();
             var viewModel = new MainWindowViewModel();
