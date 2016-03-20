@@ -526,54 +526,56 @@ namespace DiscerningEye.ViewModel
                 alarmItem.NextSpawn = alarmInfo.NextSpawn;
             }
 
-
-            //  Check if there are any notifications to push
-            if (earlyWarningMessages.Count > 0)
+            if (Properties.Settings.Default.DoNotDisturb == false)
             {
-                notificationMessage.AppendLine("Early Warnings:");
-                foreach(string message in earlyWarningMessages)
+                //  Check if there are any notifications to push
+                if (earlyWarningMessages.Count > 0)
                 {
-                    notificationMessage.AppendLine(message);
-                }
-            }
-
-            if(itemAvailableMessages.Count > 0)
-            {
-                notificationMessage.AppendLine("Items Available:");
-                foreach (string message in itemAvailableMessages)
-                {
-                    notificationMessage.AppendLine(message);
-                }
-            }
-
-
-            if (notificationMessage.Length > 0)
-            {
-                if(Properties.Settings.Default.EnableBallonTip)
-                    MainWindow.View.notificationIcon.ShowBalloonTip("Discerning Eye: Notificaitons", notificationMessage.ToString(), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
-
-                if (Properties.Settings.Default.EnableTextToSpeech)
-                {
-                    if (_synth.State == SynthesizerState.Ready)
+                    notificationMessage.AppendLine("Early Warnings:");
+                    foreach (string message in earlyWarningMessages)
                     {
-                        _synth.Volume = Properties.Settings.Default.TextToSpeechVolume;
-                        _synth.SpeakAsync(notificationMessage.ToString());
+                        notificationMessage.AppendLine(message);
                     }
                 }
 
-                if(Properties.Settings.Default.EnableNotificationTone && File.Exists(Properties.Settings.Default.NotificationToneUri))
+                if (itemAvailableMessages.Count > 0)
                 {
-                    if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
+                    notificationMessage.AppendLine("Items Available:");
+                    foreach (string message in itemAvailableMessages)
                     {
-
-                        _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
-                        _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
-                        _waveOutDevice.Init(_audioFileReader);
-                        _waveOutDevice.Play();
+                        notificationMessage.AppendLine(message);
                     }
-                }     
-            }
+                }
 
+
+                if (notificationMessage.Length > 0)
+                {
+                    if (Properties.Settings.Default.EnableBallonTip)
+                        MainWindow.View.notificationIcon.ShowBalloonTip("Discerning Eye: Notificaitons", notificationMessage.ToString(), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
+
+                    if (Properties.Settings.Default.EnableTextToSpeech)
+                    {
+                        if (_synth.State == SynthesizerState.Ready)
+                        {
+                            _synth.Volume = Properties.Settings.Default.TextToSpeechVolume;
+                            _synth.SpeakAsync(notificationMessage.ToString());
+                        }
+                    }
+
+                    if (Properties.Settings.Default.EnableNotificationTone && File.Exists(Properties.Settings.Default.NotificationToneUri))
+                    {
+                        if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
+                        {
+
+                            _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
+                            _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
+                            _waveOutDevice.Init(_audioFileReader);
+                            _waveOutDevice.Play();
+                        }
+                    }
+                }
+
+            }
             this.UpdateTimer.Start();
         }
 
