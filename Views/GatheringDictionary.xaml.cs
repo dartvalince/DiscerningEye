@@ -33,7 +33,7 @@ namespace DiscerningEye.Views
         public GatheringItemListView()
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.GatheringItemViewModel();
+            this.DataContext = new ViewModels.GatheringDictionaryViewModel();
         }
     }
 }

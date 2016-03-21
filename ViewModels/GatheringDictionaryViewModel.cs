@@ -29,7 +29,7 @@ using System.Windows.Data;
 
 namespace DiscerningEye.ViewModels
 {
-    public class GatheringItemViewModel : ViewModelBase
+    public class GatheringDictionaryViewModel : ViewModelBase
     {
         //=========================================================
         //  Private Fields
@@ -198,7 +198,7 @@ namespace DiscerningEye.ViewModels
         //  Constructor
         //=========================================================
         //public GatheringItemViewModel(Canvas mapCanvas)
-        public GatheringItemViewModel()
+        public GatheringDictionaryViewModel()
         {
             if (_gatheringItemRepository == null)
                 _gatheringItemRepository = new GatheringItemRepository();
