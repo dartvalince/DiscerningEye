@@ -25,7 +25,7 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 
-namespace DiscerningEye.ViewModel
+namespace DiscerningEye.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {

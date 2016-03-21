@@ -27,7 +27,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Data;
 
-namespace DiscerningEye.ViewModel
+namespace DiscerningEye.ViewModels
 {
     public class GatheringItemViewModel : ViewModelBase
     {

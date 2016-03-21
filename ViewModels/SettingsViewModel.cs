@@ -27,7 +27,7 @@ using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
 using System.Windows.Input;
 
-namespace DiscerningEye.ViewModel
+namespace DiscerningEye.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
@@ -191,7 +191,7 @@ namespace DiscerningEye.ViewModel
                 settings.AnimateHide = true;
                 settings.AnimateShow = true;
                 settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                await MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
+                await Views.MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
                 return;
             }
             

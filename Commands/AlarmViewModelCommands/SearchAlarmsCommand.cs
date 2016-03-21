@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.AlarmViewModelCommands
     public class SearchAlarmsCommand : ICommand
     {
 
-        private ViewModel.AlarmsViewModel _viewModel;
+        private ViewModels.AlarmsViewModel _viewModel;
 
-        public SearchAlarmsCommand(ViewModel.AlarmsViewModel viewModel)
+        public SearchAlarmsCommand(ViewModels.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

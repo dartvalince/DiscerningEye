@@ -23,7 +23,7 @@
 using System;
 using System.ComponentModel;
 
-namespace DiscerningEye.ViewModel
+namespace DiscerningEye.ViewModels
 {
     public abstract class ViewModelBase : INotifyPropertyChanged, IDisposable
     {

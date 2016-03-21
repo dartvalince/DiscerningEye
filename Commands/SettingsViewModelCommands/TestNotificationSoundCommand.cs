@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.SettingsViewModelCommands
     public class TestNotificationSoundCommand : ICommand
     {
 
-        private ViewModel.SettingsViewModel _viewModel;
+        private ViewModels.SettingsViewModel _viewModel;
 
-        public TestNotificationSoundCommand(ViewModel.SettingsViewModel viewModel)
+        public TestNotificationSoundCommand(ViewModels.SettingsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.AlarmViewModelCommands
     public class RefreshScheduleViewCommand : ICommand
     {
 
-        private ViewModel.AlarmsViewModel _viewModel;
+        private ViewModels.AlarmsViewModel _viewModel;
 
-        public RefreshScheduleViewCommand(ViewModel.AlarmsViewModel viewModel)
+        public RefreshScheduleViewCommand(ViewModels.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

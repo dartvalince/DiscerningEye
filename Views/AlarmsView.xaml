@@ -20,14 +20,14 @@
   =================================================================== -->
 
 
-<UserControl x:Class="DiscerningEye.View.AlarmsView"
+<UserControl x:Class="DiscerningEye.Views.AlarmsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:p="clr-namespace:DiscerningEye.Properties"
-             xmlns:local="clr-namespace:DiscerningEye.View"
+             xmlns:local="clr-namespace:DiscerningEye.Views"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"

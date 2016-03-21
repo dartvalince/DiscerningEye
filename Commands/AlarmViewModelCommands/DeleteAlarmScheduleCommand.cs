@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.AlarmViewModelCommands
     public class DeleteAlarmScheduleCommand : ICommand
     {
 
-        private ViewModel.AlarmsViewModel _viewModel;
+        private ViewModels.AlarmsViewModel _viewModel;
 
-        public DeleteAlarmScheduleCommand(ViewModel.AlarmsViewModel viewModel)
+        public DeleteAlarmScheduleCommand(ViewModels.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

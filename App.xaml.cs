@@ -21,7 +21,7 @@
   =================================================================== */
 
 
-using DiscerningEye.ViewModel;
+using DiscerningEye.ViewModels;
 using MahApps.Metro;
 using System.Windows;
 
@@ -38,7 +38,7 @@ namespace DiscerningEye
 
             
 
-            MainWindow window = new DiscerningEye.MainWindow();
+            DiscerningEye.Views.MainWindow window = new DiscerningEye.Views.MainWindow();
             var viewModel = new MainWindowViewModel();
             
             window.DataContext = viewModel;

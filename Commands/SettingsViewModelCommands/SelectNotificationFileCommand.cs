@@ -29,9 +29,9 @@ namespace DiscerningEye.Commands.SettingsViewModelCommands
     public class SelectNotificationFileCommand : ICommand
     {
 
-        private ViewModel.SettingsViewModel _viewModel;
+        private ViewModels.SettingsViewModel _viewModel;
 
-        public SelectNotificationFileCommand(ViewModel.SettingsViewModel viewModel)
+        public SelectNotificationFileCommand(ViewModels.SettingsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    MainWindow.xaml.cs
+    GatheringItemListView.xaml.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,21 +20,21 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using System.Windows.Controls;
+using System.Windows.Input;
 
-using MahApps.Metro.Controls;
-
-namespace DiscerningEye
+namespace DiscerningEye.Views
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for GatheringItemListView.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class GatheringItemListView : UserControl
     {
-        public static MainWindow View;
-        public MainWindow()
+        public GatheringItemListView()
         {
             InitializeComponent();
-            View = this;
+            this.DataContext = new ViewModels.GatheringItemViewModel();
         }
     }
 }
+

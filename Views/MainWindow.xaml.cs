@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    SettingsView.xaml.cs
+    MainWindow.xaml.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -20,19 +20,21 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
-using System.Windows.Controls;
 
-namespace DiscerningEye.View
+using MahApps.Metro.Controls;
+
+namespace DiscerningEye.Views
 {
     /// <summary>
-    /// Interaction logic for SettingsView.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class SettingsView : UserControl
+    public partial class MainWindow : MetroWindow
     {
-        public SettingsView()
+        public static MainWindow View;
+        public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new DiscerningEye.ViewModel.SettingsViewModel();
+            View = this;
         }
     }
 }

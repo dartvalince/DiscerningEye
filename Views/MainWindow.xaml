@@ -24,7 +24,7 @@
 
 
 
-<Controls:MetroWindow x:Class="DiscerningEye.MainWindow"
+<Controls:MetroWindow x:Class="DiscerningEye.Views.MainWindow"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -33,8 +33,8 @@
                       xmlns:prop="clr-namespace:DiscerningEye.Properties"
                       xmlns:local="clr-namespace:DiscerningEye"
                       mc:Ignorable="d"
-                      xmlns:vm="clr-namespace:DiscerningEye.ViewModel"
-                      xmlns:Views="clr-namespace:DiscerningEye.View"
+                      xmlns:vm="clr-namespace:DiscerningEye.ViewModels"
+                      xmlns:Views="clr-namespace:DiscerningEye.Views"
                       xmlns:tb="http://www.hardcodet.net/taskbar"
                       WindowState="Maximized"
                       Title="Discerning Eye" 

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    GatheringItemListView.xaml.cs
+    SettingsView.xaml.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -21,20 +21,18 @@
   =================================================================== */
 
 using System.Windows.Controls;
-using System.Windows.Input;
 
-namespace DiscerningEye.View
+namespace DiscerningEye.Views
 {
     /// <summary>
-    /// Interaction logic for GatheringItemListView.xaml
+    /// Interaction logic for SettingsView.xaml
     /// </summary>
-    public partial class GatheringItemListView : UserControl
+    public partial class SettingsView : UserControl
     {
-        public GatheringItemListView()
+        public SettingsView()
         {
             InitializeComponent();
-            this.DataContext = new ViewModel.GatheringItemViewModel();
+            this.DataContext = new DiscerningEye.ViewModels.SettingsViewModel();
         }
     }
 }
-

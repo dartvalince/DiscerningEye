@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.TaskBarCommands
     public class AllNotificationsCommand : ICommand
     {
 
-        private ViewModel.MainWindowViewModel _viewModel;
+        private ViewModels.MainWindowViewModel _viewModel;
 
-        public AllNotificationsCommand(ViewModel.MainWindowViewModel viewModel)
+        public AllNotificationsCommand(ViewModels.MainWindowViewModel viewModel)
         {
             _viewModel = viewModel;
         }

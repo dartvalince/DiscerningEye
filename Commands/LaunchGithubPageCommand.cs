@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands
     public class LaunchGithubPageCommand : ICommand
     {
 
-        private ViewModel.MainWindowViewModel _viewModel;
+        private ViewModels.MainWindowViewModel _viewModel;
 
-        public LaunchGithubPageCommand(ViewModel.MainWindowViewModel viewModel)
+        public LaunchGithubPageCommand(ViewModels.MainWindowViewModel viewModel)
         {
             _viewModel = viewModel;
         }

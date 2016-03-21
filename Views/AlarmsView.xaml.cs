@@ -23,7 +23,7 @@
 using System.Windows.Controls;
 
 
-namespace DiscerningEye.View
+namespace DiscerningEye.Views
 {
     /// <summary>
     /// Interaction logic for AlarmsView.xaml
@@ -35,7 +35,7 @@ namespace DiscerningEye.View
         {
             InitializeComponent();
             View = this;
-            this.DataContext = new ViewModel.AlarmsViewModel();
+            this.DataContext = new ViewModels.AlarmsViewModel();
             
             
         }

@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.AlarmViewModelCommands
     public class RemoveAllAlarmsCommand : ICommand
     {
 
-        private ViewModel.AlarmsViewModel _viewModel;
+        private ViewModels.AlarmsViewModel _viewModel;
 
-        public RemoveAllAlarmsCommand(ViewModel.AlarmsViewModel viewModel)
+        public RemoveAllAlarmsCommand(ViewModels.AlarmsViewModel viewModel)
         {
             _viewModel = viewModel;
         }

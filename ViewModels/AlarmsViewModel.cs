@@ -22,7 +22,7 @@
 
 
 using DiscerningEye.DataAccess;
-using DiscerningEye.View;
+using DiscerningEye.Views;
 using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
 using System;
@@ -35,7 +35,7 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace DiscerningEye.ViewModel
+namespace DiscerningEye.ViewModels
 {
     public class AlarmsViewModel : ViewModelBase
     {

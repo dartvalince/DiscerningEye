@@ -28,9 +28,9 @@ namespace DiscerningEye.Commands.TaskBarCommands
     public class MinimalNotificationsCommand : ICommand
     {
 
-        private ViewModel.MainWindowViewModel _viewModel;
+        private ViewModels.MainWindowViewModel _viewModel;
 
-        public MinimalNotificationsCommand(ViewModel.MainWindowViewModel viewModel)
+        public MinimalNotificationsCommand(ViewModels.MainWindowViewModel viewModel)
         {
             _viewModel = viewModel;
         }
