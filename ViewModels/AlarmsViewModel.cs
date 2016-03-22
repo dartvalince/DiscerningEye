@@ -25,6 +25,7 @@ using DiscerningEye.DataAccess;
 using DiscerningEye.Views;
 using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
+using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,24 +40,14 @@ namespace DiscerningEye.ViewModels
 {
     public class AlarmsViewModel : ViewModelBase
     {
-        //=========================================================
-        //  Private Fields
-        //=========================================================
         private AlarmItemRepository _alarmItemRepository;
-        private ObservableCollection<Model.AlarmItem> _alarmItemCollection;
-        private ObservableCollection<Model.AlarmSchedule> _alarmScheduleCollection;
-        private Model.AlarmSchedule _selectedSchedule;
-        private string _searchText;
-        private Utilities.ClockController _eorzeaClock;
-        private System.Timers.Timer _updateTimer;
-        private bool _isLoaded;
-        private IWavePlayer _waveOutDevice;
         private AudioFileReader _audioFileReader;
+        private bool _isLoaded;
         private SpeechSynthesizer _synth;
+        private System.Timers.Timer _updateTimer;
+        private IWavePlayer _waveOutDevice;
 
-        //=========================================================
-        //  Properties
-        //=========================================================
+        private ObservableCollection<Model.AlarmItem> _alarmItemCollection;
         /// <summary>
         /// Gets or sets the observablecollection of Model.AlarmItem
         /// </summary>
@@ -65,20 +56,18 @@ namespace DiscerningEye.ViewModels
         /// </remarks>
         public ObservableCollection<Model.AlarmItem> AlarmItemCollection
         {
-            get {
-                
-                return this._alarmItemCollection; }
+            get { return this._alarmItemCollection; }
             set
             {
-                if (this._alarmItemCollection == value) return;
-                this._alarmItemCollection = value;
-                OnPropertyChanged("AlarmItemCollection");
-                
-
-
+                SetProperty(ref _alarmItemCollection, value);
+                //if (this._alarmItemCollection == value) return;
+                //this._alarmItemCollection = value;
+                //OnPropertyChanged("AlarmItemCollection");
             }
         }
 
+
+        private ObservableCollection<Model.AlarmSchedule> _alarmScheduleCollection;
         /// <summary>
         /// Gets or sets the observablecollection of Model.AlarmSchedul
         /// </summary>
@@ -90,80 +79,13 @@ namespace DiscerningEye.ViewModels
             get { return this._alarmScheduleCollection; }
             set
             {
-                if (this._alarmScheduleCollection == value) return;
-                this._alarmScheduleCollection = value;
-                OnPropertyChanged("AlarmScheduleCollection");
+                SetProperty(ref _alarmScheduleCollection, value);
+                //if (this._alarmScheduleCollection == value) return;
+                //this._alarmScheduleCollection = value;
+                //OnPropertyChanged("AlarmScheduleCollection");
             }
         }
 
-        /// <summary>
-        /// Gets or sets the current selected Model.AlarmSchedule
-        /// </summary>
-        /// <remarks>
-        /// This is bound to the SelectedValue property of the combobox on the AlarmView
-        /// </remarks>
-        public Model.AlarmSchedule SelectedSchedule
-        {
-            get { return this._selectedSchedule; }
-            set
-            {
-                if (this._selectedSchedule == value) return;
-                this._selectedSchedule = value;
-                OnPropertyChanged("SelectedSchedule");
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the serach text
-        /// </summary>
-        /// <remarks>
-        /// This is bound to the Text property of the search textbox on the AlarmView
-        /// </remarks>
-        public string SearchText
-        {
-            get { return this._searchText; }
-            set
-            {
-                if (this._searchText == value) return;
-                this._searchText = value;
-                OnPropertyChanged("SearchText");
-                if (value == "") this.SearchAlarmsCommand.Execute(null);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the ClockController used to get the eorzeatime
-        /// </summary>
-        /// <remarks>
-        /// This is bound within the MainView
-        /// </remarks>
-        public Utilities.ClockController EorzeaClock
-        {
-            get { return this._eorzeaClock; }
-            set
-            {
-                if (this._eorzeaClock == value) return;
-                this._eorzeaClock = value;
-                OnPropertyChanged("EorzeaClock");
-            }
-        }
-
-        /// <summary>
-        /// Gets or set the System.Timers.Timer
-        /// </summary>
-        /// <remarks>
-        /// The elapsed event of this timer is used to calculate
-        /// all things related to the alarms
-        /// </remarks>
-        public System.Timers.Timer UpdateTimer
-        {
-            get { return this._updateTimer; }
-            set
-            {
-                if (this._updateTimer == value) return;
-                this._updateTimer = value;
-            }
-        }
 
         /// <summary>
         /// Gets or Sets the Boolean value used to determine if a schedule can be adjusted
@@ -181,70 +103,126 @@ namespace DiscerningEye.ViewModels
             }
         }
 
+        private Utilities.ClockController _eorzeaClock;
+        /// <summary>
+        /// Gets or sets the ClockController used to get the eorzeatime
+        /// </summary>
+        /// <remarks>
+        /// This is bound within the MainView
+        /// </remarks>
+        public Utilities.ClockController EorzeaClock
+        {
+            get { return this._eorzeaClock; }
+            set
+            {
+                SetProperty(ref _eorzeaClock, value);
+                //if (this._eorzeaClock == value) return;
+                //this._eorzeaClock = value;
+                //OnPropertyChanged("EorzeaClock");
+            }
+        }
 
 
+        private string _searchText;
+        /// <summary>
+        /// Gets or sets the serach text
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the Text property of the search textbox on the AlarmView
+        /// </remarks>
+        public string SearchText
+        {
+            get { return this._searchText; }
+            set
+            {
+                SetProperty(ref _searchText, value);
+                //if (this._searchText == value) return;
+                //this._searchText = value;
+                //OnPropertyChanged("SearchText");
+                if (value == "") this.SearchAlarmsCommand.Execute();
+            }
+        }
+
+        private Model.AlarmSchedule _selectedSchedule;
+        /// <summary>
+        /// Gets or sets the current selected Model.AlarmSchedule
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the SelectedValue property of the combobox on the AlarmView
+        /// </remarks>
+        public Model.AlarmSchedule SelectedSchedule
+        {
+            get { return this._selectedSchedule; }
+            set
+            {
+                SetProperty(ref _selectedSchedule, value);
+                //if (this._selectedSchedule == value) return;
+                //this._selectedSchedule = value;
+                //OnPropertyChanged("SelectedSchedule");
+            }
+        }
 
         //=========================================================
         //  ICommands
         //=========================================================
         /// <summary>
-        /// Gets or sets the ICommand used to create a new schedule
+        /// Gets or sets the DelegateCommand used to create a new schedule
         /// </summary>
-        public ICommand CreateNewScheduleCommand
+        public DelegateCommand CreateNewScheduleCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the Icommand used to load the selected schedule
+        /// Gets or sets the DelegateCommand used to load the selected schedule
         /// </summary>
-        public ICommand LoadScheduleCommand
+        public DelegateCommand LoadScheduleCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the ICommand used to update the selected schedule
+        /// Gets or sets the DelegateCommand used to update the selected schedule
         /// </summary>
-        public ICommand UpdateScheduleCommand
+        public DelegateCommand UpdateScheduleCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the ICommand used to search the alarms
+        /// Gets or sets the DelegateCommand used to search the alarms
         /// </summary>
-        public ICommand SearchAlarmsCommand
+        public DelegateCommand SearchAlarmsCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the ICommand used to delete the current selected schedule
+        /// Gets or sets the DelegateCommand used to delete the current selected schedule
         /// </summary>
-        public ICommand DeleteCurrentScheduleCommand
+        public DelegateCommand DeleteCurrentScheduleCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the ICommand to use to refresh the scheduled alarms view
+        /// Gets or sets the DelegateCommand to use to refresh the scheduled alarms view
         /// </summary>
-        public ICommand RefreshSchedulViewCommand
+        public DelegateCommand RefreshSchedulViewCommand
         {
             get;
             private set;
         }
 
         /// <summary>
-        /// Gets or sets the ICommand used to remove all alarms from the schedule alarms view
+        /// Gets or sets the DelegateCommand used to remove all alarms from the schedule alarms view
         /// </summary>
-        public ICommand RemoveAllAlarmsCommand
+        public DelegateCommand RemoveAllAlarmsCommand
         {
             get;
             private set;
@@ -258,33 +236,24 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public AlarmsViewModel()
         {
-            AlarmsView.View.Loaded += View_Loaded;
-            this.CreateNewScheduleCommand = new Commands.AlarmViewModelCommands.CreateAlarmScheduleComand(this);
-            this.LoadScheduleCommand = new Commands.AlarmViewModelCommands.LoadAlarmScheduleCommand(this);
-            this.UpdateScheduleCommand = new Commands.AlarmViewModelCommands.UpdateAlarmScheduleCommand(this);
-            this.SearchAlarmsCommand = new Commands.AlarmViewModelCommands.SearchAlarmsCommand(this);
-            this.DeleteCurrentScheduleCommand = new Commands.AlarmViewModelCommands.DeleteAlarmScheduleCommand(this);
-            this.RefreshSchedulViewCommand = new Commands.AlarmViewModelCommands.RefreshScheduleViewCommand(this);
-            this.RemoveAllAlarmsCommand = new Commands.AlarmViewModelCommands.RemoveAllAlarmsCommand(this);
-            this._isLoaded = false;
+            //  Setup Commands
+            this.CreateNewScheduleCommand = new DelegateCommand(this.CreateNewSchedule, () => true);
+            this.LoadScheduleCommand = new DelegateCommand(this.LoadSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
+            this.UpdateScheduleCommand = new DelegateCommand(this.UpdateCurrentSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
+            this.DeleteCurrentScheduleCommand = new DelegateCommand(this.DeleteCurrentSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
 
-        }
+            this.SearchAlarmsCommand = new DelegateCommand(this.SearchAlarms, () => !string.IsNullOrEmpty(this.SearchText) && !string.IsNullOrWhiteSpace(this.SearchText)).ObservesProperty(() => this.SearchText);
+            this.RefreshSchedulViewCommand = new DelegateCommand(this.RefreshScheduleView, () => true);
+            this.RemoveAllAlarmsCommand = new DelegateCommand(this.RemoveAllAlarms, () => true);
 
-        /// <summary>
-        /// Called when the AlarmView user control is loaded
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void View_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (this._isLoaded) return;
+            //AlarmsView.View.Loaded += View_Loaded;
 
             //  Initilize the alarm item repository
             if (_alarmItemRepository == null)
                 _alarmItemRepository = new AlarmItemRepository();
 
             this.SearchText = "";
-            
+
             //  Initilize the AlarmItemCollection
             this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
             ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmViewSource_Filter;
@@ -299,18 +268,45 @@ namespace DiscerningEye.ViewModels
             this.EorzeaClock = new Utilities.ClockController();
 
             // Initilize the update timer
-            this.UpdateTimer = new System.Timers.Timer();
-            this.UpdateTimer.Interval = 100;
-            this.UpdateTimer.AutoReset = false;
-            this.UpdateTimer.Elapsed += UpdateTimer_Elapsed;
-            this.UpdateTimer.Start();
+            this._updateTimer = new System.Timers.Timer();
+            this._updateTimer.Interval = 100;
+            this._updateTimer.AutoReset = false;
+            this._updateTimer.Elapsed += UpdateTimer_Elapsed;
+            this._updateTimer.Start();
 
 
             //  Initilize the sound player
             _waveOutDevice = new WaveOut();
-            
+
             //  Initilize the text-to-speech object
             _synth = new SpeechSynthesizer();
+
+
+
+
+
+
+
+
+
+
+
+            this._isLoaded = false;
+
+        }
+
+
+
+        /// <summary>
+        /// Called when the AlarmView user control is loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void View_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (this._isLoaded) return;
+
+
 
             this._isLoaded = true;
         }
@@ -576,7 +572,7 @@ namespace DiscerningEye.ViewModels
                 }
 
             }
-            this.UpdateTimer.Start();
+            this._updateTimer.Start();
         }
 
 
@@ -593,9 +589,9 @@ namespace DiscerningEye.ViewModels
             ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter -= AlarmViewSource_Filter;
             ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter -= SetAlarmsViewSource_Filter;
 
-            this.UpdateTimer.Stop();
-            this.UpdateTimer.Elapsed -= UpdateTimer_Elapsed;
-            this.UpdateTimer.Dispose();
+            this._updateTimer.Stop();
+            this._updateTimer.Elapsed -= UpdateTimer_Elapsed;
+            this._updateTimer.Dispose();
 
             if (this._synth != null)
             {
@@ -631,8 +627,8 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public void SearchAlarms()
         {
-            if (!this._isLoaded) return;
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).View.Refresh();
+            CollectionViewSource alarmsViewSource = ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource"));
+            if (alarmsViewSource.View != null) alarmsViewSource.View.Refresh();
         }
 
         /// <summary>

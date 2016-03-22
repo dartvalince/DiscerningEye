@@ -20,34 +20,19 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using Prism.Mvvm;
 using System;
 using System.ComponentModel;
 
 namespace DiscerningEye.ViewModels
 {
-    public abstract class ViewModelBase : INotifyPropertyChanged, IDisposable
+    public abstract class ViewModelBase : BindableBase, IDisposable
     {
         protected ViewModelBase()
         {
 
         }
 
-        #region INotifyPropertyChanged Implementation
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-
-            if (handler != null)
-            {
-                var e = new PropertyChangedEventArgs(propertyName);
-                handler(this, e);
-            }
-        }
-
-        #endregion INotifyPropertyChanged Implementation
 
 
         #region IDisposible Implementation
