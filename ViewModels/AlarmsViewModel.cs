@@ -42,7 +42,6 @@ namespace DiscerningEye.ViewModels
     {
         private AlarmItemRepository _alarmItemRepository;
         private AudioFileReader _audioFileReader;
-        private bool _isLoaded;
         private SpeechSynthesizer _synth;
         private System.Timers.Timer _updateTimer;
         private IWavePlayer _waveOutDevice;
@@ -246,7 +245,6 @@ namespace DiscerningEye.ViewModels
             this.RefreshSchedulViewCommand = new DelegateCommand(this.RefreshScheduleView, () => true);
             this.RemoveAllAlarmsCommand = new DelegateCommand(this.RemoveAllAlarms, () => true);
 
-            //AlarmsView.View.Loaded += View_Loaded;
 
             //  Initilize the alarm item repository
             if (_alarmItemRepository == null)
@@ -281,34 +279,6 @@ namespace DiscerningEye.ViewModels
             //  Initilize the text-to-speech object
             _synth = new SpeechSynthesizer();
 
-
-
-
-
-
-
-
-
-
-
-            this._isLoaded = false;
-
-        }
-
-
-
-        /// <summary>
-        /// Called when the AlarmView user control is loaded
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void View_Loaded(object sender, System.Windows.RoutedEventArgs e)
-        {
-            if (this._isLoaded) return;
-
-
-
-            this._isLoaded = true;
         }
 
 
