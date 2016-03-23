@@ -36,13 +36,9 @@ namespace DiscerningEye
         {
             base.OnStartup(e);
 
-            
+            var bs = new Bootstrapper();
+            bs.Run();
 
-            DiscerningEye.Views.MainWindow window = new DiscerningEye.Views.MainWindow();
-            var viewModel = new MainWindowViewModel();
-            
-            window.DataContext = viewModel;
-            window.Show();
             DiscerningEye.App.Current.Exit += Current_Exit;
 
             DiscerningEye.Properties.Settings.Default.PropertyChanged += Default_PropertyChanged;
