@@ -35,9 +35,29 @@ namespace DiscerningEye.Views
         {
             InitializeComponent();
             View = this;
-            this.DataContext = new ViewModels.AlarmsViewModel();
             
             
+        }
+
+        private void AlarmViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+            Model.AlarmItem i = e.Item as Model.AlarmItem;
+            if(i!= null)
+            {
+                if ( !string.IsNullOrEmpty( ((ViewModels.AlarmsViewModel)this.DataContext).SearchText))
+                {
+                    e.Accepted = i.Name.ToLower().Contains(((ViewModels.AlarmsViewModel)this.DataContext).SearchText.ToLower());
+                }
+            }
+        }
+
+        private void SetAlarmsViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+            Model.AlarmItem i = e.Item as Model.AlarmItem;
+            if (i != null)
+            {
+                    e.Accepted = i.IsSet == true;
+            }
         }
     }
 }

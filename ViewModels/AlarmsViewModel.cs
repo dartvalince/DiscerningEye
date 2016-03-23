@@ -29,6 +29,7 @@ using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
@@ -161,71 +162,51 @@ namespace DiscerningEye.ViewModels
             }
         }
 
+
+        
+
         //=========================================================
         //  ICommands
         //=========================================================
         /// <summary>
         /// Gets or sets the DelegateCommand used to create a new schedule
         /// </summary>
-        public DelegateCommand CreateNewScheduleCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand CreateNewScheduleCommand { get; private set; }
+
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to load the selected schedule
         /// </summary>
-        public DelegateCommand LoadScheduleCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand LoadScheduleCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to update the selected schedule
         /// </summary>
-        public DelegateCommand UpdateScheduleCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand UpdateScheduleCommand { get; private set; }
+
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to search the alarms
         /// </summary>
-        public DelegateCommand SearchAlarmsCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand SearchAlarmsCommand { get; private set; }
+
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to delete the current selected schedule
         /// </summary>
-        public DelegateCommand DeleteCurrentScheduleCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand DeleteCurrentScheduleCommand { get; private set; }
+
 
         /// <summary>
         /// Gets or sets the DelegateCommand to use to refresh the scheduled alarms view
         /// </summary>
-        public DelegateCommand RefreshSchedulViewCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand RefreshSchedulViewCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to remove all alarms from the schedule alarms view
         /// </summary>
-        public DelegateCommand RemoveAllAlarmsCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand RemoveAllAlarmsCommand { get; private set; }
+
 
         //=========================================================
         //  Constructor
@@ -250,12 +231,13 @@ namespace DiscerningEye.ViewModels
             if (_alarmItemRepository == null)
                 _alarmItemRepository = new AlarmItemRepository();
 
-            this.SearchText = "";
+            //this.SearchText = "";
 
             //  Initilize the AlarmItemCollection
             this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmViewSource_Filter;
-            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter += SetAlarmsViewSource_Filter;
+
+            //((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmViewSource_Filter;
+            //((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter += SetAlarmsViewSource_Filter;
 
 
             //  Initilize the Alarm Schedules Collection

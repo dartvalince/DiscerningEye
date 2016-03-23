@@ -31,6 +31,8 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1280">
 
@@ -40,7 +42,8 @@
                               IsLiveFilteringRequested="True"
                               IsLiveSortingRequested="True"
                               Source="{Binding AlarmItemCollection}"
-                              VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                              Filter="AlarmViewSource_Filter">
             <CollectionViewSource.GroupDescriptions>
                 <dat:PropertyGroupDescription PropertyName="Job" />
             </CollectionViewSource.GroupDescriptions>
@@ -55,7 +58,8 @@
                               IsLiveFilteringRequested="True"
                               IsLiveSortingRequested="True"
                               Source="{Binding AlarmItemCollection}"
-                              VirtualizingPanel.IsVirtualizingWhenGrouping="True">
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                              Filter="SetAlarmsViewSource_Filter">
             <CollectionViewSource.GroupDescriptions>
                 <dat:PropertyGroupDescription PropertyName="Job" />
             </CollectionViewSource.GroupDescriptions>
@@ -178,21 +182,10 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <DataGrid Grid.Row="0"
-                          Grid.Column="0"
-                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsSynchronizedWithCurrentItem="True"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserReorderColumns="False"
-                          CanUserResizeColumns="False"
-                          CanUserResizeRows="False"
-                          CanUserSortColumns="True"
-                          SelectionMode="Single"
-                          GridLinesVisibility="All">
-                    <DataGrid.GroupStyle>
+                <ListView Grid.Column="0"
+                          Grid.Row="0"
+                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}">
+                    <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>
                                 <Style TargetType="{x:Type GroupItem}">
@@ -216,62 +209,27 @@
                                 </Style>
                             </GroupStyle.ContainerStyle>
                         </GroupStyle>
-                    </DataGrid.GroupStyle>
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header=""
-                                                Width="auto"
-                                                SortMemberPath="IsSet">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black"
-                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" 
-                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Name"
-                                            Binding="{Binding Name}" 
-                                            SortMemberPath="Name"
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
+                    </ListView.GroupStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="" Width="auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
+                            <GridViewColumn Width="auto" Header="Start" DisplayMemberBinding="{Binding Path=StartTime}" />
+                            <GridViewColumn Width="auto" Header="End" DisplayMemberBinding="{Binding Path=EndTime}" />
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" />
+                        </GridView>
+                    </ListView.View>
 
-                        <DataGridTextColumn Header="Start"
-                                            Binding="{Binding StartTime}" 
-                                            SortMemberPath="StartTime"
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="End"
-                                            SortMemberPath="EndTime"
-                                            Binding="{Binding EndTime}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Region"
-                                            SortMemberPath="Region"
-                                            Binding="{Binding Region}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Zone"
-                                            SortMemberPath="Zone"
-                                            Binding="{Binding Zone}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Slot"
-                                            SortMemberPath="Zone"
-                                            Binding="{Binding Slot}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-
+                </ListView>
 
             </Grid>
         </GroupBox>
@@ -295,21 +253,12 @@
                         Grid.Column="0"
                         Content="Remove All Alarms From Schedule"
                         Command="{Binding RemoveAllAlarmsCommand}"/>
-                <DataGrid Grid.Row="1"
-                          Grid.Column="0"
-                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="True"
-                          IsSynchronizedWithCurrentItem="True"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserReorderColumns="False"
-                          CanUserResizeColumns="False"
-                          CanUserResizeRows="False"
-                          CanUserSortColumns="False"
-                          SelectionMode="Single"
-                          GridLinesVisibility="All">
-                    <DataGrid.GroupStyle>
+
+
+                <ListView Grid.Column="0"
+                          Grid.Row="0"
+                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}">
+                    <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>
                                 <Style TargetType="{x:Type GroupItem}">
@@ -333,81 +282,51 @@
                                 </Style>
                             </GroupStyle.ContainerStyle>
                         </GroupStyle>
-                    </DataGrid.GroupStyle>
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header=""
-                                                Width="auto"
-                                                SortMemberPath="IsSet">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black"
-                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                    </ListView.GroupStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="" Width="auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
+                            <GridViewColumn Header="Available In" Width="auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text">
+                                                        <Setter.Value>
+                                                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                                                <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
+                                                            </MultiBinding>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSet}" Value="False">
+                                                            <Setter Property="Text" Value="{x:Null}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" />
+                        </GridView>
+                    </ListView.View>
 
-
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                            <DataGridTemplateColumn.CellEditingTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                              
-                                              HorizontalAlignment="Center" 
-                                              BorderBrush="Black" 
-                                              Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellEditingTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Name"
-                                            Binding="{Binding Name}" 
-                                            SortMemberPath="Name"
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTemplateColumn Header="Availible In"
-                                                Width="auto"
-                                                SortMemberPath="NextSpawn">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock TextAlignment="Center">
-                                        <TextBlock.Style>
-                                            <Style TargetType="{x:Type TextBlock}">
-                                                <Setter Property="Text">
-                                                    <Setter.Value>
-                                                        <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                                            <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
-                                                            <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
-                                                            <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
-                                                        </MultiBinding>
-                                                    </Setter.Value>
-                                                </Setter>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsSet}" Value="False">
-                                                        <Setter Property="Text" Value="{x:Null}" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Region"
-                                            SortMemberPath="Region"
-                                            Binding="{Binding Region}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Zone"
-                                            SortMemberPath="Zone"
-                                            Binding="{Binding Zone}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                        <DataGridTextColumn Header="Slot"
-                                            SortMemberPath="Zone"
-                                            Binding="{Binding Slot}" 
-                                            TextBlock.TextAlignment="Center"
-                                            Width="auto"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                </ListView>
 
             </Grid>
         </GroupBox>
