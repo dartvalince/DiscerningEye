@@ -27,9 +27,9 @@ namespace DiscerningEye.Views
     /// <summary>
     /// Interaction logic for SettingsView.xaml
     /// </summary>
-    public partial class SettingsView : UserControl
+    public partial class Settings : UserControl
     {
-        public SettingsView()
+        public Settings()
         {
             InitializeComponent();
             this.DataContext = new DiscerningEye.ViewModels.SettingsViewModel();

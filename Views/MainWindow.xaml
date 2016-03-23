@@ -124,7 +124,7 @@
         </tb:TaskbarIcon>
         <Views:AlarmsView x:Name="AlarmsView" Grid.Column="0"
                           Margin="10,0,10,10"/>
-        <Views:SettingsView Grid.Column="1"
+        <Views:Settings Grid.Column="1"
                             Margin="10,0,10,10" />
 
 
