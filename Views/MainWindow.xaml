@@ -70,7 +70,7 @@
                              Position="Right"
                              Theme="Inverse"
                              Width="600">
-                <Views:GatheringItemListView Margin="10,0,10,10" />
+                <Views:GatheringDictionary Margin="10,0,10,10" />
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>

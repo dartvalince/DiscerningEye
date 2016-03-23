@@ -265,36 +265,6 @@ namespace DiscerningEye.ViewModels
         //  Events
         //=========================================================
         /// <summary>
-        /// Filter event used for the AlarmViewSource
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //////private void AlarmViewSource_Filter(object sender, FilterEventArgs e)
-        //////{
-        //////    Model.AlarmItem i = e.Item as Model.AlarmItem;
-        //////    if (i != null)
-        //////    {
-        //////        if (this.SearchText == null) this.SearchText = "";
-        //////        e.Accepted = i.Name.ToLower().Contains(this.SearchText.ToLower());
-        //////    }
-        //////}
-
-        /// <summary>
-        /// Filter event used for the SetAlarmsViewSource
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //////private void SetAlarmsViewSource_Filter(object sender, FilterEventArgs e)
-        //////{
-        //////    Model.AlarmItem i = e.Item as Model.AlarmItem;
-        //////    if (i != null)
-        //////    {
-        //////        if (this.SearchText == null) this.SearchText = "";
-        //////        e.Accepted = i.IsSet == true;
-        //////    }
-        //////}
-
-        /// <summary>
         /// AlarmInfo struct used to temporaraly hold data about an alarm item
         /// during the UpdateTimer_Elapsed event
         /// </summary>

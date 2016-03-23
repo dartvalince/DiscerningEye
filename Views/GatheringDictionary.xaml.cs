@@ -28,12 +28,11 @@ namespace DiscerningEye.Views
     /// <summary>
     /// Interaction logic for GatheringItemListView.xaml
     /// </summary>
-    public partial class GatheringItemListView : UserControl
+    public partial class GatheringDictionary : UserControl
     {
-        public GatheringItemListView()
+        public GatheringDictionary()
         {
             InitializeComponent();
-            this.DataContext = new ViewModels.GatheringDictionaryViewModel();
         }
     }
 }
