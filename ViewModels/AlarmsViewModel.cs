@@ -231,13 +231,10 @@ namespace DiscerningEye.ViewModels
             if (_alarmItemRepository == null)
                 _alarmItemRepository = new AlarmItemRepository();
 
-            //this.SearchText = "";
 
             //  Initilize the AlarmItemCollection
             this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
 
-            //((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter += AlarmViewSource_Filter;
-            //((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter += SetAlarmsViewSource_Filter;
 
 
             //  Initilize the Alarm Schedules Collection
@@ -272,30 +269,30 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void AlarmViewSource_Filter(object sender, FilterEventArgs e)
-        {
-            Model.AlarmItem i = e.Item as Model.AlarmItem;
-            if (i != null)
-            {
-                if (this.SearchText == null) this.SearchText = "";
-                e.Accepted = i.Name.ToLower().Contains(this.SearchText.ToLower());
-            }
-        }
+        //////private void AlarmViewSource_Filter(object sender, FilterEventArgs e)
+        //////{
+        //////    Model.AlarmItem i = e.Item as Model.AlarmItem;
+        //////    if (i != null)
+        //////    {
+        //////        if (this.SearchText == null) this.SearchText = "";
+        //////        e.Accepted = i.Name.ToLower().Contains(this.SearchText.ToLower());
+        //////    }
+        //////}
 
         /// <summary>
         /// Filter event used for the SetAlarmsViewSource
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SetAlarmsViewSource_Filter(object sender, FilterEventArgs e)
-        {
-            Model.AlarmItem i = e.Item as Model.AlarmItem;
-            if (i != null)
-            {
-                if (this.SearchText == null) this.SearchText = "";
-                e.Accepted = i.IsSet == true;
-            }
-        }
+        //////private void SetAlarmsViewSource_Filter(object sender, FilterEventArgs e)
+        //////{
+        //////    Model.AlarmItem i = e.Item as Model.AlarmItem;
+        //////    if (i != null)
+        //////    {
+        //////        if (this.SearchText == null) this.SearchText = "";
+        //////        e.Accepted = i.IsSet == true;
+        //////    }
+        //////}
 
         /// <summary>
         /// AlarmInfo struct used to temporaraly hold data about an alarm item
@@ -537,9 +534,6 @@ namespace DiscerningEye.ViewModels
         {
             this.AlarmItemCollection.Clear();
             this.AlarmScheduleCollection.Clear();
-
-            ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource")).Filter -= AlarmViewSource_Filter;
-            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).Filter -= SetAlarmsViewSource_Filter;
 
             this._updateTimer.Stop();
             this._updateTimer.Elapsed -= UpdateTimer_Elapsed;
