@@ -67,7 +67,7 @@ namespace DiscerningEye
 
         private async void SquirrlUpdater()
         {
-            using (var mgr = UpdateManager.GitHubUpdateManager(""))
+            using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/Dartvalince/DiscerningEye"))
             {
                 await mgr.Result.UpdateApp();
             }
