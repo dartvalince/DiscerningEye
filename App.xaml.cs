@@ -38,19 +38,22 @@ namespace DiscerningEye
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            MessageBox.Show(typeof(App).Assembly.GetName().Version.ToString());
 
             //  Check for application updates
-            this.SquirrlUpdater();
+            using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/Dartvalince/DiscerningEye"))
+            {
+                await mgr.Result.UpdateApp();
+            }
 
 
 
 
-
-                //  Check for updats to the alarm data file
-                this.UpdateAlarmData();
+            //  Check for updats to the alarm data file
+            this.UpdateAlarmData();
 
             var bs = new Bootstrapper();
             bs.Run();
@@ -63,18 +66,6 @@ namespace DiscerningEye
             ChangeApplicationTheme();
 
         }
-
-
-        private async void SquirrlUpdater()
-        {
-            using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/Dartvalince/DiscerningEye"))
-            {
-                await mgr.Result.UpdateApp();
-            }
-        }
-
-
-
 
 
         private void Current_Exit(object sender, ExitEventArgs e)
