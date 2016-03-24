@@ -20,6 +20,7 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,11 +50,21 @@ namespace DiscerningEye.DataAccess
                 _alarmItems = new List<Model.AlarmItem>();
 
             //  Read from the json file
-            using (Stream stream = Application.GetResourceStream(new Uri("pack://application:,,,/DiscerningEye;component/Resources/alarmdata.json")).Stream)
+            string localDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"DiscerningEye\Data\Local\");
+            string localAlarmsFilePath = Path.Combine(localDirectory, "alarms.json");
+            using (var fileStream = new FileStream(localAlarmsFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Model.AlarmItem>));
-                _alarmItems = (List<Model.AlarmItem>)ser.ReadObject(stream);
+                using (var streamReader = new StreamReader(fileStream))
+                {
+
+                    this._alarmItems = JsonConvert.DeserializeObject<List<Model.AlarmItem>>(streamReader.ReadToEnd());
+                }
             }
+            //using (Stream stream = Application.GetResourceStream(new Uri("pack://application:,,,/DiscerningEye;component/Resources/alarmdata.json")).Stream)
+            //{
+            //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Model.AlarmItem>));
+            //    _alarmItems = (List<Model.AlarmItem>)ser.ReadObject(stream);
+            //}
         }
 
 

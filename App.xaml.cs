@@ -23,6 +23,11 @@
 
 using DiscerningEye.ViewModels;
 using MahApps.Metro;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Net;
+using System.Net.Cache;
 using System.Windows;
 
 namespace DiscerningEye
@@ -35,6 +40,10 @@ namespace DiscerningEye
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+
+            //  Check for updats to the alarm data file
+            this.UpdateAlarmData();
 
             var bs = new Bootstrapper();
             bs.Run();
@@ -69,5 +78,91 @@ namespace DiscerningEye
                              ThemeManager.GetAccent(DiscerningEye.Properties.Settings.Default.UIAccent),
                              ThemeManager.GetAppTheme(DiscerningEye.Properties.Settings.Default.UIAppTheme));
         }
+
+
+        private void UpdateAlarmData()
+        {
+            string localDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"DiscerningEye\Data\Local\");
+            string localGithubDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"DiscerningEye\Data\Github\");
+            Directory.CreateDirectory(localDirectory);
+            Directory.CreateDirectory(localGithubDirectory);
+
+            string localAlarmsFilePath = Path.Combine(localDirectory, "alarms.json");
+            string localAlarmsDateFilePath = Path.Combine(localDirectory, "date.txt");
+            string localGithubAlarmsFilePath = Path.Combine(localGithubDirectory, "alarms.json");
+            string localGithubAlarmsDateFilePath = Path.Combine(localGithubDirectory, "date.txt");
+
+            //  Check if local files exists
+            bool doesLocalAlarmsExist = File.Exists(localAlarmsFilePath);
+            bool doesLocalDateFilePathExist = File.Exists(localAlarmsDateFilePath);
+
+            //  If local files exists, get the last update date from the date.txt file
+            string localVersion = "0";
+            if (doesLocalDateFilePathExist)
+            {
+                using (var fs = new FileStream(localAlarmsDateFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    using (var streamReader = new StreamReader(fs))
+                    {
+                        localVersion = streamReader.ReadToEnd();
+                    }
+                }
+            }
+
+            //  Check version of file on github
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/Dartvalince/DiscerningEye-Alarms/releases/latest");
+            httpWebRequest.UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36";
+            httpWebRequest.Headers.Add("Accept-Language", "en;q=0.8");
+            httpWebRequest.ContentType = "application/json; charset=utf-8";
+            httpWebRequest.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+            Models.GitHub.Release githubRelease = null;
+            using (var httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse())
+            {
+                using (var response = httpWebResponse.GetResponseStream())
+                {
+
+                    if (response != null)
+                    {
+                        string responseText = string.Empty;
+                        using (var streamReader = new StreamReader(response))
+                        {
+                            responseText = streamReader.ReadToEnd();
+                        }
+                        //responseText = responseText.Replace("\n", "");
+                        //responseText = responseText.Replace("\t", "");
+                        //responseText = responseText.Remove(0, 1);
+                        //responseText = responseText.Remove(responseText.Length - 1, 1);
+
+
+                        githubRelease = JsonConvert.DeserializeObject<Models.GitHub.Release>(responseText);
+
+                    }
+
+                    if (httpWebResponse.StatusCode != HttpStatusCode.OK || githubRelease == null)
+                    {
+                        githubRelease = new Models.GitHub.Release();
+                        githubRelease.tag_name = "0";
+                    }
+                }
+            }
+
+            //  Compare Verions
+            //  If GitHUb file is newer, download it and replace the local file
+            int localVersionNumber;
+            int gitHubVersionNumber;
+            Int32.TryParse(localVersion, out localVersionNumber);
+            Int32.TryParse(githubRelease.tag_name, out gitHubVersionNumber);
+            if (localVersionNumber < gitHubVersionNumber)
+            {
+                foreach (Models.GitHub.Asset asset in githubRelease.assets)
+                {
+                    using (var client = new WebClient())
+                    {
+                        client.DownloadFile(asset.browser_download_url, Path.Combine(localDirectory, asset.name));
+                    }
+                }
+            }
+        }
     }
+
 }
