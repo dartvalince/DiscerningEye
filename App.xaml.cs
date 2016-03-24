@@ -29,6 +29,7 @@ using System.IO;
 using System.Net;
 using System.Net.Cache;
 using System.Windows;
+using Squirrel;
 
 namespace DiscerningEye
 {
@@ -41,9 +42,15 @@ namespace DiscerningEye
         {
             base.OnStartup(e);
 
+            //  Check for application updates
+            this.SquirrlUpdater();
 
-            //  Check for updats to the alarm data file
-            this.UpdateAlarmData();
+
+
+
+
+                //  Check for updats to the alarm data file
+                this.UpdateAlarmData();
 
             var bs = new Bootstrapper();
             bs.Run();
@@ -56,6 +63,19 @@ namespace DiscerningEye
             ChangeApplicationTheme();
 
         }
+
+
+        private async void SquirrlUpdater()
+        {
+            using (var mgr = UpdateManager.GitHubUpdateManager(""))
+            {
+                await mgr.Result.UpdateApp();
+            }
+        }
+
+
+
+
 
         private void Current_Exit(object sender, ExitEventArgs e)
         {
@@ -78,6 +98,8 @@ namespace DiscerningEye
                              ThemeManager.GetAccent(DiscerningEye.Properties.Settings.Default.UIAccent),
                              ThemeManager.GetAppTheme(DiscerningEye.Properties.Settings.Default.UIAppTheme));
         }
+
+
 
 
         private void UpdateAlarmData()
