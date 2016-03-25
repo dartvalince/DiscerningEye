@@ -55,13 +55,7 @@ namespace DiscerningEye
             
             
             //  Check for updats to the alarm data file
-
-
-
-
-
-
-            //this.UpdateAlarmData();
+            this.UpdateAlarmData();
 
             var bs = new Bootstrapper();
             bs.Run();
