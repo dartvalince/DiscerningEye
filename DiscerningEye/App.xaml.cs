@@ -41,13 +41,26 @@ namespace DiscerningEye
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-
+            
+            
             //  Check for updats to the alarm data file
-            using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/myuser/myapp"))
+            try
             {
-                await mgr.UpdateApp();
+                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
+                {
+                    await mgr.UpdateApp();
+                }
             }
+            catch (Exception ex)
+            {
+                string message = "";
+                message = ex.Message + Environment.NewLine;
+                if (ex.InnerException != null)
+                    message += ex.InnerException.Message;
+                MessageBox.Show(message);
+            }
+
+
 
 
 
