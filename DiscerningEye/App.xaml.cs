@@ -29,6 +29,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Cache;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace DiscerningEye
@@ -38,27 +39,23 @@ namespace DiscerningEye
     /// </summary>
     public partial class App : Application
     {
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
+
+
             base.OnStartup(e);
+
+            Task.Run(async () =>
+             {
+                 using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
+                 {
+                     await mgr.Result.UpdateApp();
+                 }
+             });
             
             
             //  Check for updats to the alarm data file
-            try
-            {
-                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
-                {
-                    await mgr.UpdateApp();
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = "";
-                message = ex.Message + Environment.NewLine;
-                if (ex.InnerException != null)
-                    message += ex.InnerException.Message;
-                MessageBox.Show(message);
-            }
+
 
 
 
