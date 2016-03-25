@@ -24,6 +24,7 @@
 using DiscerningEye.ViewModels;
 using MahApps.Metro;
 using Newtonsoft.Json;
+using Squirrel;
 using System;
 using System.IO;
 using System.Net;
@@ -37,13 +38,20 @@ namespace DiscerningEye
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
 
             //  Check for updats to the alarm data file
-            this.UpdateAlarmData();
+            using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/myuser/myapp"))
+            {
+                await mgr.UpdateApp();
+            }
+
+
+
+            //this.UpdateAlarmData();
 
             var bs = new Bootstrapper();
             bs.Run();

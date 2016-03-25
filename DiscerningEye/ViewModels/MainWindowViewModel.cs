@@ -22,6 +22,7 @@
 
 
 
+using Squirrel;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
@@ -147,6 +148,8 @@ namespace DiscerningEye.ViewModels
             this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
             this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
             this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
+
+
         }
 
 
