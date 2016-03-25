@@ -44,14 +44,6 @@ namespace DiscerningEye
 
 
             base.OnStartup(e);
-
-            Task.Run(async () =>
-             {
-                 using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
-                 {
-                     await mgr.Result.UpdateApp();
-                 }
-             });
             
             
             //  Check for updats to the alarm data file

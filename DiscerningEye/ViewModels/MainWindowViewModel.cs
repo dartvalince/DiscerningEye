@@ -23,6 +23,7 @@
 
 
 using Squirrel;
+using System;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
@@ -37,6 +38,7 @@ namespace DiscerningEye.ViewModels
         //  Fields
         //================================================================
         private bool _isGatheringDictionaryOpen;
+        private IUpdateManager updateManager;
 
 
         //================================================================
@@ -143,12 +145,14 @@ namespace DiscerningEye.ViewModels
         public MainWindowViewModel()
         {
 
+
             this.GitHubCommand = new Commands.LaunchGithubPageCommand(this);
             this.MinimalNotificationCommand = new Commands.TaskBarCommands.MinimalNotificationsCommand(this);
             this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
             this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
             this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
 
+            this.CheckForUpdate();
 
         }
 
@@ -157,6 +161,26 @@ namespace DiscerningEye.ViewModels
         //================================================================
         //  Functions
         //================================================================
+        private async void CheckForUpdate()
+        {
+            try
+            {
+                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
+                {
+                    updateManager = mgr;
+                    var release = await mgr.UpdateApp();
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message + Environment.NewLine;
+                if (ex.InnerException != null)
+                    message += ex.InnerException.Message;
+                MessageBox.Show(message);
+            }
+        }
+
+
 
         public void OpenGatheringDictionary()
         {
