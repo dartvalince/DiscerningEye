@@ -29,7 +29,6 @@ using System.IO;
 using System.Net;
 using System.Net.Cache;
 using System.Windows;
-using Squirrel;
 
 namespace DiscerningEye
 {
@@ -38,18 +37,9 @@ namespace DiscerningEye
     /// </summary>
     public partial class App : Application
     {
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            MessageBox.Show(typeof(App).Assembly.GetName().Version.ToString());
-
-            //  Check for application updates
-            using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/Dartvalince/DiscerningEye"))
-            {
-                await mgr.Result.UpdateApp();
-            }
-
-
 
 
             //  Check for updats to the alarm data file
@@ -89,6 +79,7 @@ namespace DiscerningEye
                              ThemeManager.GetAccent(DiscerningEye.Properties.Settings.Default.UIAccent),
                              ThemeManager.GetAppTheme(DiscerningEye.Properties.Settings.Default.UIAppTheme));
         }
+
 
 
 

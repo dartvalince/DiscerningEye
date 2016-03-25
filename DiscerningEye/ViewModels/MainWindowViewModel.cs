@@ -35,8 +35,6 @@ namespace DiscerningEye.ViewModels
         //================================================================
         //  Fields
         //================================================================
-        //public static MainWindowViewModel ViewModel;
-        ObservableCollection<ViewModelBase> _viewModels;
         private bool _isGatheringDictionaryOpen;
 
 
@@ -46,24 +44,28 @@ namespace DiscerningEye.ViewModels
         public bool IsGatheringDictionaryOpen
         {
             get { return this._isGatheringDictionaryOpen; }
-            set
-            {
-                if (this._isGatheringDictionaryOpen == value) return;
-                this._isGatheringDictionaryOpen = value;
-                OnPropertyChanged("IsGatheringDictionaryOpen");
-            }
+            set { SetProperty(ref _isGatheringDictionaryOpen, value); }
         }
 
+        private string _windowTitle;
 
-        public ObservableCollection<ViewModelBase> ViewModels
+        public string WindowTitle
         {
-            get
-            {
-                if (_viewModels == null)
-                    _viewModels = new ObservableCollection<ViewModelBase>();
-                return _viewModels;
-            }
+            get { return _windowTitle; }
+            set { SetProperty(ref _windowTitle, value); }
         }
+
+
+
+        //public ObservableCollection<ViewModelBase> ViewModels
+        //{
+        //    get
+        //    {
+        //        if (_viewModels == null)
+        //            _viewModels = new ObservableCollection<ViewModelBase>();
+        //        return _viewModels;
+        //    }
+        //}
 
 
 
@@ -144,6 +146,7 @@ namespace DiscerningEye.ViewModels
             this.MinimalNotificationCommand = new Commands.TaskBarCommands.MinimalNotificationsCommand(this);
             this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
             this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
+            this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
         }
 
 
