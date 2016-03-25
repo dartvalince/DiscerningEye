@@ -165,7 +165,7 @@ namespace DiscerningEye.ViewModels
         {
             try
             {
-                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye/"))
+                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye"))
                 {
                     updateManager = mgr;
                     var release = await mgr.UpdateApp();
