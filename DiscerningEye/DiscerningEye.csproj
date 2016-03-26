@@ -202,6 +202,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Converters\BooleanToFlyoutThemeConverter.cs" />
     <Compile Include="DataAccess\AlarmItemRepository.cs" />
     <Compile Include="DataAccess\AlarmScheduleRepository.cs" />
     <Compile Include="Models\AlarmItem.cs" />

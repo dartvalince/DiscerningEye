@@ -38,12 +38,16 @@
                       xmlns:tb="http://www.hardcodet.net/taskbar"
                       xmlns:prism="http://prismlibrary.com/"
                       prism:ViewModelLocator.AutoWireViewModel="True"
+                      xmlns:converters="clr-namespace:DiscerningEye.Converters"
                       WindowState="Maximized"
                       Title="{Binding WindowTitle}" 
                       Height="1080" 
                       Icon="pack://application:,,,/DiscerningEye;component/Resources/icon.ico"
                       ShowIconOnTitleBar="False"
                       Width="1920">
+    <Controls:MetroWindow.Resources>
+        <converters:BooleanToFlyoutThemeConverter x:Key="BooleanToFlyoutThemeConverter" />
+    </Controls:MetroWindow.Resources>
     <Controls:MetroWindow.RightWindowCommands>
         <Controls:WindowCommands>
             <TextBlock>
@@ -60,9 +64,6 @@
 
     </Controls:MetroWindow.RightWindowCommands>
 
-
-
-
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
             <Controls:FlyoutsControl.LayoutTransform>
@@ -70,7 +71,7 @@
             </Controls:FlyoutsControl.LayoutTransform>
             <Controls:Flyout IsOpen="{Binding IsGatheringDictionaryOpen}"
                              Position="Right"
-                             Theme="Inverse"
+                             Theme="{Binding Source={x:Static prop:Settings.Default}, Path=UseInverseOnFlyout, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToFlyoutThemeConverter}}"
                              Width="600">
                 <Views:GatheringDictionary Margin="10,0,10,10" />
             </Controls:Flyout>

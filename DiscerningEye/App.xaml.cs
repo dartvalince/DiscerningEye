@@ -69,7 +69,7 @@ namespace DiscerningEye
 
         private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme")
+            if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme" || e.PropertyName == "UseInverseOnFlyout")
             {
                 ChangeApplicationTheme();
             }
