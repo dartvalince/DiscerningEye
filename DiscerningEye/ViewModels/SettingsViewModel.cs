@@ -22,29 +22,21 @@
 
 
 
-using DiscerningEye.Model;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using NAudio.Wave;
-using System.Windows.Input;
+using Prism.Commands;
 
 namespace DiscerningEye.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
-        //=========================================================
-        //  Private Fields
-        //=========================================================
-        private string _testButtonText;
-        private string _uiAccentSelectedValue;
-        private string _uiAppThemeSelectedValue;
+              
+        
         private IWavePlayer _waveOutDevice;
         private AudioFileReader _audioFileReader;
 
-
-
-        //=========================================================
-        //  Properties
-        //=========================================================
+        private string _uiAccentSelectedValue;
         /// <summary>
         /// Gets or sets the selected UI Accent Value
         /// </summary>
@@ -54,15 +46,10 @@ namespace DiscerningEye.ViewModels
         public string UIAccentSelectedValue
         {
             get { return this._uiAccentSelectedValue; }
-            set
-            {
-                if (this._uiAccentSelectedValue == value) return;
-                this._uiAccentSelectedValue = value;
-
-            }
+            set { SetProperty(ref _uiAccentSelectedValue, value); }
         }
 
-
+        private string _uiAppThemeSelectedValue;
         /// <summary>
         /// Gets or sets the selected UI theme
         /// </summary>
@@ -72,39 +59,40 @@ namespace DiscerningEye.ViewModels
         public string UIAppThemeSelectedValue
         {
             get { return this._uiAppThemeSelectedValue; }
-            set
-            {
-                if (this._uiAppThemeSelectedValue == value) return;
-                this._uiAppThemeSelectedValue = value;
-            }
+            set { SetProperty(ref this._uiAppThemeSelectedValue, value); }
         }
 
+        private string _testButtonText;
+        /// <summary>
+        /// Gets or sets a string representing the text shown for the test button
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the content property of a button on Settings.xaml
+        /// </remarks>
         public string TestButtonText
         {
             get { return this._testButtonText; }
-            set
-            {
-                if (this._testButtonText == value) return;
-                this._testButtonText = value;
-                OnPropertyChanged("TestButtonText");
-            }
+            set { SetProperty(ref this._testButtonText, value); }
         }
 
         //=========================================================
         //  Commands
         //=========================================================
-        public ICommand SelectFileCommand
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// Gets or sets the SelectFileCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to a control on Settings.xaml
+        /// </remarks>
+        public DelegateCommand SelectFileCommand { get; private set; }
 
-        public ICommand TestNotificationCommand
-        {
-            get;
-            private set;
-        }
-
+        /// <summary>
+        /// Gets or sets the TestNotificationCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to a control on Settings.xaml
+        /// </remarks>
+        public DelegateCommand TestNotificationCommand { get; private set; }
 
 
         //=========================================================
@@ -115,11 +103,53 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public SettingsViewModel()
         {
+            //  Setup the commands
+            this.SelectFileCommand = new DelegateCommand(() =>
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Filter = "MP3 (*.mp3)|*.mp3";
+                if ((bool)ofd.ShowDialog())
+                {
+                    Properties.Settings.Default.NotificationToneUri = ofd.FileName;
+                }
+            }, () => true);
+
+
+            this.TestNotificationCommand = new DelegateCommand(async() =>
+            {
+                if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
+                {
+                    MetroDialogSettings settings = new MetroDialogSettings();
+                    settings.AffirmativeButtonText = "Ok";
+                    settings.AnimateHide = true;
+                    settings.AnimateShow = true;
+                    settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    await Views.MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
+                    return;
+                }
+
+                if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
+                {
+
+                    _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
+                    _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
+                    _waveOutDevice.Init(_audioFileReader);
+                    _waveOutDevice.Play();
+                    this.TestButtonText = "Cancel Test";
+                }
+                else
+                {
+                    _waveOutDevice.Stop();
+                }
+            }, () => true);
+
+
+            //  Set default values for propeties
             this.TestButtonText = "Test Sound";
             this.UIAccentSelectedValue = Properties.Settings.Default.UIAccent;
             this.UIAppThemeSelectedValue = Properties.Settings.Default.UIAppTheme;
-            this.SelectFileCommand = new Commands.SettingsViewModelCommands.SelectNotificationFileCommand(this);
-            this.TestNotificationCommand = new Commands.SettingsViewModelCommands.TestNotificationSoundCommand(this);
+
+            //  Initilize the wave out device
             _waveOutDevice = new WaveOut();
             _waveOutDevice.PlaybackStopped += _waveOutDevice_PlaybackStopped;
         }
@@ -128,6 +158,16 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Events
         //=========================================================
+        /// <summary>
+        /// Occurs when the _waveOutDevice sound playback is stopped.
+        /// </summary>
+        /// <remarks>
+        /// This is used to ensure that the object is disposed after playback has stopped
+        /// to prevent any type of memory leak and to also allow users to test sounds
+        /// again if they choose to test sound immediatly after stopping playback
+        /// </remarks>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void _waveOutDevice_PlaybackStopped(object sender, StoppedEventArgs e)
         {
             if (_audioFileReader != null)
@@ -137,10 +177,6 @@ namespace DiscerningEye.ViewModels
             }
             this.TestButtonText = "Test Sound";
         }
-
-
-
-
 
 
         //=========================================================
@@ -176,38 +212,5 @@ namespace DiscerningEye.ViewModels
         }
 
         #endregion IDisposeable Implementation
-
-
-
-        //=========================================================
-        //  Methods
-        //=========================================================
-        public async void TestNotificationSound()
-        {
-            if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
-            {
-                MetroDialogSettings settings = new MetroDialogSettings();
-                settings.AffirmativeButtonText = "Ok";
-                settings.AnimateHide = true;
-                settings.AnimateShow = true;
-                settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                await Views.MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
-                return;
-            }
-            
-            if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
-            {
-
-                _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
-                _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
-                _waveOutDevice.Init(_audioFileReader);
-                _waveOutDevice.Play();
-                this.TestButtonText = "Cancel Test";
-            }
-            else
-            {
-                _waveOutDevice.Stop();
-            }
-        }
     }
 }

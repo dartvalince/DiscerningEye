@@ -202,8 +202,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Commands\SettingsViewModelCommands\TestNotificationSoundCommand.cs" />
-    <Compile Include="Commands\SettingsViewModelCommands\SelectNotificationFileCommand.cs" />
     <Compile Include="DataAccess\AlarmItemRepository.cs" />
     <Compile Include="DataAccess\AlarmScheduleRepository.cs" />
     <Compile Include="Models\AlarmItem.cs" />
@@ -378,9 +376,7 @@
   <ItemGroup>
     <Resource Include="License.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Commands\MainWindowViewModelCommands\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
