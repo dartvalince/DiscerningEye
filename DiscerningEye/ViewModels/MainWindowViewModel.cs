@@ -22,6 +22,7 @@
 
 
 
+using Prism.Commands;
 using Squirrel;
 using System;
 using System.Collections.ObjectModel;
@@ -58,25 +59,6 @@ namespace DiscerningEye.ViewModels
             set { SetProperty(ref _windowTitle, value); }
         }
 
-
-
-        //public ObservableCollection<ViewModelBase> ViewModels
-        //{
-        //    get
-        //    {
-        //        if (_viewModels == null)
-        //            _viewModels = new ObservableCollection<ViewModelBase>();
-        //        return _viewModels;
-        //    }
-        //}
-
-
-
-
-
-
-
-
         //================================================================
         //  Commands
         //================================================================
@@ -86,7 +68,7 @@ namespace DiscerningEye.ViewModels
         /// <remarks>
         /// This is bound to the Command of the Settings button on MainWindow.xaml
         /// </remarks>
-        public ICommand SettingsCommand
+        public DelegateCommand SettingsCommand
         {
             get;
             private set;
@@ -100,32 +82,32 @@ namespace DiscerningEye.ViewModels
         /// This is not bound to any controls on a view, instead it is called
         /// explicity when the Settings flyout on MainWindow.xaml is closed.
         /// </remarks>
-        public ICommand SettingsSaveCommand
+        public DelegateCommand SettingsSaveCommand
         {
             get;
             private set;
         }
 
 
-        public ICommand GitHubCommand
+        public DelegateCommand GitHubCommand
         {
             get;
             private set;
         }
 
-        public ICommand MinimalNotificationCommand
+        public DelegateCommand MinimalNotificationCommand
         {
             get;
             private set;
         }
 
-        public ICommand AllNotificationsCommand
+        public DelegateCommand AllNotificationsCommand
         {
             get;
             private set;
         }
 
-        public ICommand OpenGatheringDictionaryCommand
+        public DelegateCommand OpenGatheringDictionaryCommand
         {
             get;
             private set;
@@ -145,16 +127,33 @@ namespace DiscerningEye.ViewModels
         public MainWindowViewModel()
         {
 
-
-            this.GitHubCommand = new Commands.LaunchGithubPageCommand(this);
-            this.MinimalNotificationCommand = new Commands.TaskBarCommands.MinimalNotificationsCommand(this);
-            this.AllNotificationsCommand = new Commands.TaskBarCommands.AllNotificationsCommand(this);
-            this.OpenGatheringDictionaryCommand = new Commands.MainWindowViewModelCommands.OpenGatheringDictionaryCommand(this);
+            this.GitHubCommand = new DelegateCommand(this.LaunchGithubPage, () => true);
+            this.MinimalNotificationCommand = new DelegateCommand(this.MinimalNotifications, () => true);
+            this.AllNotificationsCommand = new DelegateCommand(this.AllNotifications, () => true);
+            this.OpenGatheringDictionaryCommand = new DelegateCommand(this.OpenGatheringDictionary, () => true);
             this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
-
+#if (!DEBUG)
             this.CheckForUpdate();
-
+#endif
         }
+
+
+        //=========================================================
+        //  Interface Implementations
+        //=========================================================
+        #region IDisposeable Implementation
+
+        protected override void OnDispose()
+        {
+            if (updateManager != null)
+                updateManager.Dispose();
+            updateManager = null;
+        }
+
+        #endregion IDisposeable Implementation
+
+
+
 
 
 
@@ -179,6 +178,7 @@ namespace DiscerningEye.ViewModels
                 MessageBox.Show(message);
             }
         }
+
 
 
 
