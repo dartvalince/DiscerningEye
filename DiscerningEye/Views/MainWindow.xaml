@@ -60,6 +60,8 @@
             </TextBlock>
             <Button Content="Gathering Dictionary"
                     Command="{Binding OpenGatheringDictionaryCommand}" />
+            <Button Content="Settings"
+                    Command="{Binding OpenSettingsCommand}" />
         </Controls:WindowCommands>
 
     </Controls:MetroWindow.RightWindowCommands>
@@ -69,6 +71,17 @@
             <Controls:FlyoutsControl.LayoutTransform>
                 <ScaleTransform ScaleX="{Binding Source={StaticResource Settings}, Path=UIScale}" ScaleY="{Binding Source={StaticResource Settings}, Path=UIScale}" />
             </Controls:FlyoutsControl.LayoutTransform>
+
+
+            <Controls:Flyout IsOpen="{Binding IsSettingsOpen}"
+                             Position="Right"
+                             Theme="{Binding Source={x:Static prop:Settings.Default}, Path=UseInverseOnFlyout, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToFlyoutThemeConverter}}"
+                             Width="600">
+                <Views:Settings Margin="10,0,10,10" />
+            </Controls:Flyout>
+            
+            
+            
             <Controls:Flyout IsOpen="{Binding IsGatheringDictionaryOpen}"
                              Position="Right"
                              Theme="{Binding Source={x:Static prop:Settings.Default}, Path=UseInverseOnFlyout, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToFlyoutThemeConverter}}"
@@ -80,7 +93,6 @@
     <Grid Margin="4">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="400"/>
         </Grid.ColumnDefinitions>
         <Grid.LayoutTransform>
             <ScaleTransform ScaleX="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}"  ScaleY="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale}" />
@@ -127,11 +139,5 @@
         </tb:TaskbarIcon>
         <Views:AlarmsView x:Name="AlarmsView" Grid.Column="0"
                           Margin="10,0,10,10"/>
-        <Views:Settings Grid.Column="1"
-                            Margin="10,0,10,10" />
-
-
-
-
     </Grid>
 </Controls:MetroWindow>

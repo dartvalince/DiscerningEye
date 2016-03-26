@@ -48,6 +48,21 @@ namespace DiscerningEye.ViewModels
             set { SetProperty(ref _isGatheringDictionaryOpen, value); }
         }
 
+        private bool _isSettingsOpen;
+        /// <summary>
+        /// Gets or sets a boolean value representing if the Settings flyout should be open
+        /// or closed
+        /// </summary>
+        /// <remarks>
+        /// This is boud to the IsOpen property of the Settings flyout on MainWindow.xaml
+        /// </remarks>
+        public bool IsSettingsOpen
+        {
+            get { return _isSettingsOpen; }
+            set { SetProperty(ref _isSettingsOpen, value); }
+        }
+
+
         private string _windowTitle;
         /// <summary>
         /// Gets or sets the string representing the title to use for the window
@@ -117,6 +132,14 @@ namespace DiscerningEye.ViewModels
         /// </remarks>
         public DelegateCommand OpenGatheringDictionaryCommand { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the OpenSettingsCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the window title button on MainWindow.xaml
+        /// </remarks>
+        public DelegateCommand OpenSettingsCommand { get; private set; }
+
 
 
 
@@ -160,6 +183,11 @@ namespace DiscerningEye.ViewModels
             this.OpenGatheringDictionaryCommand = new DelegateCommand(() =>
             {
                 this.IsGatheringDictionaryOpen = !this.IsGatheringDictionaryOpen;
+            }, () => true);
+
+            this.OpenSettingsCommand = new DelegateCommand(() =>
+            {
+                this.IsSettingsOpen = !this.IsSettingsOpen;
             }, () => true);
 
             //  Set the window title
