@@ -54,6 +54,9 @@
                                    Margin="5,10,5,5" />
                         <ComboBox  ItemsSource="{Binding Source={x:Static prop:Settings.Default}, Path=UIScaleList, Mode=OneTime, UpdateSourceTrigger=PropertyChanged}"
                                   SelectedValue="{Binding Source={x:Static prop:Settings.Default}, Path=UIScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <CheckBox Margin="5,10,5,5"
+                                  Content="Inverse Base Theme On Flyouts"
+                                  IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=UseInverseOnFlyout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </GroupBox>
 
