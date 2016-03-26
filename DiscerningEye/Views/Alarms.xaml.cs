@@ -36,7 +36,6 @@ namespace DiscerningEye.Views
             InitializeComponent();
             View = this;
             
-            
         }
 
         private void AlarmViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)

@@ -219,6 +219,7 @@
     <Compile Include="Models\XIVDBSharp\Type.cs" />
     <Compile Include="Models\XIVDBSharp\Zone.cs" />
     <Compile Include="Utilities\ClockController.cs" />
+    <Compile Include="Utilities\GridViewSort.cs" />
     <Compile Include="ViewModels\AlarmsViewModel.cs" />
     <Compile Include="ViewModels\GatheringDictionaryViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

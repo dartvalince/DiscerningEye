@@ -28,6 +28,7 @@
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:p="clr-namespace:DiscerningEye.Properties"
              xmlns:local="clr-namespace:DiscerningEye.Views"
+             xmlns:utils="clr-namespace:DiscerningEye.Utilities"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
@@ -184,7 +185,8 @@
                 </Grid.ColumnDefinitions>
                 <ListView Grid.Column="0"
                           Grid.Row="0"
-                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}">
+                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}"
+                          utils:GridViewSort.AutoSort="True">
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>
@@ -220,12 +222,12 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
-                            <GridViewColumn Width="auto" Header="Start" DisplayMemberBinding="{Binding Path=StartTime}" />
-                            <GridViewColumn Width="auto" Header="End" DisplayMemberBinding="{Binding Path=EndTime}" />
-                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" />
-                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" />
-                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" />
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}"  utils:GridViewSort.PropertyName="Name" />
+                            <GridViewColumn Width="auto" Header="Start" DisplayMemberBinding="{Binding Path=StartTime}"  utils:GridViewSort.PropertyName="StartTime" />
+                            <GridViewColumn Width="auto" Header="End" DisplayMemberBinding="{Binding Path=EndTime}" utils:GridViewSort.PropertyName="EndTime" />
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
                         </GridView>
                     </ListView.View>
 
@@ -257,7 +259,8 @@
 
                 <ListView Grid.Column="0"
                           Grid.Row="0"
-                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}">
+                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
+                          utils:GridViewSort.AutoSort="True">
                     <ListView.GroupStyle>
                         <GroupStyle>
                             <GroupStyle.ContainerStyle>
@@ -293,8 +296,8 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
-                            <GridViewColumn Header="Available In" Width="auto">
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" utils:GridViewSort.PropertyName="Name" />
+                            <GridViewColumn Header="Available In" Width="auto" utils:GridViewSort.PropertyName="NextSpawn">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock TextAlignment="Center">
@@ -320,9 +323,9 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" />
-                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" />
-                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" />
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
                         </GridView>
                     </ListView.View>
 
