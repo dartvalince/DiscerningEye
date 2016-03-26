@@ -130,7 +130,7 @@ namespace DiscerningEye.ViewModels
             this.GitHubCommand = new DelegateCommand(this.LaunchGithubPage, () => true);
             this.MinimalNotificationCommand = new DelegateCommand(this.MinimalNotifications, () => true);
             this.AllNotificationsCommand = new DelegateCommand(this.AllNotifications, () => true);
-            this.OpenGatheringDictionaryCommand = new DelegateCommand(this.OpenGatheringDictionary, () => true);
+            this.OpenGatheringDictionaryCommand = new DelegateCommand(() => this.IsGatheringDictionaryOpen = !this.IsGatheringDictionaryOpen, () => true);
             this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
 #if (!DEBUG)
             this.CheckForUpdate();
