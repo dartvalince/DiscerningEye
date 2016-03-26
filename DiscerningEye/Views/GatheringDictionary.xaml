@@ -120,12 +120,13 @@
 
                     </GroupBox>
 
-                    <GroupBox Grid.Row="1"
+                        <!--ItemsSource="{Binding GatheringInformationCollection}" -->
+                        <GroupBox Grid.Row="1"
                               Header="Gathered By Jobs (Select to View WHere to Gather)">
                         <DataGrid Grid.Row="1"
-                                ItemsSource="{Binding GatheringInformationCollection}" 
+                                ItemsSource="{Binding SelectedGatheringItem.gathering}"
                                 IsReadOnly="True"
-                                SelectedValue="{Binding SelectedGatheringInformation, Mode=TwoWay}"
+                                SelectedValue="{Binding SelectedGatheringType, Mode=TwoWay}"
                                 SelectionMode="Single"
                                 IsSynchronizedWithCurrentItem="True"
                                 CanUserAddRows="False"
@@ -176,7 +177,7 @@
                     <GroupBox Grid.Row="2"
                               Header="Where to Gather">
                         <DataGrid Grid.Row="1" 
-                                ItemsSource="{Binding NodeInformationCollection}"
+                                ItemsSource="{Binding SelectedGatheringType.nodes}"
                                 SelectedValue="{Binding SelectedNodeInformation, Mode=TwoWay}"
                                 IsSynchronizedWithCurrentItem="True"
                                 SelectionMode="Single"

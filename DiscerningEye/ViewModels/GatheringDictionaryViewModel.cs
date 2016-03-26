@@ -31,25 +31,11 @@ namespace DiscerningEye.ViewModels
 {
     public class GatheringDictionaryViewModel : ViewModelBase
     {
-        //=========================================================
-        //  Private Fields
-        //=========================================================
+
         private GatheringItemRepository _gatheringItemRepository;
+
+
         private ObservableCollection<Model.XIVDBSharp.ItemRoot> _gatheirngItemsCollection;
-        private ObservableCollection<Model.XIVDBSharp.Gathering> _gatheringInformationCollection;
-        private ObservableCollection<Model.XIVDBSharp.Node> _nodeInformationCollection;
-        private Model.XIVDBSharp.ItemRoot _selectedGatheringItem;
-        private Model.XIVDBSharp.Gathering _selectedGatheringInformation;
-        private Model.XIVDBSharp.Node _selectedNodeInformation;
-        private string _searchText;
-
-
-
-
-        //=========================================================
-        //  Propertes
-        //=========================================================
-
         /// <summary>
         /// Gets or sets the list of items
         /// </summary>
@@ -59,58 +45,11 @@ namespace DiscerningEye.ViewModels
         public ObservableCollection<Model.XIVDBSharp.ItemRoot> GatheirngItemsCollection
         {
             get { return _gatheirngItemsCollection; }
-            set
-            {
-                if (this._gatheirngItemsCollection == value) return;
-                this._gatheirngItemsCollection = value;
-                OnPropertyChanged("GatheirngItemsCollection");
-            }
+            set { SetProperty(ref this._gatheirngItemsCollection, value); }
         }
 
-        /// <summary>
-        /// Gets or sets the collection of Gathering Information for the current selecteditme
-        /// </summary>
-        /// <remarks>
-        /// This is bound to as the ItemsSource for a datagrid on GatheringItemListView.xaml
-        /// </remarks>
-        public ObservableCollection<Model.XIVDBSharp.Gathering> GatheringInformationCollection
-        {
-            get { return this._gatheringInformationCollection; }
-            set
-            {
-                if (this._gatheringInformationCollection == value) return;
-                this._gatheringInformationCollection = value;
 
-                OnPropertyChanged("GatheringInformationCollection");
-
-                //  Set the selected Gathering Informaiton item 
-                if (value != null)
-                    this.SelectedGatheringInformation = value[0];
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the collection of Node Information for the current selected gathering
-        /// information item
-        /// </summary>
-        /// <remarks>
-        /// This is bound as the ItemSource for a datagrid on GatheringItemListView.xaml
-        /// </remarks>
-        public ObservableCollection<Model.XIVDBSharp.Node> NodeInformationCollection
-        {
-            get { return this._nodeInformationCollection; }
-            set
-            {
-                if (this._nodeInformationCollection == value) return;
-                this._nodeInformationCollection = value;
-                OnPropertyChanged("NodeInformationCollection");
-
-                //  Set the selected Gathering Informaiton item 
-                if (value != null)
-                    this.SelectedNodeInformation = value[0];
-            }
-        }
-
+        private Model.XIVDBSharp.ItemRoot _selectedGatheringItem;
         /// <summary>
         /// Gets or sets the current selected item in the items list datagrid
         /// </summary>
@@ -120,43 +59,25 @@ namespace DiscerningEye.ViewModels
         public Model.XIVDBSharp.ItemRoot SelectedGatheringItem
         {
             get { return this._selectedGatheringItem; }
-            set
-            {
-                if (this._selectedGatheringItem == value) return;
-                this._selectedGatheringItem = value;
-                OnPropertyChanged("SelectedGatheringItem");
-
-                //  Initilize the GatheringInformationCollection based on this
-                if (value != null)
-                    this.GatheringInformationCollection = new ObservableCollection<Model.XIVDBSharp.Gathering>(this.RetreiveGatheringListFromItemRoot(value));
-                
-            }
-
+            set { SetProperty(ref this._selectedGatheringItem, value); }
         }
 
 
+        private Model.XIVDBSharp.Gathering _selectedGatheringType;
         /// <summary>
         /// Gets or sets the current selected gathering item in the gathering information datagrid
         /// </summary>
         /// <remarks>
         /// This is bound to the SelectedValue of a datagrid on GatheringItemListView.xaml
         /// </remarks>
-        public Model.XIVDBSharp.Gathering SelectedGatheringInformation
+        public Model.XIVDBSharp.Gathering SelectedGatheringType
         {
-            get { return this._selectedGatheringInformation; }
-            set
-            {
-                if (this._selectedGatheringInformation == value) return;
-                this._selectedGatheringInformation = value;
-                OnPropertyChanged("SelectedGatheringInformation");
-
-                //  Initilize the NodeInformationCollection based on this
-                if(value != null)
-                    this.NodeInformationCollection = new ObservableCollection<Model.XIVDBSharp.Node>(this.RetreiveNodeListFromGathering(value));
-            }
-
+            get { return this._selectedGatheringType; }
+            set { SetProperty(ref this._selectedGatheringType, value); }
         }
 
+
+        private Model.XIVDBSharp.Node _selectedNodeInformation;
         /// <summary>
         /// Gets or sets the current selected node inofmraiton item in the node information datagrid
         /// </summary>
@@ -166,15 +87,11 @@ namespace DiscerningEye.ViewModels
         public Model.XIVDBSharp.Node SelectedNodeInformation
         {
             get { return this._selectedNodeInformation; }
-            set
-            {
-                if (this._selectedNodeInformation == value) return;
-                this._selectedNodeInformation = value;
-                OnPropertyChanged("SelectedNodeInformation");
-            }
+            set { SetProperty(ref this._selectedNodeInformation, value); }
         }
 
 
+        private string _searchText;
         /// <summary>
         /// Gets or sets the text used to filter the GatheirngItemsCollection view
         /// </summary>
@@ -186,10 +103,8 @@ namespace DiscerningEye.ViewModels
             get { return this._searchText; }
             set
             {
-                if (this._searchText == value) return;
-                this._searchText = value;
+                SetProperty(ref this._searchText, value);
                 this.FilterView(value);
-                OnPropertyChanged("SearchText");
             }
         }
 
@@ -197,7 +112,6 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Constructor
         //=========================================================
-        //public GatheringItemViewModel(Canvas mapCanvas)
         public GatheringDictionaryViewModel()
         {
             if (_gatheringItemRepository == null)
@@ -220,7 +134,7 @@ namespace DiscerningEye.ViewModels
         protected override void OnDispose()
         {
             this.GatheirngItemsCollection.Clear();
-            this.SelectedGatheringInformation = null;
+            this.SelectedGatheringType = null;
             this.SelectedNodeInformation = null;
             this.SelectedGatheringItem = null;
         }
@@ -232,44 +146,6 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Methods
         //=========================================================
-        /// <summary>
-        /// Retreives a list of Gathering information from the given ItemRoot object
-        /// </summary>
-        /// <param name="itemRoot">The ItemRoot item to retrieve the gathering information and build a list upon</param>
-        /// <returns></returns>
-        private List<Model.XIVDBSharp.Gathering> RetreiveGatheringListFromItemRoot(Model.XIVDBSharp.ItemRoot itemRoot)
-        {
-            if (itemRoot == null) return new List<Model.XIVDBSharp.Gathering>();
-            List<Model.XIVDBSharp.Gathering> gatherings = new List<Model.XIVDBSharp.Gathering>();
-
-            foreach (Model.XIVDBSharp.Gathering gathering in itemRoot.gathering)
-            {
-                gathering.stars_html = System.Net.WebUtility.HtmlDecode(gathering.stars_html);
-                gatherings.Add(gathering);
-            }
-            return gatherings;
-        }
-
-
-        /// <summary>
-        /// Retreives a list of node information from the given Gathering object
-        /// </summary>
-        /// <param name="gathering">The Gathering object to retrieve the node information and build a list upon</param>
-        /// <returns></returns>
-        private List<Model.XIVDBSharp.Node> RetreiveNodeListFromGathering(Model.XIVDBSharp.Gathering gathering)
-        {
-            if (gathering == null) return new List<Model.XIVDBSharp.Node>();
-
-            List<Model.XIVDBSharp.Node> nodes = new List<Model.XIVDBSharp.Node>();
-            foreach (Model.XIVDBSharp.Node node in gathering.nodes)
-            {
-                node.gathering = gathering.type.name;
-                nodes.Add(node);
-            }
-            return nodes;
-
-        }
-
         /// <summary>
         /// Filters the GatheringItemCollection based on the filter text given
         /// </summary>
