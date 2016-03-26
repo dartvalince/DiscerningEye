@@ -382,5 +382,17 @@ namespace DiscerningEye.Properties {
                 this["UseInverseOnFlyout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int EarlyWarningSeconds {
+            get {
+                return ((int)(this["EarlyWarningSeconds"]));
+            }
+            set {
+                this["EarlyWarningSeconds"] = value;
+            }
+        }
     }
 }
