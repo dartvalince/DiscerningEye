@@ -25,26 +25,23 @@
 using Prism.Commands;
 using Squirrel;
 using System;
-using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Windows;
-using System.Windows.Input;
 
 namespace DiscerningEye.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
-    {
-
-        //================================================================
-        //  Fields
-        //================================================================
-        private bool _isGatheringDictionaryOpen;
+    {        
+        
         private IUpdateManager updateManager;
 
-
-        //================================================================
-        //  Properties
-        //================================================================
+        private bool _isGatheringDictionaryOpen;
+        /// <summary>
+        /// Gets or sets a boolean value representing if the Gathering Dicitonary flyout
+        /// shoudl be open or closed
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the IsOpen property of the GatheringDictionary flyout on MainWindow.xaml
+        /// </remarks>
         public bool IsGatheringDictionaryOpen
         {
             get { return this._isGatheringDictionaryOpen; }
@@ -52,7 +49,12 @@ namespace DiscerningEye.ViewModels
         }
 
         private string _windowTitle;
-
+        /// <summary>
+        /// Gets or sets the string representing the title to use for the window
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the Title property of the window on MainWindow.xaml
+        /// </remarks>
         public string WindowTitle
         {
             get { return _windowTitle; }
@@ -68,11 +70,7 @@ namespace DiscerningEye.ViewModels
         /// <remarks>
         /// This is bound to the Command of the Settings button on MainWindow.xaml
         /// </remarks>
-        public DelegateCommand SettingsCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand SettingsCommand { get; private set; }
 
 
         /// <summary>
@@ -82,36 +80,43 @@ namespace DiscerningEye.ViewModels
         /// This is not bound to any controls on a view, instead it is called
         /// explicity when the Settings flyout on MainWindow.xaml is closed.
         /// </remarks>
-        public DelegateCommand SettingsSaveCommand
-        {
-            get;
-            private set;
-        }
+        public DelegateCommand SettingsSaveCommand { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the GitHubCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to a menu item on the notification icon context menu
+        /// in MainWindow.xaml
+        /// </remarks>
+        public DelegateCommand GitHubCommand { get; private set; }
 
-        public DelegateCommand GitHubCommand
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// Gets or sets the MinimalNotificationCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to a menu item on the notification icon context menu
+        /// in MainWindow.xaml
+        /// </remarks>
+        public DelegateCommand MinimalNotificationCommand { get; private set; }
 
-        public DelegateCommand MinimalNotificationCommand
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// Gets or sets the AllNotificationCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to a menu item on the notification icon context menu
+        /// in MainWindow.xaml
+        /// </remarks>
+        public DelegateCommand AllNotificationsCommand { get; private set; }
 
-        public DelegateCommand AllNotificationsCommand
-        {
-            get;
-            private set;
-        }
+        /// <summary>
+        /// Gets or sets the OpenGatheringDicationaryCommand
+        /// </summary>
+        /// <remarks>
+        /// This is bound to the window title button on MainWindow.xaml
+        /// </remarks>
+        public DelegateCommand OpenGatheringDictionaryCommand { get; private set; }
 
-        public DelegateCommand OpenGatheringDictionaryCommand
-        {
-            get;
-            private set;
-        }
 
 
 
@@ -126,12 +131,41 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
+            //  Stup all of the delegate commands
+            this.GitHubCommand = new DelegateCommand(() =>
+            {
+                System.Diagnostics.Process.Start("https://github.com/dartvalince");
+            }, () => true);
 
-            this.GitHubCommand = new DelegateCommand(this.LaunchGithubPage, () => true);
-            this.MinimalNotificationCommand = new DelegateCommand(this.MinimalNotifications, () => true);
-            this.AllNotificationsCommand = new DelegateCommand(this.AllNotifications, () => true);
-            this.OpenGatheringDictionaryCommand = new DelegateCommand(() => this.IsGatheringDictionaryOpen = !this.IsGatheringDictionaryOpen, () => true);
+            this.MinimalNotificationCommand = new DelegateCommand(() =>
+            {
+                Properties.Settings.Default.EnableAlarms = true;
+                Properties.Settings.Default.EnableBallonTip = true;
+                Properties.Settings.Default.EnableEarlyWarning = true;
+                Properties.Settings.Default.EnableNotificationTone = false;
+                Properties.Settings.Default.EnableTextToSpeech = false;
+            }, () => true);
+
+
+            this.AllNotificationsCommand = new DelegateCommand(() =>
+            {
+                Properties.Settings.Default.EnableAlarms = true;
+                Properties.Settings.Default.EnableBallonTip = true;
+                Properties.Settings.Default.EnableEarlyWarning = true;
+                Properties.Settings.Default.EnableNotificationTone = true;
+                Properties.Settings.Default.EnableTextToSpeech = true;
+            }, () => true);
+
+
+            this.OpenGatheringDictionaryCommand = new DelegateCommand(() =>
+            {
+                this.IsGatheringDictionaryOpen = !this.IsGatheringDictionaryOpen;
+            }, () => true);
+
+            //  Set the window title
             this.WindowTitle = string.Format("Discerning Eye (v{0})", typeof(MainWindowViewModel).Assembly.GetName().Version);
+
+            //  Check for updates for the application
 #if (!DEBUG)
             this.CheckForUpdate();
 #endif
@@ -160,6 +194,10 @@ namespace DiscerningEye.ViewModels
         //================================================================
         //  Functions
         //================================================================
+        /// <summary>
+        /// Utilizing the Squirrel.Windows framework, check for updates on GitHub for the applicaiton
+        /// and download/install them if needed.
+        /// </summary>
         private async void CheckForUpdate()
         {
             try
@@ -178,41 +216,5 @@ namespace DiscerningEye.ViewModels
                 MessageBox.Show(message);
             }
         }
-
-
-
-
-        public void OpenGatheringDictionary()
-        {
-            this.IsGatheringDictionaryOpen = true;
-        }
-
-        public void LaunchGithubPage()
-        {
-            System.Diagnostics.Process.Start("https://github.com/dartvalince");
-        }
-
-        public void MinimalNotifications()
-        {
-            Properties.Settings.Default.EnableAlarms = true;
-            Properties.Settings.Default.EnableBallonTip = true;
-            Properties.Settings.Default.EnableEarlyWarning = true;
-            Properties.Settings.Default.EnableNotificationTone = false;
-            Properties.Settings.Default.EnableTextToSpeech = false;
-        }
-
-        public void AllNotifications()
-        {
-            Properties.Settings.Default.EnableAlarms = true;
-            Properties.Settings.Default.EnableBallonTip = true;
-            Properties.Settings.Default.EnableEarlyWarning = true;
-            Properties.Settings.Default.EnableNotificationTone = true;
-            Properties.Settings.Default.EnableTextToSpeech = true;
-        }
-
-
-
-
-
     }
 }
