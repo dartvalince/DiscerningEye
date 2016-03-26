@@ -29,13 +29,11 @@ using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace DiscerningEye.ViewModels
 {
@@ -57,13 +55,7 @@ namespace DiscerningEye.ViewModels
         public ObservableCollection<Model.AlarmItem> AlarmItemCollection
         {
             get { return this._alarmItemCollection; }
-            set
-            {
-                SetProperty(ref _alarmItemCollection, value);
-                //if (this._alarmItemCollection == value) return;
-                //this._alarmItemCollection = value;
-                //OnPropertyChanged("AlarmItemCollection");
-            }
+            set { SetProperty(ref _alarmItemCollection, value); }
         }
 
 
@@ -77,13 +69,7 @@ namespace DiscerningEye.ViewModels
         public ObservableCollection<Model.AlarmSchedule> AlarmScheduleCollection
         {
             get { return this._alarmScheduleCollection; }
-            set
-            {
-                SetProperty(ref _alarmScheduleCollection, value);
-                //if (this._alarmScheduleCollection == value) return;
-                //this._alarmScheduleCollection = value;
-                //OnPropertyChanged("AlarmScheduleCollection");
-            }
+            set { SetProperty(ref _alarmScheduleCollection, value); }
         }
 
 
@@ -113,13 +99,7 @@ namespace DiscerningEye.ViewModels
         public Utilities.ClockController EorzeaClock
         {
             get { return this._eorzeaClock; }
-            set
-            {
-                SetProperty(ref _eorzeaClock, value);
-                //if (this._eorzeaClock == value) return;
-                //this._eorzeaClock = value;
-                //OnPropertyChanged("EorzeaClock");
-            }
+            set { SetProperty(ref _eorzeaClock, value); }
         }
 
 
@@ -136,9 +116,6 @@ namespace DiscerningEye.ViewModels
             set
             {
                 SetProperty(ref _searchText, value);
-                //if (this._searchText == value) return;
-                //this._searchText = value;
-                //OnPropertyChanged("SearchText");
                 if (value == "") this.SearchAlarmsCommand.Execute();
             }
         }
@@ -153,13 +130,7 @@ namespace DiscerningEye.ViewModels
         public Model.AlarmSchedule SelectedSchedule
         {
             get { return this._selectedSchedule; }
-            set
-            {
-                SetProperty(ref _selectedSchedule, value);
-                //if (this._selectedSchedule == value) return;
-                //this._selectedSchedule = value;
-                //OnPropertyChanged("SelectedSchedule");
-            }
+            set { SetProperty(ref _selectedSchedule, value); }
         }
 
 
