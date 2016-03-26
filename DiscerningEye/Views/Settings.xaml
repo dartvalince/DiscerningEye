@@ -132,17 +132,48 @@
                         <CheckBox Content="Enable Early Warning" 
                                   Margin="5,5"
                                   IsChecked="{Binding Source={x:Static prop:Settings.Default}, Path=EnableEarlyWarning, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <StackPanel Orientation="Horizontal"
-                                    Margin="5,5">
-                            <Controls:NumericUpDown Minimum="0"
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Margin="5,5"
+                                       TextWrapping="WrapWithOverflow"
+                                       Text="Enter how soon before an alarm is ready that an early warning should be triggered"/>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="20" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Controls:NumericUpDown Grid.Row="0"
+                                                    Grid.Column="0"
+                                                    Minimum="0"
                                                     Maximum="60"
                                                     Value="{Binding Source={x:Static prop:Settings.Default}, Path=EarlyWarningMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                     HideUpDownButtons="True"
                                                     Margin="0,0"
                                                     />
-                            <TextBlock TextWrapping="WrapWithOverflow"
-                                       Text="Number of minutes for early warning"
-                                       Margin="5,0"/>
+                                <Label Grid.Row="1"
+                                   Grid.Column="0"
+                                   Margin="5,0"
+                                   Content="Minutes" />
+
+                                <Controls:NumericUpDown Grid.Row="0"
+                                                    Grid.Column="2"
+                                                    Minimum="0"
+                                                    Maximum="60"
+                                                    Value="{Binding Source={x:Static prop:Settings.Default}, Path=EarlyWarningSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    HideUpDownButtons="True"
+                                                    Margin="0,0"
+                                                    />
+                                <Label Grid.Row="1"
+                                   Grid.Column="2"
+                                   Margin="5,0"
+                                   Content="Seconds" />
+
+
+                            </Grid>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>

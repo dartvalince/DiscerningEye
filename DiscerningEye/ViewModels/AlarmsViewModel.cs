@@ -344,7 +344,7 @@ namespace DiscerningEye.ViewModels
                 if(Properties.Settings.Default.EnableEarlyWarning && alarmInfo.IsSet)
                 {
                     //  Check if the alarm should issue an early warning
-                    if(alarmInfo.NextSpawn.TotalMinutes <= Properties.Settings.Default.EarlyWarningMinutes && !alarmInfo.EarlyWarningIssued)
+                    if(alarmInfo.NextSpawn.TotalMinutes <= new TimeSpan(0,Properties.Settings.Default.EarlyWarningMinutes, Properties.Settings.Default.EarlyWarningSeconds).TotalMinutes && !alarmInfo.EarlyWarningIssued)
                     {
                         alarmInfo.EarlyWarningIssued = true;
 
