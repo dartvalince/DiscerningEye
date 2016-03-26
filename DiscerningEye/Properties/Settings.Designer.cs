@@ -370,5 +370,17 @@ namespace DiscerningEye.Properties {
                 this["ReleasesUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseInverseOnFlyout {
+            get {
+                return ((bool)(this["UseInverseOnFlyout"]));
+            }
+            set {
+                this["UseInverseOnFlyout"] = value;
+            }
+        }
     }
 }

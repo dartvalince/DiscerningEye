@@ -130,5 +130,8 @@
     <Setting Name="ReleasesUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://github.com/Dartvalince/DiscerningEye</Value>
     </Setting>
+    <Setting Name="UseInverseOnFlyout" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
