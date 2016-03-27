@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Windows;
 
@@ -59,6 +60,19 @@ namespace DiscerningEye.DataAccess
                 DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Model.XIVDBSharp.ItemRoot>));
                 _gatheringItems = (List<Model.XIVDBSharp.ItemRoot>)ser.ReadObject(stream);
             }
+
+
+            foreach(Model.XIVDBSharp.ItemRoot item in _gatheringItems)
+            {
+                foreach(Model.XIVDBSharp.Gathering gathering in item.gathering)
+                {
+                    gathering.stars_html = WebUtility.HtmlDecode(gathering.stars_html);
+                }
+            }
+
+
+
+
         }
 
 
