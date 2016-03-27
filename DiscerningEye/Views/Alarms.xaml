@@ -258,7 +258,7 @@
 
 
                 <ListView Grid.Column="0"
-                          Grid.Row="0"
+                          Grid.Row="1"
                           ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
                           utils:GridViewSort.AutoSort="True">
                     <ListView.GroupStyle>

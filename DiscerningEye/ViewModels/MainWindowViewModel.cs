@@ -22,6 +22,7 @@
 
 
 
+using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
 using Squirrel;
 using System;
@@ -157,7 +158,7 @@ namespace DiscerningEye.ViewModels
             //  Stup all of the delegate commands
             this.GitHubCommand = new DelegateCommand(() =>
             {
-                System.Diagnostics.Process.Start("https://github.com/dartvalince");
+                System.Diagnostics.Process.Start("https://github.com/dartvalince/DiscerningEye");
             }, () => true);
 
             this.MinimalNotificationCommand = new DelegateCommand(() =>
@@ -233,7 +234,10 @@ namespace DiscerningEye.ViewModels
                 using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/dartvalince/DiscerningEye"))
                 {
                     updateManager = mgr;
+                    
+                    
                     var release = await mgr.UpdateApp();
+                    
                 }
             }
             catch (Exception ex)
@@ -242,6 +246,21 @@ namespace DiscerningEye.ViewModels
                 if (ex.InnerException != null)
                     message += ex.InnerException.Message;
                 MessageBox.Show(message);
+            }
+
+            if(Properties.Settings.Default.AssemblyVersion != typeof(MainWindowViewModel).Assembly.GetName().Version.ToString())
+            {
+                Properties.Settings.Default.AssemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version.ToString();
+                MetroDialogSettings settings = new MetroDialogSettings();
+                settings.AffirmativeButtonText = "View Changes On GitHub";
+                settings.NegativeButtonText = "Close";
+                settings.AnimateHide = true;
+                settings.AnimateShow = true;
+                settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                var result = await Views.MainWindow.View.ShowMessageAsync("Application Updated", string.Format("This application has been udpated to version {0}", Properties.Settings.Default.AssemblyVersion), MessageDialogStyle.AffirmativeAndNegative, settings);
+                if (result == MessageDialogResult.Affirmative)
+                    System.Diagnostics.Process.Start("https://github.com/dartvalince/DiscerningEye/releases/latest");
+
             }
         }
     }

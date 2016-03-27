@@ -394,5 +394,17 @@ namespace DiscerningEye.Properties {
                 this["EarlyWarningSeconds"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1.2.12")]
+        public string AssemblyVersion {
+            get {
+                return ((string)(this["AssemblyVersion"]));
+            }
+            set {
+                this["AssemblyVersion"] = value;
+            }
+        }
     }
 }
