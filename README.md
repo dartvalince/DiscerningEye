@@ -1,6 +1,14 @@
 # DiscerningEye
 Gathering Companion App For FFXIV
 
+## Download and Installation Instructions
+
+Due to a current issue with subsequent releases after initial, to install the application, please use the following download link to download version 0.1.2.12.  
+
+### [Download Setup.exe](https://github.com/dartvalince/DiscerningEye/releases/download/0.1.2.12/Setup.exe)
+
+Once downloaded, open Setup.exe to install the application. When you first open it, you will be on version 0.1.2.12.  Close the application then reopen and you should be on the newest version.
+
 
 
 Please see the wiki page for more inforamtion: https://github.com/dartvalince/DiscerningEye/wiki
