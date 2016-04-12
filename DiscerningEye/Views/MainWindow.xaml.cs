@@ -21,6 +21,7 @@
   =================================================================== */
 
 
+using DiscerningEye.DataAccess;
 using DiscerningEye.ViewModels;
 using MahApps.Metro.Controls;
 
@@ -38,6 +39,8 @@ namespace DiscerningEye.Views
             View = this;
             this.Loaded += MainWindow_Loaded;
         }
+
+
 
         private void MainWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
 using System.Windows;
 using DiscerningEye.Views;
+using DiscerningEye.DataAccess;
 
 namespace DiscerningEye
 {
@@ -21,6 +22,27 @@ namespace DiscerningEye
         protected override void InitializeShell()
         {
             Application.Current.MainWindow.Show();
+            Application.Current.MainWindow.StateChanged += MainWindow_StateChanged;
+            ((MainWindow)(Application.Current.MainWindow)).notificationIcon.TrayMouseDoubleClick += NotificationIcon_TrayMouseDoubleClick;
+        }
+
+        private void NotificationIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.MainWindow.WindowState == WindowState.Minimized)
+            {
+                Application.Current.MainWindow.Show();
+                Application.Current.MainWindow.WindowState = WindowState.Normal;
+
+            }
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            if(UserSettingsRepository.Settings != null)
+            {
+                if (Application.Current.MainWindow.WindowState == System.Windows.WindowState.Minimized && !UserSettingsRepository.Settings.MinimizeToTaskBar)
+                    Application.Current.MainWindow.Hide();
+            }
         }
 
         protected override void ConfigureContainer()

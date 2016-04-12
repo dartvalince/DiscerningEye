@@ -377,6 +377,26 @@ namespace DiscerningEye.Models
             set { SetProperty(ref _shouldHighlightRows, value); }
         }
 
+        private bool _minimizeToTaskBar;
+        /// <summary>
+        /// Gets or sets a boolean value representing if the application should minimize to the taskbar
+        /// </summary>
+        public bool MinimizeToTaskBar
+        {
+            get { return _minimizeToTaskBar; }
+            set { SetProperty(ref _minimizeToTaskBar, value); }
+        }
+
+        private bool _hideSystemTrayIcon;
+        /// <summary>
+        /// Gets or sets a boolean value representing if the system tray icon should be hidden
+        /// </summary>
+        public bool HideSystemTrayIcon
+        {
+            get { return _hideSystemTrayIcon; }
+            set { SetProperty(ref _hideSystemTrayIcon, value); }
+        }
+
 
 
 
@@ -489,6 +509,7 @@ namespace DiscerningEye.Models
                 this.AssemblyVersion = "0.1.2.12";
                 this.ShouldShowCircles = true;
                 this.ShouldHighlightRows = true;
+                this.MinimizeToTaskBar = true;
             }
 
 

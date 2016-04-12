@@ -81,10 +81,6 @@ namespace DiscerningEye
             {
                 ChangeApplicationTheme(UserSettingsRepository.Settings.UseNightMode);
             }
-            //if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme" || e.PropertyName == "UseInverseOnFlyout")
-            //{
-            //    ChangeApplicationTheme();
-            //}
 
         }
 
@@ -93,12 +89,6 @@ namespace DiscerningEye
             //DiscerningEye.Properties.Settings.Default.Save();
             UserSettingsRepository.SaveSettings();
         }
-
-        ////private void Default_PropertyChanged(object sender, System.ComponentModels.PropertyChangedEventArgs e)
-        ////{
-
-
-        ////}
 
         private void ChangeApplicationTheme(bool useNightMode)
         {
