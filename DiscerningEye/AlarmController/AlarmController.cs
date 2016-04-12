@@ -5,6 +5,7 @@ using DiscerningEye.Utilities;
 using DiscerningEye.Views;
 using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +18,7 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows.Data;
 
 namespace DiscerningEye.AlarmController
 {
@@ -375,6 +377,8 @@ namespace DiscerningEye.AlarmController
         {
             var alarmItem = this.AlarmItemCollection.Where(ai => ai.Name == name && ai.StartTime == startTime).First();
             alarmItem.IsSet = !alarmItem.IsSet;
+            if(Schedules.View != null)
+                ((CollectionViewSource)Schedules.View.FindResource("ScheduledAlarmsViewSource")).View.Refresh();
         }
 
 

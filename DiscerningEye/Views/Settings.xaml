@@ -41,21 +41,17 @@
                         <CheckBox Margin="5,5"
                                   Content="Night Mode"
                                   IsChecked="{Binding UserSettings.UseNightMode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <CheckBox Margin="5,10,5,5"
-                                  Content="Inverse Base Theme On Flyouts"
-                                  IsChecked="{Binding UserSettings.UseInverseOnFlyout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        
 
-                        <!--<TextBlock TextWrapping="WrapWithOverflow"
-                                   Text="UI Theme Accent"
-                                   Margin="5,5" />
-                        <ComboBox ItemsSource="{Binding UserSettings.UIAccentList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding UserSettings.UIAccent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock TextWrapping="WrapWithOverflow"
-                                   Text="UI Theme Base"
-                                   Margin="5,10,5,5" />
-                        <ComboBox ItemsSource="{Binding  UserSettings.UIAppThemeList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding UserSettings.UIAppTheme, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
+                        <CheckBox Margin="5,10,5,5"
+                                  Content="Highlight rows of upcoming alarms"
+                                  IsChecked="{Binding UserSettings.ShouldHighlightRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <CheckBox Margin="5,10,5,5"
+                                  Content="Show circle indicators of upcoming alarms"
+                                  IsChecked="{Binding UserSettings.ShouldShowCircles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+
+
                         <TextBlock TextWrapping="WrapWithOverflow"
                                    Text="UI Scaling"
                                    Margin="5,10,5,5" />

@@ -13,6 +13,7 @@
              xmlns:converters="clr-namespace:DiscerningEye.Converters"
              xmlns:ac="clr-namespace:DiscerningEye.AlarmController"
              mc:Ignorable="d" 
+             Name="schedulesView"
              d:DesignHeight="800" d:DesignWidth="1280">
 
     <UserControl.Resources>
@@ -37,91 +38,216 @@
 
         <!-- Style for checkbox inside the ListView -->
         <Style x:Key="CheckBoxSelectTypeStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
-            <Setter Property="Command" Value="{Binding DataContext.AlarmItemChecked, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+            <Setter Property="Command" Value="{Binding ElementName=schedulesView, Path=DataContext.AlarmItemChecked}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
+        </Style>
+
+        <EllipseGeometry x:Key="Circle" Center="0,0" RadiusX="5" RadiusY="5" />
+
+        <Style x:Key="PathFillBasedOnThemeBase" TargetType="Path">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding UserSettings.UseNightMode}" Value="True">
+                    <Setter Property="Fill" Value="#FFFFFFFF" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding UserSettings.UseNightMode}" Value="False">
+                    <Setter Property="Fill" Value="#FF000000" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
 
-    </UserControl.Resources>
-    
-    
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        
-        <!-- Manage Schedules -->
-        <Expander Grid.Row="0"
-                  ExpandDirection="Down"
-                  Header="Manage Scheduels (click to expand)"
-                  IsExpanded="True">
+        <Canvas x:Key="appbar_folder_open" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Path Style="{StaticResource PathFillBasedOnThemeBase}" Width="44" Height="26" Canvas.Left="19" Canvas.Top="24" Stretch="Fill"  Data="F1 M 19,50L 28,34L 63,34L 54,50L 19,50 Z M 19,28.0001L 35,28C 36,25 37.4999,24.0001 37.4999,24.0001L 48.75,24C 49.3023,24 50,24.6977 50,25.25L 50,28L 53.9999,28.0001L 53.9999,32L 27,32L 19,46.4L 19,28.0001 Z "/>
+        </Canvas>
 
-            <StackPanel Margin="5,5" 
+        <Canvas x:Key="appbar_disk_upload" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Path Style="{StaticResource PathFillBasedOnThemeBase}" Width="43.25" Height="40" Canvas.Left="20" Canvas.Top="20" Stretch="Fill"  Data="F1 M 48,60L 56,60L 56,50L 63.25,50L 52,38.75L 40.75,50L 48,50L 48,60 Z M 20,20L 50.25,20L 56,25.75L 56,40.25L 52,36.25L 52,27.25L 48.75,24L 48,24L 48,37L 28,37L 28,24L 24,24L 24,52L 46,52L 46,56L 20,56L 20,20 Z M 39,24L 39,34L 44,34L 44,24L 39,24 Z "/>
+        </Canvas>
+
+        <Canvas x:Key="appbar_save" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Path Style="{StaticResource PathFillBasedOnThemeBase}" Width="34.8333" Height="34.8333" Canvas.Left="20.5833" Canvas.Top="20.5833" Stretch="Fill"  Data="F1 M 20.5833,20.5833L 55.4167,20.5833L 55.4167,55.4167L 45.9167,55.4167L 45.9167,44.3333L 30.0833,44.3333L 30.0833,55.4167L 20.5833,55.4167L 20.5833,20.5833 Z M 33.25,55.4167L 33.25,50.6667L 39.5833,50.6667L 39.5833,55.4167L 33.25,55.4167 Z M 26.9167,23.75L 26.9167,33.25L 49.0833,33.25L 49.0833,23.75L 26.9167,23.75 Z "/>
+        </Canvas>
+
+        <Canvas x:Key="appbar_delete" Width="76" Height="76" Clip="F1 M 0,0L 76,0L 76,76L 0,76L 0,0">
+            <Path Style="{StaticResource PathFillBasedOnThemeBase}" Width="27.7083" Height="35.625" Canvas.Left="24.1458" Canvas.Top="19.7917" Stretch="Fill" Data="F1 M 25.3333,23.75L 50.6667,23.75C 51.5411,23.75 51.8541,27.3125 51.8541,27.3125L 24.1458,27.3125C 24.1458,27.3125 24.4589,23.75 25.3333,23.75 Z M 35.625,19.7917L 40.375,19.7917C 40.8122,19.7917 41.9583,20.9378 41.9583,21.375C 41.9583,21.8122 40.8122,22.9584 40.375,22.9584L 35.625,22.9584C 35.1878,22.9584 34.0416,21.8122 34.0416,21.375C 34.0416,20.9378 35.1878,19.7917 35.625,19.7917 Z M 27.7083,28.5L 48.2916,28.5C 49.1661,28.5 49.875,29.2089 49.875,30.0834L 48.2916,53.8334C 48.2916,54.7078 47.5828,55.4167 46.7083,55.4167L 29.2917,55.4167C 28.4172,55.4167 27.7083,54.7078 27.7083,53.8334L 26.125,30.0834C 26.125,29.2089 26.8339,28.5 27.7083,28.5 Z M 30.0833,31.6667L 30.4792,52.25L 33.25,52.25L 32.8542,31.6667L 30.0833,31.6667 Z M 36.4167,31.6667L 36.4167,52.25L 39.5833,52.25L 39.5833,31.6667L 36.4167,31.6667 Z M 43.1458,31.6667L 42.75,52.25L 45.5208,52.25L 45.9167,31.6667L 43.1458,31.6667 Z "/>
+        </Canvas>
+
+
+    </UserControl.Resources>
+        <DockPanel LastChildFill="True">
+            <!-- Manage Schedules -->
+            <GroupBox DockPanel.Dock="Top"
+                      Header="Manage Scheduels (click to expand)">
+
+                <StackPanel Margin="5,5" 
                         Orientation="Vertical">
-                <TextBlock Margin="0,5" 
+                    <TextBlock Margin="0,5" 
                            Text="Select schedule from dropdown or Create New Schedule"/>
-                <ComboBox Margin="0,5" 
+                    <ComboBox Margin="0,5" 
                           ItemsSource="{Binding Source={x:Static ac:Controller.Master}, Path=AlarmScheduleCollection}"
                           SelectedValue="{Binding SelectedSchedule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           DisplayMemberPath="Name"/>
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            Content="Load Selected Schedule" 
-                            Command="{Binding LoadScheduleCommand}"/>
-                    
-                    <Button Grid.Column="1"
+                        <Button Grid.Column="0"
+                            Command="{Binding LoadScheduleCommand}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{StaticResource appbar_folder_open}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Label Content="Load" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                        <Button Grid.Column="1"
                             Margin="0,0,5,0" 
-                            Content="Save Schedule" 
-                            Command="{Binding CreateNewScheduleCommand}"/>
+                            Command="{Binding CreateNewScheduleCommand}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{StaticResource appbar_save}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Label Content="Save New" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
 
-                    <Button Grid.Column="2"
+                        <Button Grid.Column="2"
                             Margin="0,0,5,0" 
-                            Content="Update Schedule"
-                            Command="{Binding UpdateScheduleCommand}"/>
+                            Command="{Binding UpdateScheduleCommand}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{StaticResource appbar_disk_upload}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Label Content="Update" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
 
-                    <Button Grid.Column="3" 
-                            Content="Delete Schedule" 
-                            Command="{Binding DeleteCurrentScheduleCommand}"/>
-                </Grid>
+                        <Button Grid.Column="3" 
+                            Command="{Binding DeleteCurrentScheduleCommand}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <VisualBrush Visual="{StaticResource appbar_delete}" />
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <Label Content="Delete" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
 
-            </StackPanel>
-        </Expander>
-
-
-
-        <!-- Schedule Alarms ListView-->
-        <GroupBox Grid.Row="1"
-                  Grid.Column="0"
-                      Header="Scheduled Alarms"
-                      Width="auto"
-                      Height="auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Row="0"
-                        Grid.Column="0"
-                        Content="Remove All Alarms From Schedule"
-                        Command="{Binding RemoveAllAlarmsCommand}"/>
+                </StackPanel>
+            </GroupBox>
 
 
-                <ListView Grid.Column="0"
+
+
+
+
+
+
+
+
+
+
+            <!-- Schedule Alarms ListView-->
+            <GroupBox DockPanel.Dock="Bottom"
+                      Header="Scheduled Alarms">
+                <DockPanel LastChildFill="True">
+                        <Button DockPanel.Dock="Top"
+                                Content="Remove All Alarms From Schedule"
+                                Command="{Binding RemoveAllAlarmsCommand}"/>
+
+
+
+
+
+
+                        <DataGrid DockPanel.Dock="Bottom"
+                                  ItemsSource="{Binding Source={StaticResource ScheduledAlarmsViewSource}}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="True"
+                                  CanUserResizeColumns="True"
+                                  CanUserResizeRows="False"
+                                  CanUserSortColumns="True">
+                            <DataGrid.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </DataGrid.ItemsPanel>
+                            <DataGrid.Columns>
+                                
+                                <DataGridTemplateColumn Width="auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                                </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="Name" Width="auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Width="16" Height="16">
+                                                    <Rectangle.Fill>
+                                                        <DrawingBrush>
+                                                            <DrawingBrush.Drawing>
+                                                                <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                            </DrawingBrush.Drawing>
+                                                        </DrawingBrush>
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                                <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Start" Binding="{Binding Path=StartTime}"  />
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Zone" Binding="{Binding Path=Zone}" />
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Location (x,y,z)">
+                                    <DataGridTextColumn.Binding>
+                                        <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                            <Binding Path="LocationX" />
+                                            <Binding Path="LocationY" />
+                                            <Binding Path="LocationZ" />
+                                        </MultiBinding>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Slot" Binding="{Binding Path=Slot}" />
+
+                                <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="auto" Binding="{Binding AvaliableMessage}" />
+                            </DataGrid.Columns>
+
+                        </DataGrid>
+                    </DockPanel>
+
+
+                    <!--<ListView Grid.Column="0"
                           Grid.Row="1"
                           ItemsSource="{Binding Source={StaticResource ScheduledAlarmsViewSource}}"
                           utils:GridViewSort.AutoSort="True">
@@ -193,10 +319,9 @@
                         </GridView>
                     </ListView.View>
 
-                </ListView>
-
-            </Grid>
-        </GroupBox>
+                </ListView>-->
+            </GroupBox>
+        </DockPanel>
 
 
 
@@ -352,7 +477,6 @@
             </Grid>
         </GroupBox>-->
                   
-    </Grid>
 </UserControl>
 
     

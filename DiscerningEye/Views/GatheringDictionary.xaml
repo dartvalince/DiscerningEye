@@ -31,32 +31,37 @@
              xmlns:local="clr-namespace:DiscerningEye.Views"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1000">
-    <Grid>
-        <ScrollViewer>
-            <StackPanel Orientation="Vertical">
-        <GroupBox Header="Item Search">
-            <TextBox Grid.Row="0" 
-                         Controls:TextBoxHelper.ClearTextButton="True"
-                         Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
-                         Margin="5, 10"
-                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        </GroupBox>
+    <DockPanel LastChildFill="True">
 
-
-        <GroupBox Header="Items List (Selecte An Item To View Info)"
-                      Height="200">
-            <Grid>
+            <Grid DockPanel.Dock="Left">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Grid.Resources>
-                    <ResourceDictionary>
-                        <ResourceDictionary.MergedDictionaries>
-                            <ResourceDictionary Source="pack://application:,,,/DiscerningEye;component/Dictionaries/CustomDataGrid.xaml" />
-                        </ResourceDictionary.MergedDictionaries>
-                    </ResourceDictionary>
-                </Grid.Resources>
-                <DataGrid Grid.Row="0"
+                
+                <!-- ITEM SEARCH -->
+                <GroupBox Grid.Row="0"
+                          Header="Item Search">
+                    <TextBox Controls:TextBoxHelper.ClearTextButton="True"
+                             Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
+                             Margin="5, 10"
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </GroupBox>
+
+
+
+                <!-- ITEMS LIST -->
+                <GroupBox Grid.Row="1"
+                          Header="Items List (Selecte An Item To View Info)">
+                    <GroupBox.Resources>
+                        <ResourceDictionary>
+                            <ResourceDictionary.MergedDictionaries>
+                                <ResourceDictionary Source="pack://application:,,,/DiscerningEye;component/Dictionaries/CustomDataGrid.xaml" />
+                            </ResourceDictionary.MergedDictionaries>
+                        </ResourceDictionary>
+                    </GroupBox.Resources>
+
+                    <DataGrid Grid.Row="0"
                           ItemsSource="{Binding GatheirngItemsCollection}"
                           AutoGenerateColumns="False"
                           SelectedValue="{Binding SelectedGatheringItem, Mode=TwoWay}"
@@ -70,30 +75,29 @@
                           CanUserSortColumns="True"
                           SelectionMode="Single"
                               Style="{StaticResource CustomDataGrid}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Select an Item (click here to sort)"
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Select an Item (click here to sort)"
                                     Binding="{Binding name}" 
-                                            Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                                            Width="auto"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
             </Grid>
 
-        </GroupBox>
-
-        <Grid>
-            
-                <StackPanel Orientation="Vertical">
-                    <GroupBox Grid.Row="0"
-                              Header="Item Description">
-                        <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Grid.Column="0"
+            <StackPanel DockPanel.Dock="Right">
+                <!-- ITEM DESCRIPTION -->
+                <GroupBox Grid.Row="0"
+                          Header="Item Description">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Grid.Column="0"
                            Grid.ColumnSpan="2"
                        Grid.Row="0"
                        Width="76"
                        Height="76"
                        Source="{Binding SelectedGatheringItem.icon}"/>
-                                <Label Grid.Column="1"
+                            <Label Grid.Column="1"
                        Grid.Row="0"
                        VerticalAlignment="Center"
                        FontSize="20"
@@ -102,28 +106,28 @@
                        Content="{Binding SelectedGatheringItem.name}"/>
 
 
-                            </StackPanel>
-                            <Border Grid.Column="0"
+                        </StackPanel>
+                        <Border Grid.Column="0"
                         Grid.ColumnSpan="3"
                         Grid.Row="1"
                         Height="75"
                         BorderThickness="0,1,0,0"
                         Margin="0,10">
-                                <Border.BorderBrush>
-                                    <SolidColorBrush Color="{DynamicResource AccentColor}"/>
-                                </Border.BorderBrush>
-                                <TextBlock TextWrapping="Wrap"
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource AccentColor}"/>
+                            </Border.BorderBrush>
+                            <TextBlock TextWrapping="Wrap"
                                FontSize="14"
                                Text="{Binding SelectedGatheringItem.help}"/>
-                            </Border>
-                        </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                    </GroupBox>
+                </GroupBox>
 
-                        <!--ItemsSource="{Binding GatheringInformationCollection}" -->
-                        <GroupBox Grid.Row="1"
+
+                <GroupBox Grid.Row="1"
                               Header="Gathered By Jobs (Select to View WHere to Gather)">
-                        <DataGrid Grid.Row="1"
+                    <DataGrid Grid.Row="1"
                                 ItemsSource="{Binding SelectedGatheringItem.gathering}"
                                 IsReadOnly="True"
                                 SelectedValue="{Binding SelectedGatheringType, Mode=TwoWay}"
@@ -137,46 +141,46 @@
                                 CanUserSortColumns="True"
                                 AutoGenerateColumns="False"
                                 GridLinesVisibility="All">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Type"
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Type"
                                         Binding="{Binding Path=type.name}"
                                                 Width="*"/>
-                                <DataGridTextColumn Header="Level"
+                            <DataGridTextColumn Header="Level"
                                         Binding="{Binding Path=level_view}"
                                                 Width="*">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="HorizontalAlignment" Value="Center" />
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                                <DataGridTextColumn Header="Stars" 
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Stars" 
                                         Binding="{Binding Path=stars_html}"
                                                 Width="*">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="HorizontalAlignment" Value="Center" />
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                                <DataGridTextColumn Header="Number of Nodes"
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Number of Nodes"
                                         Binding="{Binding nodes.Count}"
                                                 Width="*">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="{x:Type TextBlock}">
-                                            <Setter Property="HorizontalAlignment" Value="Center" />
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="HorizontalAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
 
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
 
 
-                    <GroupBox Grid.Row="2"
+                <GroupBox Grid.Row="2"
                               Header="Where to Gather">
-                        <DataGrid Grid.Row="1" 
+                    <DataGrid Grid.Row="1" 
                                 ItemsSource="{Binding SelectedGatheringType.nodes}"
                                 SelectedValue="{Binding SelectedNodeInformation, Mode=TwoWay}"
                                 IsSynchronizedWithCurrentItem="True"
@@ -190,21 +194,23 @@
                                 CanUserSortColumns="True"                          
                                 AutoGenerateColumns="False"
                                 GridLinesVisibility="All">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Region"
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Region"
                                         Binding="{Binding Path=region.name}"
                                                 Width="*"/>
-                                <DataGridTextColumn Header="Zone"
+                            <DataGridTextColumn Header="Zone"
                                         Binding="{Binding Path=zone.name}"
                                                 Width="*"/>
 
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </GroupBox>
-                </StackPanel>
-           
-        </Grid>
-    </StackPanel>
-    </ScrollViewer>
-    </Grid>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </StackPanel>
+
+            
+            
+            
+            
+        </DockPanel>        
+   
 </UserControl>

@@ -29,6 +29,8 @@ namespace DiscerningEye
 
             Container.RegisterType(typeof(object), typeof(Alarms), "Alarms");
             Container.RegisterType(typeof(object), typeof(Schedules), "Schedules");
+            Container.RegisterType(typeof(object), typeof(GatheringDictionary), "GatheringDictionary");
+            Container.RegisterType(typeof(object), typeof(Settings), "Settings");
         }
     }
 }

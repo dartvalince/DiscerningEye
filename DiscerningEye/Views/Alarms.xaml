@@ -39,11 +39,69 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
+             Name="alarmsView"
              d:DesignHeight="800" d:DesignWidth="1280">
 
 
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:AvailableInToBooleanConverter x:Key="AvailableInToBooleanConverter" />
+
+
+        <Style x:Key="RowHighlightOnTime" TargetType="DataGridRow" BasedOn="{StaticResource MetroDataGridRow}">
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding AvaliableMessage, Converter={StaticResource AvailableInToBooleanConverter}}" Value="Green"/>
+                        <Condition Binding="{Binding ElementName=alarmsView, Path=DataContext.UserSettings.ShouldHighlightRows}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="BorderBrush" Value="DarkSeaGreen" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="DarkSeaGreen" Opacity=".5" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding AvaliableMessage, Converter={StaticResource AvailableInToBooleanConverter}}" Value="Yellow"/>
+                        <Condition Binding="{Binding ElementName=alarmsView, Path=DataContext.UserSettings.ShouldHighlightRows}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter Property="BorderBrush" Value="DarkGoldenrod" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <SolidColorBrush Color="DarkGoldenrod" Opacity=".5" />
+                            </Setter.Value>
+                        </Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <!--<DataTrigger Binding="{Binding AvaliableMessage, Converter={StaticResource AvailableInToBooleanConverter}}" Value="Green">
+                    <Setter Property="BorderBrush" Value="DarkSeaGreen" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="DarkSeaGreen" Opacity=".5" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+
+                <DataTrigger Binding="{Binding AvaliableMessage, Converter={StaticResource AvailableInToBooleanConverter}}" Value="Yellow">
+                    <Setter Property="BorderBrush" Value="DarkGoldenrod" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="DarkGoldenrod" Opacity=".5" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>-->
+            </Style.Triggers>
+        </Style>
 
         <CollectionViewSource x:Key="BotanistViewSource" 
                               IsLiveFilteringRequested="True"
@@ -69,56 +127,110 @@
 
         
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition Height="300"/>
-            <RowDefinition Height="300"/>
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto" MinWidth="470" />
-            <ColumnDefinition Width="419" />
-        </Grid.ColumnDefinitions>
-    
-
-        <!-- 
+        <DockPanel LastChildFill="True">
+            <!-- 
         
             Search Alarms 
         
         -->
-        <GroupBox Grid.Row="0"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="2"
-                  Header="Search Alarms">
-            <StackPanel Margin="5,5"
+            <GroupBox DockPanel.Dock="Top"
+                      Header="Search Alarms">
+                <StackPanel Margin="5,5"
                         Orientation="Vertical">
-                <TextBlock Text="Search for an item in the alarms list" />
-                <DockPanel LastChildFill="True"
+                    <TextBlock Text="Search for an item in the alarms list" />
+                    <DockPanel LastChildFill="True"
                            Margin="0,5">
-                    <Button DockPanel.Dock="Right"
+                        <Button DockPanel.Dock="Right"
                             Margin="5,0,0,0"
                             Content="Search"
                             IsDefault="True"
                             Command="{Binding SearchAlarmsCommand}" />
-                    <TextBox Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
+                        <TextBox Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
                              Controls:TextBoxHelper.ClearTextButton="True"
                              AcceptsReturn="False"
                              Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </DockPanel>
-            </StackPanel>
-        </GroupBox>
+                    </DockPanel>
+                </StackPanel>
+            </GroupBox>
 
 
-       
-        <!-- Alarms -->
-        <GroupBox Grid.Row="1"
-                  Grid.Column="0"
-                  Width="735"
-                  Height="auto"
-                  x:Name="grpAlarms"
-                  Header="Botany Alarms">
-            <DataGrid ItemsSource="{Binding BotanistView}"
+
+            <TabControl DockPanel.Dock="Bottom">
+            <TabControl.Resources>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedTabControl.xaml" />
+            </TabControl.Resources>
+                <TabItem Header="Botany">
+                    <GroupBox Header="Botany Alarms">
+                    <DataGrid ItemsSource="{Binding BotanistView}"
+                      AutoGenerateColumns="False"
+                      SelectionMode="Single"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False"
+                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}"
+                              RowStyle="{StaticResource RowHighlightOnTime}">
+
+                        <DataGrid.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </DataGrid.ItemsPanel>
+                            <DataGrid.Columns>
+
+                                <DataGridTemplateColumn Width="auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                                    </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTemplateColumn Header="Name" Width="auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Rectangle Width="16" Height="16" Visibility="{Binding ElementName=alarmsView, Path=DataContext.UserSettings.ShouldShowCircles, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <Rectangle.Fill>
+                                                        <DrawingBrush>
+                                                            <DrawingBrush.Drawing>
+                                                                <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                            </DrawingBrush.Drawing>
+                                                        </DrawingBrush>
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                                <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Start" Binding="{Binding Path=StartTime}"  />
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Zone" Binding="{Binding Path=Zone}" />
+
+                                <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Location (x,y,z)">
+                                    <DataGridTextColumn.Binding>
+                                        <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                            <Binding Path="LocationX" />
+                                            <Binding Path="LocationY" />
+                                            <Binding Path="LocationZ" />
+                                        </MultiBinding>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="auto" Binding="{Binding AvaliableMessage}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </TabItem>
+
+
+                <TabItem Header="Miner">
+                <GroupBox Header="Miner Alarms">
+                    <DataGrid ItemsSource="{Binding MinerView}"
                       AutoGenerateColumns="False"
                       SelectionMode="Single"
                       ScrollViewer.CanContentScroll="True"
@@ -130,118 +242,63 @@
                       CanUserAddRows="False"
                       SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
 
-                <DataGrid.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </DataGrid.ItemsPanel>
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Name" Width="*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="16" Height="16">
-                                        <Rectangle.Fill>
-                                            <DrawingBrush>
-                                                <DrawingBrush.Drawing>
-                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
-                                                </DrawingBrush.Drawing>
-                                            </DrawingBrush>
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
+                        <DataGrid.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </DataGrid.ItemsPanel>
+                        <DataGrid.Columns>
 
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
-                        <DataGridTextColumn.Binding>
-                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
-                                <Binding Path="LocationX" />
-                                <Binding Path="LocationY" />
-                                <Binding Path="LocationZ" />
-                            </MultiBinding>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+                            <DataGridTemplateColumn Width="auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-        <GroupBox Grid.Row="2"
-                  Grid.Column="0"
-                  Width="735"
-                  Height="auto"
-                  Header="Miner Alarms">
-            <DataGrid ItemsSource="{Binding MinerView}"
-                      AutoGenerateColumns="False"
-                      SelectionMode="Single"
-                      ScrollViewer.CanContentScroll="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling"
-                      VirtualizingPanel.IsContainerVirtualizable="True"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      VirtualizingPanel.ScrollUnit="Pixel"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      CanUserAddRows="False"
-                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
+                            <DataGridTemplateColumn Header="Name" Width="auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Rectangle Width="16" Height="16">
+                                                <Rectangle.Fill>
+                                                    <DrawingBrush>
+                                                        <DrawingBrush.Drawing>
+                                                            <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                        </DrawingBrush.Drawing>
+                                                    </DrawingBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+                                            <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
 
-                <DataGrid.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </DataGrid.ItemsPanel>
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Name" Width="*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="16" Height="16">
-                                        <Rectangle.Fill>
-                                            <DrawingBrush>
-                                                <DrawingBrush.Drawing>
-                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
-                                                </DrawingBrush.Drawing>
-                                            </DrawingBrush>
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
 
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
-                        <DataGridTextColumn.Binding>
-                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
-                                <Binding Path="LocationX" />
-                                <Binding Path="LocationY" />
-                                <Binding Path="LocationZ" />
-                            </MultiBinding>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </GroupBox>
+                            <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Start" Binding="{Binding Path=StartTime}"  />
+                            <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Zone" Binding="{Binding Path=Zone}" />
+
+                            <DataGridTextColumn IsReadOnly="True" Width="auto" Header="Location (x,y,z)">
+                                <DataGridTextColumn.Binding>
+                                    <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                        <Binding Path="LocationX" />
+                                        <Binding Path="LocationY" />
+                                        <Binding Path="LocationZ" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="auto" Binding="{Binding AvaliableMessage}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </TabItem>
+
+            </TabControl>
+
+        </DockPanel>
+    
 
 
 
@@ -249,76 +306,8 @@
 
 
 
-        <!-- Alarms --><!--
-        <GroupBox Grid.Row="2"
-                  Grid.Column="0"
-                  Width="auto"
-                  Height="auto"
-                  Header="Miner Alarms">
-            <DataGrid ItemsSource="{Binding MinerView}"
-                      AutoGenerateColumns="False"
-                      SelectionMode="Single"
-                      ScrollViewer.CanContentScroll="True"
-                      VirtualizingPanel.VirtualizationMode="Recycling"
-                      VirtualizingPanel.IsContainerVirtualizable="True"
-                      VirtualizingPanel.ScrollUnit="Item"
-                      VirtualizingPanel.IsVirtualizing="True"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      CanUserAddRows="False"
-                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
-
-                <DataGrid.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" />
-                    </ItemsPanelTemplate>
-                </DataGrid.ItemsPanel>
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Name" Width="*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Rectangle Width="16" Height="16">
-                                        <Rectangle.Fill>
-                                            <DrawingBrush>
-                                                <DrawingBrush.Drawing>
-                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
-                                                </DrawingBrush.Drawing>
-                                            </DrawingBrush>
-                                        </Rectangle.Fill>
-                                    </Rectangle>
-                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
-
-                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
-                        <DataGridTextColumn.Binding>
-                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
-                                <Binding Path="LocationX" />
-                                <Binding Path="LocationY" />
-                                <Binding Path="LocationZ" />
-                            </MultiBinding>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
-                </DataGrid.Columns>
-                
-
-
-            </DataGrid>
-        </GroupBox>-->
-
-        <GroupBox Grid.Row="1"
+        <!-- Selected Alarm Info. Maybe use in future? -->
+        <!--<GroupBox Grid.Row="1"
                   Grid.Column="1"
                   Grid.RowSpan="2"
                   Header="Selected Alarm Information (Select item from list to view info)">
@@ -472,11 +461,5 @@
             </Grid>
 
 
-        </GroupBox>
-        
-        
-        
-        
-        
-    </Grid>
+        </GroupBox>-->
 </UserControl>

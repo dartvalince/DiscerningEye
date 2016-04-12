@@ -355,6 +355,34 @@ namespace DiscerningEye.Models
         }
 
 
+        private bool _shouldShowCircles;
+        /// <summary>
+        /// Gets or sets the boolean value representing if the circle indicators should be shown on data grids for upcoming alarms
+        /// </summary>
+        [DataMember(EmitDefaultValue = true)]
+        public bool ShouldShowCircles
+        {
+            get { return _shouldShowCircles; }
+            set { SetProperty(ref _shouldShowCircles, value); }
+        }
+
+        private bool _shouldHighlightRows;
+        /// <summary>
+        /// Gets or sets the boolean value representing if data rows should be highlighted for upcoming alarms
+        /// </summary>
+        [DataMember(EmitDefaultValue = true)]
+        public bool ShouldHighlightRows
+        {
+            get { return _shouldHighlightRows; }
+            set { SetProperty(ref _shouldHighlightRows, value); }
+        }
+
+
+
+
+
+
+
         //  FOr Json.Net
         protected UserSettingsModel()
         {
@@ -459,6 +487,8 @@ namespace DiscerningEye.Models
                 this.UseInverseOnFlyout = false;
                 this.EarlyWarningSeconds = 0;
                 this.AssemblyVersion = "0.1.2.12";
+                this.ShouldShowCircles = true;
+                this.ShouldHighlightRows = true;
             }
 
 

@@ -59,6 +59,7 @@ namespace DiscerningEye
             this.UpdateAlarmData();
 
             //  Initilize the alarm controller
+            
             this._alarmController = new AlarmController.Controller();
             
 

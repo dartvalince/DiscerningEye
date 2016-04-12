@@ -21,9 +21,11 @@ namespace DiscerningEye.Views
     /// </summary>
     public partial class Schedules : UserControl
     {
+        public static Schedules View;
         public Schedules()
         {
             InitializeComponent();
+            Schedules.View = this;
         }
 
 

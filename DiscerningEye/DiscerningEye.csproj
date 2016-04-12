@@ -206,6 +206,7 @@
     <Compile Include="AlarmController\Notify\Tone.cs" />
     <Compile Include="AlarmController\Notify\TTS.cs" />
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="Converters\AvailableInToBooleanConverter.cs" />
     <Compile Include="Converters\BooleanToFlyoutThemeConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="DataAccess\AlarmItemRepository.cs" />
@@ -229,7 +230,6 @@
     <Compile Include="Models\XIVDBSharp\Type.cs" />
     <Compile Include="Models\XIVDBSharp\Zone.cs" />
     <Compile Include="Utilities\ClockController.cs" />
-    <Compile Include="Utilities\GridViewSort.cs" />
     <Compile Include="ViewModels\AlarmsViewModel.cs" />
     <Compile Include="ViewModels\GatheringDictionaryViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
@@ -242,6 +242,9 @@
     <Compile Include="Views\GatheringDictionary.xaml.cs">
       <DependentUpon>GatheringDictionary.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\HomeTiles.xaml.cs">
+      <DependentUpon>HomeTiles.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Schedules.xaml.cs">
       <DependentUpon>Schedules.xaml</DependentUpon>
     </Compile>
@@ -249,6 +252,10 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionaries\CustomDataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\HomeTiles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -401,6 +408,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Blue_Gatherers%27_Scrip_Icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\images\Botanist_Icon_9.png" />
+    <Resource Include="Resources\images\Fisher_Icon_9.png" />
+    <Resource Include="Resources\images\Gathering_Log.png" />
+    <Resource Include="Resources\images\Miner_Icon_9.png" />
+    <Resource Include="Resources\images\Timers.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
