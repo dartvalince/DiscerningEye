@@ -13,8 +13,8 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <GroupBox Header="Application Information">
         <StackPanel>
@@ -36,8 +36,11 @@
 
         </StackPanel>
         </GroupBox>
+        <GroupBox Grid.Row="1"
+                  Header="The Sexy Lala Who Created This App">
         <Image Grid.Row="1" Source="pack://application:,,,/DiscerningEye;component/Resources/images/dart_on_gobwalker.png"/>
-        
+        </GroupBox>
+
 
 
     </Grid>
