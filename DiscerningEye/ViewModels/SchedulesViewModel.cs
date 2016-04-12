@@ -18,6 +18,7 @@ namespace DiscerningEye.ViewModels
 {
     public class SchedulesViewModel : ViewModelBase
     {
+        IEventAggregator _eventAggregator;
         //=========================================================
         //  Properties (some with backing private fields)
         //=========================================================
@@ -94,8 +95,9 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Constructor
         //=========================================================
-        public SchedulesViewModel()
+        public SchedulesViewModel(IEventAggregator eventAggregator)
         {
+            this._eventAggregator = eventAggregator;
             this.AlarmItemChecked = new DelegateCommand<AlarmItem>(this.OnAlarmItemChecked);
             this.CreateNewScheduleCommand = new DelegateCommand(this.CreateNewSchedule, () => true);
             this.LoadScheduleCommand = new DelegateCommand(this.LoadSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
@@ -145,6 +147,7 @@ namespace DiscerningEye.ViewModels
             {
                 settings.AffirmativeButtonText = "Ok";
                 await MainWindow.View.ShowMessageAsync("Create Schedule Error", "Cannot create a sachedule with the same name as an existing one", MessageDialogStyle.Affirmative, settings);
+                this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish("Cannot create a sachedule with the same name as an existing one");
 
             }
             else
@@ -161,40 +164,9 @@ namespace DiscerningEye.ViewModels
 
                 Controller.Master.AlarmScheduleCollection.Add(schedule);
 
-                settings.AffirmativeButtonText = "Ok";
-                await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Schedule has been created and saved for {0}", scheduleName), MessageDialogStyle.Affirmative, settings);
-                Controller.Master.AlarmScheduleCollection = new ObservableCollection<Models.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
-
-                this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
-            }
-
-
-
-
-        }
-
-
-        /// <summary>
-        /// Creates a new schedule based on an existing schedule
-        /// </summary>
-        public void CreateNewSchedule(Models.AlarmSchedule schedule)
-        {
-            var list = Controller.Master.AlarmScheduleCollection.Where(ap => ap.Name == schedule.Name);
-
-            if (list.Count() > 0)
-            {
-                return;
-            }
-            else
-            {
-
-                if (schedule.Name == null) return;
-
-                if (schedule.Name.Length > 0)
-                {
-                    AlarmScheduleRepository.Save(schedule);
-                }
-
+                ////settings.AffirmativeButtonText = "Ok";
+                //await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Schedule has been created and saved for {0}", scheduleName), MessageDialogStyle.Affirmative, settings);
+                this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("Schedule has been created and saved for {0}", scheduleName));
                 Controller.Master.AlarmScheduleCollection = new ObservableCollection<Models.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
 
                 this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
@@ -224,12 +196,17 @@ namespace DiscerningEye.ViewModels
 
             this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(s => s.Name == scheduleName).First();
 
-            MetroDialogSettings settings = new MetroDialogSettings();
-            settings.AffirmativeButtonText = "Ok";
-            settings.AnimateHide = true;
-            settings.AnimateShow = true;
-            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Updated ", string.Format("Schedule \"{0}\" has been updated.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
+            //MetroDialogSettings settings = new MetroDialogSettings();
+            //settings.ColorScheme = MetroDialogColorScheme.Accented;
+            //settings.AffirmativeButtonText = "Ok";
+            //settings.AnimateHide = true;
+            //settings.AnimateShow = true;
+            //settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            //await MainWindow.View.ShowMessageAsync("Schedule Updated ", string.Format("Schedule \"{0}\" has been updated.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
+
+            this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("Schedule \"{0}\" has been updated.", this.SelectedSchedule.Name));
+
+
 
         }
 
@@ -248,12 +225,14 @@ namespace DiscerningEye.ViewModels
             this.RemoveAllAlarms();
 
 
-            MetroDialogSettings settings = new MetroDialogSettings();
-            settings.AffirmativeButtonText = "Ok";
-            settings.AnimateHide = true;
-            settings.AnimateShow = true;
-            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Deleted ", string.Format("Schedule \"{0}\" has been deleted.", scheduleName), MessageDialogStyle.Affirmative, settings);
+            //MetroDialogSettings settings = new MetroDialogSettings();
+            //settings.AffirmativeButtonText = "Ok";
+            //settings.AnimateHide = true;
+            //settings.AnimateShow = true;
+            //settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            //await MainWindow.View.ShowMessageAsync("Schedule Deleted ", string.Format("Schedule \"{0}\" has been deleted.", scheduleName), MessageDialogStyle.Affirmative, settings);
+
+            this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("Schedule \"{0}\" has been deleted", scheduleName));
 
         }
 
@@ -284,12 +263,14 @@ namespace DiscerningEye.ViewModels
             //this.RefreshScheduleView();
 
 
-            MetroDialogSettings settings = new MetroDialogSettings();
-            settings.AffirmativeButtonText = "Ok";
-            settings.AnimateHide = true;
-            settings.AnimateShow = true;
-            settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-            await MainWindow.View.ShowMessageAsync("Schedule Loaded ", string.Format("Schedule \"{0}\" has been loaded.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
+            //////MetroDialogSettings settings = new MetroDialogSettings();
+            //////settings.AffirmativeButtonText = "Ok";
+            //////settings.AnimateHide = true;
+            //////settings.AnimateShow = true;
+            //////settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+            //////await MainWindow.View.ShowMessageAsync("Schedule Loaded ", string.Format("Schedule \"{0}\" has been loaded.", this.SelectedSchedule.Name), MessageDialogStyle.Affirmative, settings);
+
+            this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("Schedule \"{0}\" has been loaded.", this.SelectedSchedule.Name));
         }
 
 

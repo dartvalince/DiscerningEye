@@ -213,6 +213,7 @@
     <Compile Include="DataAccess\AlarmScheduleRepository.cs" />
     <Compile Include="DataAccess\UserSettingsRepository.cs" />
     <Compile Include="Events\AddAlarmEvent.cs" />
+    <Compile Include="Events\PushStatusMessageEvent.cs" />
     <Compile Include="Models\AlarmItem\AlarmItem.cs" />
     <Compile Include="Models\AlarmItem\Locations.cs" />
     <Compile Include="Models\AlarmItem\Requirements.cs" />

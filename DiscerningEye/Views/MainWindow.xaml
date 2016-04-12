@@ -99,6 +99,20 @@
 
     </Controls:MetroWindow.RightWindowCommands>
 
+
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout Header="{Binding StatusMessage}"
+                             Position="Bottom"
+                             IsOpen="{Binding IsStatusOpen}">
+                
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+        
+
+    
+    
     <DockPanel Margin="4"
                    LastChildFill="True">
         <DockPanel.LayoutTransform>

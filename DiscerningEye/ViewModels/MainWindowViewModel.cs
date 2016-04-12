@@ -23,8 +23,10 @@
 
 
 using DiscerningEye.DataAccess;
+using DiscerningEye.Events;
 using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Regions;
 using Squirrel;
 using System;
@@ -37,6 +39,8 @@ namespace DiscerningEye.ViewModels
         private readonly IRegionManager _regionManager;
 
         private IUpdateManager updateManager;
+
+        private System.Timers.Timer _statusTimer;
 
         private bool _isGatheringDictionaryOpen;
         /// <summary>
@@ -79,6 +83,31 @@ namespace DiscerningEye.ViewModels
             get { return _windowTitle; }
             set { SetProperty(ref _windowTitle, value); }
         }
+
+
+        private string _statusMessage;
+        /// <summary>
+        /// Gets or sets the string representing the status message to show in the status flyout popup
+        /// </summary>
+        public string StatusMessage
+        {
+            get { return _statusMessage; }
+            set { SetProperty(ref _statusMessage, value); }
+        }
+
+
+        private bool _isStatusOpen;
+        /// <summary>
+        /// Gets or sets the boolean value representing if the status flyout is open
+        /// </summary>
+        public bool IsStatusOpen
+        {
+            get { return _isStatusOpen; }
+            set { SetProperty(ref _isStatusOpen, value); }
+        }
+
+
+
 
         //================================================================
         //  Commands
@@ -151,17 +180,27 @@ namespace DiscerningEye.ViewModels
 
 
 
-
+        private IEventAggregator _eventAggregator;
         //================================================================
         //  Constructor
         //================================================================
         /// <summary>
         /// Creates a new instance of MainWindowViewModel
         /// </summary>
-        public MainWindowViewModel(IRegionManager regionManager)
+        public MainWindowViewModel(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
 
+            _eventAggregator = eventAggregator;
+            _eventAggregator.GetEvent<PushStatusMessageEvent>().Subscribe(this.ShowStatusMessage);
             _regionManager = regionManager;
+
+            this.StatusMessage = "";
+            this.IsStatusOpen = false;
+            this._statusTimer = new System.Timers.Timer();
+            this._statusTimer.Interval = 3000;
+            this._statusTimer.Elapsed += _statusTimer_Elapsed;
+            this._statusTimer.AutoReset = false;
+            this._statusTimer.Stop();
 
             //  Setup all of the delegate commands
             this.NavigateCommand = new DelegateCommand<string>(Navigate);
@@ -218,6 +257,12 @@ namespace DiscerningEye.ViewModels
 #if (!DEBUG)
             this.CheckForUpdate();
 #endif
+        }
+
+        private void _statusTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this._statusTimer.Stop();
+            this.IsStatusOpen = false;
         }
 
 
@@ -291,6 +336,14 @@ namespace DiscerningEye.ViewModels
                     System.Diagnostics.Process.Start("https://github.com/dartvalince/DiscerningEye/releases/latest");
 
             }
+        }
+
+
+        private void ShowStatusMessage(string message)
+        {
+            this.StatusMessage = message;
+            this.IsStatusOpen = true;
+            this._statusTimer.Start();
         }
     }
 }
