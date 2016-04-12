@@ -20,6 +20,7 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using DiscerningEye.DataAccess;
 using System;
 using System.ComponentModel;
 using System.Timers;
@@ -97,7 +98,8 @@ namespace DiscerningEye.Utilities
         {
             get
             {
-                return new TimeSpan(Properties.Settings.Default.ClockOffsetHours, Properties.Settings.Default.ClockOffsetMinutes, Properties.Settings.Default.ClockOffsetSeconds);
+                //return new TimeSpan(Properties.Settings.Default.ClockOffsetHours, Properties.Settings.Default.ClockOffsetMinutes, Properties.Settings.Default.ClockOffsetSeconds);
+                return new TimeSpan(UserSettingsRepository.Settings.ClockOffsetHours, UserSettingsRepository.Settings.ClockOffsetMinutes, UserSettingsRepository.Settings.ClockOffsetSeconds);
             }
         }
 

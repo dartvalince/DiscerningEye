@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
 using System.Windows;
+using DiscerningEye.Views;
 
 namespace DiscerningEye
 {
@@ -20,6 +21,14 @@ namespace DiscerningEye
         protected override void InitializeShell()
         {
             Application.Current.MainWindow.Show();
+        }
+
+        protected override void ConfigureContainer()
+        {
+            base.ConfigureContainer();
+
+            Container.RegisterType(typeof(object), typeof(Alarms), "Alarms");
+            Container.RegisterType(typeof(object), typeof(Schedules), "Schedules");
         }
     }
 }

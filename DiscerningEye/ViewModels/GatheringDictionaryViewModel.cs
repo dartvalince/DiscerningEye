@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    GatheringItemViewModel.cs
+    GatheringItemViewModels.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -34,56 +34,56 @@ namespace DiscerningEye.ViewModels
         private GatheringItemRepository _gatheringItemRepository;
 
 
-        private ObservableCollection<Model.XIVDBSharp.ItemRoot> _gatheirngItemsCollection;
+        private ObservableCollection<Models.XIVDBSharp.ItemRoot> _gatheirngItemsCollection;
         /// <summary>
         /// Gets or sets the list of items
         /// </summary>
         /// <remarks>
         /// This is bound to as the ItemsSource for a datagrid on GatheringItemListView.xaml
         /// </remarks>
-        public ObservableCollection<Model.XIVDBSharp.ItemRoot> GatheirngItemsCollection
+        public ObservableCollection<Models.XIVDBSharp.ItemRoot> GatheirngItemsCollection
         {
             get { return _gatheirngItemsCollection; }
             set { SetProperty(ref this._gatheirngItemsCollection, value); }
         }
 
 
-        private Model.XIVDBSharp.ItemRoot _selectedGatheringItem;
+        private Models.XIVDBSharp.ItemRoot _selectedGatheringItem;
         /// <summary>
         /// Gets or sets the current selected item in the items list datagrid
         /// </summary>
         /// <remarks>
         /// This is bound to the SelectedValue of a datagrid on GatheringItemListView.xaml
         /// </remarks>
-        public Model.XIVDBSharp.ItemRoot SelectedGatheringItem
+        public Models.XIVDBSharp.ItemRoot SelectedGatheringItem
         {
             get { return this._selectedGatheringItem; }
             set { SetProperty(ref this._selectedGatheringItem, value); }
         }
 
 
-        private Model.XIVDBSharp.Gathering _selectedGatheringType;
+        private Models.XIVDBSharp.Gathering _selectedGatheringType;
         /// <summary>
         /// Gets or sets the current selected gathering item in the gathering information datagrid
         /// </summary>
         /// <remarks>
         /// This is bound to the SelectedValue of a datagrid on GatheringItemListView.xaml
         /// </remarks>
-        public Model.XIVDBSharp.Gathering SelectedGatheringType
+        public Models.XIVDBSharp.Gathering SelectedGatheringType
         {
             get { return this._selectedGatheringType; }
             set { SetProperty(ref this._selectedGatheringType, value); }
         }
 
 
-        private Model.XIVDBSharp.Node _selectedNodeInformation;
+        private Models.XIVDBSharp.Node _selectedNodeInformation;
         /// <summary>
         /// Gets or sets the current selected node inofmraiton item in the node information datagrid
         /// </summary>
         /// <remarks>
         /// This is bound to the SelectedValue of a datagrid on GatheringItemListView.xaml
         /// </remarks>
-        public Model.XIVDBSharp.Node SelectedNodeInformation
+        public Models.XIVDBSharp.Node SelectedNodeInformation
         {
             get { return this._selectedNodeInformation; }
             set { SetProperty(ref this._selectedNodeInformation, value); }
@@ -118,7 +118,7 @@ namespace DiscerningEye.ViewModels
 
 
             //  Initilize the GatheirngItemsCollection
-            this.GatheirngItemsCollection = new ObservableCollection<Model.XIVDBSharp.ItemRoot>(_gatheringItemRepository.GetGatheringItems());
+            this.GatheirngItemsCollection = new ObservableCollection<Models.XIVDBSharp.ItemRoot>(_gatheringItemRepository.GetGatheringItems());
 
             this.SelectedGatheringItem = this.GatheirngItemsCollection[0];
 
@@ -156,7 +156,7 @@ namespace DiscerningEye.ViewModels
             {
                 view.Filter = item =>
                 {
-                    Model.XIVDBSharp.ItemRoot vItem = item as Model.XIVDBSharp.ItemRoot;
+                    Models.XIVDBSharp.ItemRoot vItem = item as Models.XIVDBSharp.ItemRoot;
                     if (vItem == null) return false;
                     return vItem.name.ToLower().Contains(this.SearchText.ToLower());
                 };

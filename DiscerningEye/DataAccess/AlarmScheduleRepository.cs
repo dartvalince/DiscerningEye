@@ -34,7 +34,7 @@ namespace DiscerningEye.DataAccess
         //  Fields
         //================================================================
         private readonly static string _schedulesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DiscerningEye\\Schedules");
-        private readonly List<Model.AlarmSchedule> _alarmSchedules;
+        private readonly List<Models.AlarmSchedule> _alarmSchedules;
 
 
 
@@ -47,7 +47,7 @@ namespace DiscerningEye.DataAccess
         public AlarmScheduleRepository()
         {
             if (_alarmSchedules == null)
-                _alarmSchedules = new List<Model.AlarmSchedule>();
+                _alarmSchedules = new List<Models.AlarmSchedule>();
 
             //  Check if schedule directory exists
             
@@ -62,12 +62,12 @@ namespace DiscerningEye.DataAccess
             {
                 foreach(FileInfo schedule in savedSchedules)
                 {
-                    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Model.AlarmSchedule));
+                    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Models.AlarmSchedule));
 
-                    Model.AlarmSchedule alarmSchedule;
+                    Models.AlarmSchedule alarmSchedule;
                     using (FileStream fs = new FileStream(schedule.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        alarmSchedule = (Model.AlarmSchedule)ser.ReadObject(fs);
+                        alarmSchedule = (Models.AlarmSchedule)ser.ReadObject(fs);
                     }
                     this._alarmSchedules.Add(alarmSchedule);
                 }
@@ -82,22 +82,22 @@ namespace DiscerningEye.DataAccess
         /// Gets a shallow copy of the alarm schedule colleciton
         /// </summary>
         /// <returns></returns>
-        public List<Model.AlarmSchedule> GetAlarmSchedules()
+        public List<Models.AlarmSchedule> GetAlarmSchedules()
         {
-            return new List<Model.AlarmSchedule>(this._alarmSchedules);
+            return new List<Models.AlarmSchedule>(this._alarmSchedules);
         }
 
         /// <summary>
         /// Provides a method for saving an alarm schedule
         /// </summary>
         /// <param name="schedule"></param>
-        public static void Save(Model.AlarmSchedule schedule)
+        public static void Save(Models.AlarmSchedule schedule)
         {
             if (schedule == null) return;
             string schedulPath = Path.Combine(_schedulesPath, string.Format("{0}.json", schedule.Name));
             using (FileStream fs = new FileStream(schedulPath, FileMode.Create, FileAccess.Write, FileShare.Write))
             {
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Model.AlarmSchedule));
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Models.AlarmSchedule));
 
                 ser.WriteObject(fs, schedule);
             }
@@ -107,7 +107,7 @@ namespace DiscerningEye.DataAccess
         /// Provides a method of deleting an alarm schedule
         /// </summary>
         /// <param name="schedule"></param>
-        public static void Delete(Model.AlarmSchedule schedule)
+        public static void Delete(Models.AlarmSchedule schedule)
         {
             if (schedule == null) return;
             string schedulePath = Path.Combine(_schedulesPath, string.Format("{0}.json", schedule.Name));

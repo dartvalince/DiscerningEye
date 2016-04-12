@@ -24,7 +24,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace DiscerningEye.Model.XIVDBSharp
+namespace DiscerningEye.Models.XIVDBSharp
 {
     [DataContract]
     public class ItemRoot

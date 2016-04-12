@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    SettingsViewModel.cs
+    SettingsViewModels.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -22,6 +22,8 @@
 
 
 
+using DiscerningEye.DataAccess;
+using DiscerningEye.Models;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using NAudio.Wave;
@@ -35,6 +37,8 @@ namespace DiscerningEye.ViewModels
         
         private IWavePlayer _waveOutDevice;
         private AudioFileReader _audioFileReader;
+
+        
 
         private string _uiAccentSelectedValue;
         /// <summary>
@@ -110,14 +114,16 @@ namespace DiscerningEye.ViewModels
                 ofd.Filter = "MP3 (*.mp3)|*.mp3";
                 if ((bool)ofd.ShowDialog())
                 {
-                    Properties.Settings.Default.NotificationToneUri = ofd.FileName;
+                    //Properties.Settings.Default.NotificationToneUri = ofd.FileName;
+                    UserSettingsRepository.Settings.NotificationToneUri = ofd.FileName;
                 }
             }, () => true);
 
 
             this.TestNotificationCommand = new DelegateCommand(async() =>
             {
-                if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
+                //if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
+                if (string.IsNullOrWhiteSpace(UserSettingsRepository.Settings.NotificationToneUri))
                 {
                     MetroDialogSettings settings = new MetroDialogSettings();
                     settings.AffirmativeButtonText = "Ok";
@@ -131,8 +137,10 @@ namespace DiscerningEye.ViewModels
                 if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
                 {
 
-                    _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
-                    _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
+                    //_audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
+                    _audioFileReader = new AudioFileReader(UserSettingsRepository.Settings.NotificationToneUri);
+                    //_audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
+                    _audioFileReader.Volume = (float)UserSettingsRepository.Settings.NotificationToneVolume / 100.0f;
                     _waveOutDevice.Init(_audioFileReader);
                     _waveOutDevice.Play();
                     this.TestButtonText = "Cancel Test";
@@ -146,8 +154,10 @@ namespace DiscerningEye.ViewModels
 
             //  Set default values for propeties
             this.TestButtonText = "Test Sound";
-            this.UIAccentSelectedValue = Properties.Settings.Default.UIAccent;
-            this.UIAppThemeSelectedValue = Properties.Settings.Default.UIAppTheme;
+            //this.UIAccentSelectedValue = Properties.Settings.Default.UIAccent;
+            this.UIAccentSelectedValue = UserSettingsRepository.Settings.UIAccent;
+            //this.UIAppThemeSelectedValue = Properties.Settings.Default.UIAppTheme;
+            this.UIAppThemeSelectedValue = UserSettingsRepository.Settings.UIAppTheme;
 
             //  Initilize the wave out device
             _waveOutDevice = new WaveOut();

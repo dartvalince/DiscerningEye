@@ -20,6 +20,7 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using DiscerningEye.Models.AlarmItem;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace DiscerningEye.DataAccess
         //================================================================
         //  Fields
         //================================================================
-        readonly List<Model.AlarmItem> _alarmItems;
+        readonly List<AlarmItem> _alarmItems;
 
 
 
@@ -47,7 +48,7 @@ namespace DiscerningEye.DataAccess
         public AlarmItemRepository()
         {
             if (_alarmItems == null)
-                _alarmItems = new List<Model.AlarmItem>();
+                _alarmItems = new List<AlarmItem>();
 
             //  Read from the json file
             string localDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"DiscerningEye\Data\Local\");
@@ -57,13 +58,25 @@ namespace DiscerningEye.DataAccess
                 using (var streamReader = new StreamReader(fileStream))
                 {
 
-                    this._alarmItems = JsonConvert.DeserializeObject<List<Model.AlarmItem>>(streamReader.ReadToEnd());
+                    this._alarmItems = JsonConvert.DeserializeObject<List<AlarmItem>>(streamReader.ReadToEnd());
                 }
             }
+
+            foreach(AlarmItem alarmItem in this._alarmItems)
+            {
+                alarmItem.Requirment = new List<Requirements>();
+                alarmItem.Location = new List<Locations>();
+                alarmItem.Requirment.Add(new Requirements { Gathering = alarmItem.GatheringNeeded, Perception = alarmItem.PerceptionNeeded });
+                alarmItem.Location.Add(new Locations { Region = alarmItem.Region, Zone = alarmItem.Zone, Slot = alarmItem.Slot, LocationX = alarmItem.LocationX, LocationY = alarmItem.LocationY, LocationZ = alarmItem.LocationZ });
+
+            }
+
+
+
             //using (Stream stream = Application.GetResourceStream(new Uri("pack://application:,,,/DiscerningEye;component/Resources/alarmdata.json")).Stream)
             //{
-            //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Model.AlarmItem>));
-            //    _alarmItems = (List<Model.AlarmItem>)ser.ReadObject(stream);
+            //    DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Models.AlarmItem>));
+            //    _alarmItems = (List<Models.AlarmItem>)ser.ReadObject(stream);
             //}
         }
 
@@ -75,9 +88,9 @@ namespace DiscerningEye.DataAccess
         /// Returns a shallow copy fo the alrm items list
         /// </summary>
         /// <returns></returns>
-        public List<Model.AlarmItem> GetAlarmItems()
+        public List<AlarmItem> GetAlarmItems()
         {
-            return new List<Model.AlarmItem>(_alarmItems);
+            return new List<AlarmItem>(_alarmItems);
         }
     }
 }

@@ -21,6 +21,7 @@
   =================================================================== */
 
 
+using DiscerningEye.DataAccess;
 using DiscerningEye.ViewModels;
 using MahApps.Metro;
 using Newtonsoft.Json;
@@ -39,49 +40,81 @@ namespace DiscerningEye
     /// </summary>
     public partial class App : Application
     {
+        AlarmController.Controller _alarmController;
+
+
         protected override void OnStartup(StartupEventArgs e)
         {
 
 
             base.OnStartup(e);
+
+            //  Initilize Settings
+            UserSettingsRepository.LoadSettings();
+            UserSettingsRepository.Settings.PropertyChanged += Settings_PropertyChanged;
+
             
             
             //  Check for updats to the alarm data file
             this.UpdateAlarmData();
+
+            //  Initilize the alarm controller
+            this._alarmController = new AlarmController.Controller();
+            
 
             var bs = new Bootstrapper();
             bs.Run();
 
             DiscerningEye.App.Current.Exit += Current_Exit;
 
-            DiscerningEye.Properties.Settings.Default.PropertyChanged += Default_PropertyChanged;
+            //DiscerningEye.Properties.Settings.Default.PropertyChanged += Default_PropertyChanged;
 
             //  Apply startup theme from users saved settings
-            ChangeApplicationTheme();
+            ChangeApplicationTheme(UserSettingsRepository.Settings.UseNightMode);
 
         }
 
+        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == "UseNightMode" || e.PropertyName == "UseInverseOnFlyout")
+            {
+                ChangeApplicationTheme(UserSettingsRepository.Settings.UseNightMode);
+            }
+            //if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme" || e.PropertyName == "UseInverseOnFlyout")
+            //{
+            //    ChangeApplicationTheme();
+            //}
+
+        }
 
         private void Current_Exit(object sender, ExitEventArgs e)
         {
-            DiscerningEye.Properties.Settings.Default.Save();
+            //DiscerningEye.Properties.Settings.Default.Save();
+            UserSettingsRepository.SaveSettings();
         }
 
-        private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "UIAccent" || e.PropertyName == "UIAppTheme" || e.PropertyName == "UseInverseOnFlyout")
-            {
-                ChangeApplicationTheme();
-            }
+        ////private void Default_PropertyChanged(object sender, System.ComponentModels.PropertyChangedEventArgs e)
+        ////{
 
-        }
 
-        private void ChangeApplicationTheme()
+        ////}
+
+        private void ChangeApplicationTheme(bool useNightMode)
         {
             var theme = ThemeManager.DetectAppStyle(Application.Current);
-            ThemeManager.ChangeAppStyle(Application.Current,
-                             ThemeManager.GetAccent(DiscerningEye.Properties.Settings.Default.UIAccent),
-                             ThemeManager.GetAppTheme(DiscerningEye.Properties.Settings.Default.UIAppTheme));
+
+            if (useNightMode)
+            {
+                ThemeManager.ChangeAppStyle(Application.Current,
+                             ThemeManager.GetAccent("Steel"),
+                             ThemeManager.GetAppTheme("BaseDark"));
+            }
+            else
+            {
+                ThemeManager.ChangeAppStyle(Application.Current,
+                             ThemeManager.GetAccent("Steel"),
+                             ThemeManager.GetAppTheme("BaseLight"));
+            }
         }
 
 

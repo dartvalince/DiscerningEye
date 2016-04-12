@@ -201,16 +201,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AlarmController\AlarmController.cs" />
+    <Compile Include="AlarmController\Notify\Taskbar.cs" />
+    <Compile Include="AlarmController\Notify\Tone.cs" />
+    <Compile Include="AlarmController\Notify\TTS.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Converters\BooleanToFlyoutThemeConverter.cs" />
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="DataAccess\AlarmItemRepository.cs" />
     <Compile Include="DataAccess\AlarmScheduleRepository.cs" />
-    <Compile Include="Models\AlarmItem.cs" />
+    <Compile Include="DataAccess\UserSettingsRepository.cs" />
+    <Compile Include="Events\AddAlarmEvent.cs" />
+    <Compile Include="Models\AlarmItem\AlarmItem.cs" />
+    <Compile Include="Models\AlarmItem\Locations.cs" />
+    <Compile Include="Models\AlarmItem\Requirements.cs" />
     <Compile Include="Models\AlarmSchedule.cs" />
     <Compile Include="Models\GitHub\Asset.cs" />
     <Compile Include="Models\GitHub\Author.cs" />
     <Compile Include="Models\GitHub\Release.cs" />
     <Compile Include="Models\GitHub\Uploader.cs" />
+    <Compile Include="Models\UserSettingsModel.cs" />
     <Compile Include="Models\XIVDBSharp\Gathering.cs" />
     <Compile Include="Models\XIVDBSharp\ItemRoot.cs" />
     <Compile Include="Models\XIVDBSharp\Node.cs" />
@@ -223,6 +233,7 @@
     <Compile Include="ViewModels\AlarmsViewModel.cs" />
     <Compile Include="ViewModels\GatheringDictionaryViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\SchedulesViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="Views\Alarms.xaml.cs">
@@ -230,6 +241,9 @@
     </Compile>
     <Compile Include="Views\GatheringDictionary.xaml.cs">
       <DependentUpon>GatheringDictionary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Schedules.xaml.cs">
+      <DependentUpon>Schedules.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
@@ -256,6 +270,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\GatheringDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Schedules.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,7 +396,12 @@
   <ItemGroup>
     <Resource Include="License.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="AlarmController\Audio\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Blue_Gatherers%27_Scrip_Icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

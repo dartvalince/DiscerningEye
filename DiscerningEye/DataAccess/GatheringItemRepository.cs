@@ -37,7 +37,7 @@ namespace DiscerningEye.DataAccess
         //================================================================
         //  Fields
         //================================================================
-        readonly List<Model.XIVDBSharp.ItemRoot> _gatheringItems;
+        readonly List<Models.XIVDBSharp.ItemRoot> _gatheringItems;
 
 
 
@@ -51,20 +51,20 @@ namespace DiscerningEye.DataAccess
         public GatheringItemRepository()
         {
             if (_gatheringItems == null)
-                _gatheringItems = new List<Model.XIVDBSharp.ItemRoot>();
+                _gatheringItems = new List<Models.XIVDBSharp.ItemRoot>();
 
             //  Read from the json file
             // pack://application:,,,/MyAssemblyName;component/MyResourcesFolder/MyImage.png
             using (Stream stream = Application.GetResourceStream(new Uri("pack://application:,,,/DiscerningEye;component/Resources/itemdata_03023016.json")).Stream)
             {
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Model.XIVDBSharp.ItemRoot>));
-                _gatheringItems = (List<Model.XIVDBSharp.ItemRoot>)ser.ReadObject(stream);
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<Models.XIVDBSharp.ItemRoot>));
+                _gatheringItems = (List<Models.XIVDBSharp.ItemRoot>)ser.ReadObject(stream);
             }
 
 
-            foreach(Model.XIVDBSharp.ItemRoot item in _gatheringItems)
+            foreach(Models.XIVDBSharp.ItemRoot item in _gatheringItems)
             {
-                foreach(Model.XIVDBSharp.Gathering gathering in item.gathering)
+                foreach(Models.XIVDBSharp.Gathering gathering in item.gathering)
                 {
                     gathering.stars_html = WebUtility.HtmlDecode(gathering.stars_html);
                 }
@@ -83,9 +83,9 @@ namespace DiscerningEye.DataAccess
         /// Returns a shallow copy of the gathering items list ordered by item name
         /// </summary>
         /// <returns></returns>
-        public List<Model.XIVDBSharp.ItemRoot> GetGatheringItems()
+        public List<Models.XIVDBSharp.ItemRoot> GetGatheringItems()
         {
-            return new List<Model.XIVDBSharp.ItemRoot>(_gatheringItems).OrderBy(o => o.name).ToList();
+            return new List<Models.XIVDBSharp.ItemRoot>(_gatheringItems).OrderBy(o => o.name).ToList();
         }
     }
 }

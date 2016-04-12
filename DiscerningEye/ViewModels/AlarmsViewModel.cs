@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    AlarmsViewModel.cs
+    AlarmsViewModels.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -22,10 +22,12 @@
 
 
 using DiscerningEye.DataAccess;
+using DiscerningEye.Events;
 using DiscerningEye.Views;
 using MahApps.Metro.Controls.Dialogs;
 using NAudio.Wave;
 using Prism.Commands;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,43 +36,15 @@ using System.Linq;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Windows.Data;
+using DiscerningEye.AlarmController;
+using DiscerningEye.Models;
+using DiscerningEye.Models.AlarmItem;
 
 namespace DiscerningEye.ViewModels
 {
     public class AlarmsViewModel : ViewModelBase
     {
-        private AlarmItemRepository _alarmItemRepository;
-        private AudioFileReader _audioFileReader;
-        private SpeechSynthesizer _synth;
-        private System.Timers.Timer _updateTimer;
-        private IWavePlayer _waveOutDevice;
-
-        private ObservableCollection<Model.AlarmItem> _alarmItemCollection;
-        /// <summary>
-        /// Gets or sets the observablecollection of Model.AlarmItem
-        /// </summary>
-        /// <remarks>
-        /// This is bound to the ItemSource property of the datagrid on the AlarmView
-        /// </remarks>
-        public ObservableCollection<Model.AlarmItem> AlarmItemCollection
-        {
-            get { return this._alarmItemCollection; }
-            set { SetProperty(ref _alarmItemCollection, value); }
-        }
-
-
-        private ObservableCollection<Model.AlarmSchedule> _alarmScheduleCollection;
-        /// <summary>
-        /// Gets or sets the observablecollection of Model.AlarmSchedul
-        /// </summary>
-        /// <remarks>
-        /// This is bound ot the ItemSource property of the combobox on the AlarmView
-        /// </remarks>
-        public ObservableCollection<Model.AlarmSchedule> AlarmScheduleCollection
-        {
-            get { return this._alarmScheduleCollection; }
-            set { SetProperty(ref _alarmScheduleCollection, value); }
-        }
+        private IEventAggregator _eventAggregator;
 
 
         /// <summary>
@@ -89,18 +63,7 @@ namespace DiscerningEye.ViewModels
             }
         }
 
-        private Utilities.ClockController _eorzeaClock;
-        /// <summary>
-        /// Gets or sets the ClockController used to get the eorzeatime
-        /// </summary>
-        /// <remarks>
-        /// This is bound within the MainView
-        /// </remarks>
-        public Utilities.ClockController EorzeaClock
-        {
-            get { return this._eorzeaClock; }
-            set { SetProperty(ref _eorzeaClock, value); }
-        }
+
 
 
         private string _searchText;
@@ -120,21 +83,72 @@ namespace DiscerningEye.ViewModels
             }
         }
 
-        private Model.AlarmSchedule _selectedSchedule;
+        private Models.AlarmSchedule _selectedSchedule;
         /// <summary>
-        /// Gets or sets the current selected Model.AlarmSchedule
+        /// Gets or sets the current selected Models.AlarmSchedule
         /// </summary>
         /// <remarks>
         /// This is bound to the SelectedValue property of the combobox on the AlarmView
         /// </remarks>
-        public Model.AlarmSchedule SelectedSchedule
+        public Models.AlarmSchedule SelectedSchedule
         {
             get { return this._selectedSchedule; }
             set { SetProperty(ref _selectedSchedule, value); }
         }
 
+        private bool _graphicViewVisible;
+        public bool GraphicViewVisible
+        {
+            get { return _graphicViewVisible; }
+            set { SetProperty(ref _graphicViewVisible, value); }
+        }
 
-        
+        private bool _listViewVisible;
+        public bool ListViewVisible
+        {
+            get { return _listViewVisible; }
+            set { SetProperty(ref _listViewVisible, value); }
+        }
+
+
+        private AlarmItem _selectedAlarmItem;
+        public AlarmItem SelectedAlarmItem
+        {
+            get { return _selectedAlarmItem; }
+            set
+            {
+                SetProperty(ref _selectedAlarmItem, value);
+                //this.SetMap();
+            }
+        }
+
+
+
+
+        private CollectionView _botanistView;
+        public CollectionView BotanistView
+        {
+            get { return _botanistView; }
+            set { SetProperty(ref _botanistView, value); }
+        }
+
+        private CollectionView _minerView;
+        public CollectionView MinerView
+        {
+            get { return _minerView; }
+            set { SetProperty(ref _minerView, value); }
+        }
+
+        private CollectionView _upComingView;
+        public CollectionView UpComingView
+        {
+            get { return _upComingView; }
+            set { SetProperty(ref _upComingView, value); }
+        }
+
+
+
+
 
         //=========================================================
         //  ICommands
@@ -171,12 +185,19 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Gets or sets the DelegateCommand to use to refresh the scheduled alarms view
         /// </summary>
-        public DelegateCommand RefreshSchedulViewCommand { get; private set; }
+        //public DelegateCommand AlarmItemChecked { get; private set; }
 
         /// <summary>
         /// Gets or sets the DelegateCommand used to remove all alarms from the schedule alarms view
         /// </summary>
         public DelegateCommand RemoveAllAlarmsCommand { get; private set; }
+
+        //public DelegateCommand ShowGraphicViewCommand { get; private set; }
+        //public DelegateCommand ShowListViewCommand { get; private set; }
+
+        //public DelegateCommand GroupBoxDoubleClick { get; private set; }
+
+        public DelegateCommand<AlarmItem> AlarmItemChecked { get; set; }
 
 
         //=========================================================
@@ -185,49 +206,109 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Creates a new instance of AlarmsViewModel
         /// </summary>
-        public AlarmsViewModel()
+        public AlarmsViewModel(IEventAggregator eventAggregator)
         {
+            _eventAggregator = eventAggregator;
             //  Setup Commands
             this.CreateNewScheduleCommand = new DelegateCommand(this.CreateNewSchedule, () => true);
+
+
+
+
+
+
             this.LoadScheduleCommand = new DelegateCommand(this.LoadSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
             this.UpdateScheduleCommand = new DelegateCommand(this.UpdateCurrentSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
             this.DeleteCurrentScheduleCommand = new DelegateCommand(this.DeleteCurrentSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
 
             this.SearchAlarmsCommand = new DelegateCommand(this.SearchAlarms, () => !string.IsNullOrEmpty(this.SearchText) && !string.IsNullOrWhiteSpace(this.SearchText)).ObservesProperty(() => this.SearchText);
-            this.RefreshSchedulViewCommand = new DelegateCommand(this.RefreshScheduleView, () => true);
+            this.AlarmItemChecked = new DelegateCommand<AlarmItem>(this.OnAlarmItemChecked);
+            //this.AlarmItemChecked = new DelegateCommand(() =>
+            //{
+            //    _eventAggregator.GetEvent<AddAlarmEvent>().Publish(this.SelectedAlarmItem);
+            //    this.RefreshScheduleView();
+
+            //},() => true);
             this.RemoveAllAlarmsCommand = new DelegateCommand(this.RemoveAllAlarms, () => true);
 
-
-            //  Initilize the alarm item repository
-            if (_alarmItemRepository == null)
-                _alarmItemRepository = new AlarmItemRepository();
-
-
-            //  Initilize the AlarmItemCollection
-            this.AlarmItemCollection = new ObservableCollection<Model.AlarmItem>(_alarmItemRepository.GetAlarmItems());
-
-
-
-            //  Initilize the Alarm Schedules Collection
-            this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+            //this.ShowGraphicViewCommand = new DelegateCommand(() => 
+            //{
+            //    this.GraphicViewVisible = true;
+            //    this.ListViewVisible = false;
+            //}, () => true);
+            //this.ShowListViewCommand = new DelegateCommand(() => 
+            //{
+            //    this.ListViewVisible = true;
+            //    this.GraphicViewVisible = false;
+            //}, () => true);
 
 
-            //  Initilize the Eorzea Clock
-            this.EorzeaClock = new Utilities.ClockController();
 
-            // Initilize the update timer
-            this._updateTimer = new System.Timers.Timer();
-            this._updateTimer.Interval = 100;
-            this._updateTimer.AutoReset = false;
-            this._updateTimer.Elapsed += UpdateTimer_Elapsed;
-            this._updateTimer.Start();
+            //this.GroupBoxDoubleClick = new DelegateCommand(() =>
+            //{
+            //    this.SelectedAlarmItem.IsSet = !this.SelectedAlarmItem.IsSet;
+            //    this.AlarmItemChecked.Execute();
+            //}, () => true);
 
 
-            //  Initilize the sound player
-            _waveOutDevice = new WaveOut();
+            //  Initilize which view type we use by default
+            this.GraphicViewVisible = true;
+            this.ListViewVisible = false;
 
-            //  Initilize the text-to-speech object
-            _synth = new SpeechSynthesizer();
+            AlarmController.Controller.Master.PropertyChanged += Master_PropertyChanged;
+            if(AlarmController.Controller.Master.AlarmItemCollection != null)
+            {
+                //this.BotanistView = (CollectionView)CollectionViewSource.GetDefaultView(AlarmController.Controller.Master.AlarmItemCollection);
+                //this.MinerView = (CollectionView)CollectionViewSource.GetDefaultView(AlarmController.Controller.Master.AlarmItemCollection);
+                this.BotanistView = (CollectionView)new CollectionViewSource { Source = AlarmController.Controller.Master.AlarmItemCollection }.View;
+                this.MinerView = (CollectionView)new CollectionViewSource { Source = AlarmController.Controller.Master.AlarmItemCollection }.View;
+                this.BotanistView.Filter = OnBotanistViewFilter;                
+                this.MinerView.Filter = OnMinerViewFilter;
+
+
+            }
+
+
+
+        }
+
+
+        private void OnAlarmItemChecked(AlarmItem item)
+        {
+            AlarmController.Controller.Master.SetAlarmItem(item.Name, item.StartTime);
+        }
+
+        private bool OnBotanistViewFilter(object item)
+        {
+            var alarmItem = (AlarmItem)item;
+
+            if (!string.IsNullOrEmpty(this.SearchText))
+            {
+                return alarmItem.Job == "Botanist" && alarmItem.Name.ToLower().Contains(this.SearchText.ToLower());
+            }
+            else
+            {
+                return alarmItem.Job == "Botanist";
+            }
+        }
+
+
+        private bool OnMinerViewFilter(object item)
+        {
+            var alarmItem = (AlarmItem)item;
+
+            if (!string.IsNullOrEmpty(this.SearchText))
+            {
+                return alarmItem.Job == "Miner" && alarmItem.Name.ToLower().Contains(this.SearchText.ToLower());
+            }
+            else
+            {
+                return alarmItem.Job == "Miner";
+            }
+        }
+
+        private void Master_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
 
         }
 
@@ -235,235 +316,7 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Events
         //=========================================================
-        /// <summary>
-        /// AlarmInfo struct used to temporaraly hold data about an alarm item
-        /// during the UpdateTimer_Elapsed event
-        /// </summary>
-        struct AlarmInfo
-        {
-            public bool IsSet;
-            public string Name;
-            public string Region;
-            public string Zone;
-            public TimeSpan StartTime;
-            public TimeSpan NextSpawn;
-            public bool Armed;
-            public bool EarlyWarningIssued;
-        }
 
-        /// <summary>
-        /// Elapsed event for the update timer. Main logic of view model occurs here
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            
-
-            //  Get the current eorzea time span
-            TimeSpan currentEorzeaTimeSpan = this.EorzeaClock.GetEorzeaTimeSpan();
-
-            List<string> earlyWarningMessages = new List<string>();
-            List<string> itemAvailableMessages = new List<string>();
-            StringBuilder notificationMessage = new StringBuilder();
-
-            //  Go through each of the alarm items
-            foreach (Model.AlarmItem alarmItem in this.AlarmItemCollection)
-            {    
-
-                //  Get info about the alarm item
-                AlarmInfo alarmInfo = new AlarmInfo();
-                alarmInfo.IsSet = alarmItem.IsSet;
-                alarmInfo.Name = alarmItem.Name;
-                alarmInfo.Region = alarmItem.Region;
-                alarmInfo.Zone = alarmItem.Zone;
-                TimeSpan.TryParse(alarmItem.StartTime, out alarmInfo.StartTime);
-                alarmInfo.Armed = alarmItem.Armed;
-                alarmInfo.EarlyWarningIssued = alarmItem.EarlyWarningIssued;
-                ///TimeSpan.TryParse(alarmItem.NextSpawn, out alarmInfo.NextSpawn);
-                alarmInfo.NextSpawn = alarmItem.NextSpawn;
-
-                //  Because we use the pretrigger of the alarms, we need a way to rearm the alarm
-                //  without it triggering over and over until the hour has passed.  So we will
-                //  check to see if the current eorzea time is > than the alarm time and if so
-                //  we just arm it
-                #region CheckIfReArm
-                if (currentEorzeaTimeSpan > alarmInfo.StartTime)
-                {
-                    //  becuase we use 24 hour time, zero hour alarms will rearm on any hour
-                    //  meaning they will continuously rearm immiedialy after alarming unless
-                    //  we perform a hacky check
-                    if ((alarmInfo.StartTime.Hours == 0 && currentEorzeaTimeSpan.Hours < 2) || alarmInfo.StartTime.Hours > 0)
-                    {
-                        alarmInfo.Armed = true;
-                        alarmInfo.EarlyWarningIssued = false;
-                    }
-                }
-                #endregion CheckIfReArm
-
-
-
-                #region CalculateTimeTillSpawn
-                if (alarmInfo.IsSet)
-                {
-                    //  Get the time difference between the alarm time and eorzea time
-                    TimeSpan timeDiff;
-                    TimeSpan nextEorzeaSpawn;
-                    if (alarmInfo.StartTime.Equals(new TimeSpan(0, 0, 0)))
-                    {
-                        timeDiff = (new TimeSpan(24, 0, 0)).Subtract(currentEorzeaTimeSpan);
-                    }
-                    else
-                    {
-                        timeDiff = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                    }
-
-
-
-                    if (alarmInfo.StartTime > currentEorzeaTimeSpan)
-                    {
-                        //alarmInfo.TimeTillSpawnEorzea = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                        nextEorzeaSpawn = alarmInfo.StartTime.Subtract(currentEorzeaTimeSpan);
-                    }
-                    else
-                    {
-                        //alarm.TimeTillSpawnEorzea = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarm.StartTime));
-                        nextEorzeaSpawn = ((TimeSpan)new TimeSpan(23, 59, 59)).Subtract(currentEorzeaTimeSpan.Subtract(alarmInfo.StartTime));
-                    }
-                    long earthTicks = nextEorzeaSpawn.Ticks / (long)Utilities.ClockController.EORZEA_MULTIPLIER;
-                    alarmInfo.NextSpawn = new TimeSpan(earthTicks);
-
-                }
-                
-                #endregion CalculateTimeTillSpawn
-
-
-
-
-                //  Check if we should issue an early warning
-                if(Properties.Settings.Default.EnableEarlyWarning && alarmInfo.IsSet)
-                {
-                    //  Check if the alarm should issue an early warning
-                    if(alarmInfo.NextSpawn.TotalMinutes <= new TimeSpan(0,Properties.Settings.Default.EarlyWarningMinutes, Properties.Settings.Default.EarlyWarningSeconds).TotalMinutes && !alarmInfo.EarlyWarningIssued)
-                    {
-                        alarmInfo.EarlyWarningIssued = true;
-
-                        string earlyWarningMessage = Properties.Settings.Default.EarlyWarningMessage;
-                        earlyWarningMessage = System.Text.RegularExpressions.Regex.Replace(earlyWarningMessage, "{item}", alarmInfo.Name, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                        earlyWarningMessage = System.Text.RegularExpressions.Regex.Replace(earlyWarningMessage, "{region}", alarmInfo.Region, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                        earlyWarningMessage = System.Text.RegularExpressions.Regex.Replace(earlyWarningMessage, "{zone}", alarmInfo.Zone, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                        string timeMessage = "";
-                        //  Check hours
-                        if (alarmInfo.NextSpawn.Hours != 0)
-                        {
-                            if (alarmInfo.NextSpawn.Hours == 1)
-                                timeMessage += "1 hour";
-                            else
-                                timeMessage += string.Format("{0} hours", alarmInfo.NextSpawn.Hours);
-                        }
-
-                        if (alarmInfo.NextSpawn.Minutes != 0)
-                        {
-                            if (alarmInfo.NextSpawn.Minutes == 1)
-                                timeMessage += " 1 minute";
-                            else
-                                timeMessage += string.Format(" {0} minutes", alarmInfo.NextSpawn.Minutes);
-                        }
-
-                        if (alarmInfo.NextSpawn.Seconds != 0)
-                        {
-                            if (alarmInfo.NextSpawn.Seconds == 1)
-                                timeMessage += " 1 second";
-                            else
-                                timeMessage += string.Format(" {0} seconds", alarmInfo.NextSpawn.Seconds);
-                        }
-
-                        
-                        earlyWarningMessage = System.Text.RegularExpressions.Regex.Replace(earlyWarningMessage, "{time}", timeMessage, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-                        earlyWarningMessages.Add(earlyWarningMessage);
-
-
-
-                    }
-                }
-
-
-
-
-                //  Check if alarm should be triggered
-                if(alarmInfo.NextSpawn <= new TimeSpan(0,0,2) && alarmInfo.Armed && alarmInfo.IsSet)
-                {
-                    alarmInfo.Armed = false;
-
-                    string spawnMessage = Properties.Settings.Default.ItemAvailableMessage;
-                    spawnMessage = System.Text.RegularExpressions.Regex.Replace(spawnMessage, "{item}", alarmInfo.Name, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    spawnMessage = System.Text.RegularExpressions.Regex.Replace(spawnMessage, "{region}", alarmInfo.Region, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    spawnMessage = System.Text.RegularExpressions.Regex.Replace(spawnMessage, "{zone}", alarmInfo.Zone, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-
-                    itemAvailableMessages.Add(spawnMessage);
-
-                }
-
-                //  Push the alarmInfo back into the alarmItem
-                alarmItem.Armed = alarmInfo.Armed;
-                alarmItem.EarlyWarningIssued = alarmInfo.EarlyWarningIssued;
-                alarmItem.NextSpawn = alarmInfo.NextSpawn;
-            }
-
-            if (Properties.Settings.Default.DoNotDisturb == false)
-            {
-                //  Check if there are any notifications to push
-                if (earlyWarningMessages.Count > 0)
-                {
-                    notificationMessage.AppendLine("Early Warnings:");
-                    foreach (string message in earlyWarningMessages)
-                    {
-                        notificationMessage.AppendLine(message);
-                    }
-                }
-
-                if (itemAvailableMessages.Count > 0)
-                {
-                    notificationMessage.AppendLine("Items Available:");
-                    foreach (string message in itemAvailableMessages)
-                    {
-                        notificationMessage.AppendLine(message);
-                    }
-                }
-
-
-                if (notificationMessage.Length > 0)
-                {
-                    if (Properties.Settings.Default.EnableBallonTip)
-                        MainWindow.View.notificationIcon.ShowBalloonTip("Discerning Eye: Notificaitons", notificationMessage.ToString(), Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
-
-                    if (Properties.Settings.Default.EnableTextToSpeech)
-                    {
-                        if (_synth.State == SynthesizerState.Ready)
-                        {
-                            _synth.Volume = Properties.Settings.Default.TextToSpeechVolume;
-                            _synth.SpeakAsync(notificationMessage.ToString());
-                        }
-                    }
-
-                    if (Properties.Settings.Default.EnableNotificationTone && File.Exists(Properties.Settings.Default.NotificationToneUri))
-                    {
-                        if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
-                        {
-
-                            _audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
-                            _audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
-                            _waveOutDevice.Init(_audioFileReader);
-                            _waveOutDevice.Play();
-                        }
-                    }
-                }
-
-            }
-            this._updateTimer.Start();
-        }
 
 
         //=========================================================
@@ -473,33 +326,7 @@ namespace DiscerningEye.ViewModels
 
         protected override void OnDispose()
         {
-            this.AlarmItemCollection.Clear();
-            this.AlarmScheduleCollection.Clear();
-
-            this._updateTimer.Stop();
-            this._updateTimer.Elapsed -= UpdateTimer_Elapsed;
-            this._updateTimer.Dispose();
-
-            if (this._synth != null)
-            {
-                this._synth.SpeakAsyncCancelAll();
-                this._synth = null;
-            }
-
-            if (_waveOutDevice != null)
-            {
-                _waveOutDevice.Stop();
-            }
-            if (_audioFileReader != null)
-            {
-                _audioFileReader.Dispose();
-                _audioFileReader = null;
-            }
-            if (_waveOutDevice != null)
-            {
-                _waveOutDevice.Dispose();
-                _waveOutDevice = null;
-            }
+ 
         }
 
         #endregion IDisposeable Implementation
@@ -514,8 +341,10 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public void SearchAlarms()
         {
-            CollectionViewSource alarmsViewSource = ((CollectionViewSource)AlarmsView.View.FindResource("AlarmViewSource"));
-            if (alarmsViewSource.View != null) alarmsViewSource.View.Refresh();
+            this.BotanistView.Refresh();
+            this.MinerView.Refresh();
+            ////CollectionViewSource alarmsViewSource = ((CollectionViewSource)Alarms.View.FindResource("BotanistViewSource"));
+            ////if (alarmsViewSource.View != null) alarmsViewSource.View.Refresh();
         }
 
         /// <summary>
@@ -523,9 +352,10 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public async void LoadSchedule()
         {
-            foreach(Model.AlarmItem scheduleAlarm in this.SelectedSchedule.Alarms)
+            foreach(AlarmItem scheduleAlarm in this.SelectedSchedule.Alarms)
             {
-                foreach(Model.AlarmItem collectionAlarm in this.AlarmItemCollection)
+                //foreach(Models.AlarmItem collectionAlarm in this.AlarmItemCollection)
+                foreach (AlarmItem collectionAlarm in Controller.Master.AlarmItemCollection)
                 {
                     if (scheduleAlarm.Name == collectionAlarm.Name && scheduleAlarm.StartTime == collectionAlarm.StartTime)
                     {
@@ -560,7 +390,7 @@ namespace DiscerningEye.ViewModels
             settings.NegativeButtonText = "Cancel";
             string scheduleName = await MainWindow.View.ShowInputAsync("Create New Schedule", "Enter the name you would like to use for the new schedule", settings);
 
-            var list = this.AlarmScheduleCollection.Where(ap => ap.Name == scheduleName);
+            var list = Controller.Master.AlarmScheduleCollection.Where(ap => ap.Name == scheduleName);
 
             if (list.Count() > 0)
             {
@@ -572,7 +402,7 @@ namespace DiscerningEye.ViewModels
             {
 
                 if (scheduleName == null) return;
-                Model.AlarmSchedule schedule = new Model.AlarmSchedule(this.AlarmItemCollection.ToList());
+                Models.AlarmSchedule schedule = new Models.AlarmSchedule(Controller.Master.AlarmItemCollection.ToList());
 
                 if (scheduleName.Length > 0)
                 {
@@ -580,11 +410,13 @@ namespace DiscerningEye.ViewModels
                     AlarmScheduleRepository.Save(schedule);
                 }
 
-                this.AlarmScheduleCollection.Add(schedule);
+                Controller.Master.AlarmScheduleCollection.Add(schedule);
+
                 settings.AffirmativeButtonText = "Ok";
                 await MainWindow.View.ShowMessageAsync("Schedule Created", string.Format("Schedule has been created and saved for {0}", scheduleName), MessageDialogStyle.Affirmative, settings);
-                this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
-                this.SelectedSchedule = this.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
+                Controller.Master.AlarmScheduleCollection = new ObservableCollection<Models.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+
+                this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
             }
 
             
@@ -597,9 +429,9 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Creates a new schedule based on an existing schedule
         /// </summary>
-        public void CreateNewSchedule(Model.AlarmSchedule schedule)
+        public void CreateNewSchedule(Models.AlarmSchedule schedule)
         {
-            var list = this.AlarmScheduleCollection.Where(ap => ap.Name == schedule.Name);
+            var list = Controller.Master.AlarmScheduleCollection.Where(ap => ap.Name == schedule.Name);
 
             if (list.Count() > 0)
             {
@@ -615,8 +447,9 @@ namespace DiscerningEye.ViewModels
                     AlarmScheduleRepository.Save(schedule);
                 }
 
-                this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
-                this.SelectedSchedule = this.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
+                Controller.Master.AlarmScheduleCollection = new ObservableCollection<Models.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+
+                this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(p => p.Name == schedule.Name).First();
             }
 
 
@@ -632,10 +465,14 @@ namespace DiscerningEye.ViewModels
             if (this.SelectedSchedule == null) return;
 
             string scheduleName = this.SelectedSchedule.Name;
-            this.AlarmScheduleCollection.Where(p => p.Name == this.SelectedSchedule.Name).First().Alarms = new List<Model.AlarmItem>(this.AlarmItemCollection.ToList());
+            Controller.Master.AlarmScheduleCollection.Where(p => p.Name == this.SelectedSchedule.Name).First().Alarms = new List<AlarmItem>(Controller.Master.AlarmItemCollection.ToList());
+
             AlarmScheduleRepository.Save(this.SelectedSchedule);
-            this.AlarmScheduleCollection = new ObservableCollection<Model.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
-            this.SelectedSchedule = this.AlarmScheduleCollection.Where(s => s.Name == scheduleName).First();
+
+
+            Controller.Master.AlarmScheduleCollection = new ObservableCollection<Models.AlarmSchedule>((new AlarmScheduleRepository()).GetAlarmSchedules());
+
+            this.SelectedSchedule = Controller.Master.AlarmScheduleCollection.Where(s => s.Name == scheduleName).First();
 
             MetroDialogSettings settings = new MetroDialogSettings();
             settings.AffirmativeButtonText = "Ok";
@@ -654,8 +491,9 @@ namespace DiscerningEye.ViewModels
         {
             string scheduleName = this.SelectedSchedule.Name;
             AlarmScheduleRepository.Delete(this.SelectedSchedule);
-            
-            this.AlarmScheduleCollection.Remove(this.AlarmScheduleCollection.Where(schedule => schedule.Name == this.SelectedSchedule.Name).First());
+
+            Controller.Master.AlarmScheduleCollection.Remove(Controller.Master.AlarmScheduleCollection.Where(schedule => schedule.Name == this.SelectedSchedule.Name).First());
+
             this.SelectedSchedule = null;
             this.RemoveAllAlarms();
 
@@ -674,7 +512,7 @@ namespace DiscerningEye.ViewModels
         /// </summary>
         public void RefreshScheduleView()
         {
-            ((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).View.Refresh();
+            //((CollectionViewSource)AlarmsView.View.FindResource("SetAlarmsViewSource")).View.Refresh();
         }
 
 
@@ -682,8 +520,8 @@ namespace DiscerningEye.ViewModels
         /// Sets all alarms IsSet property to false
         /// </summary>
         public void RemoveAllAlarms()
-        {
-            foreach(Model.AlarmItem alarmItem in this.AlarmItemCollection)
+        {            
+            foreach (AlarmItem alarmItem in Controller.Master.AlarmItemCollection)
             {
                 alarmItem.IsSet = false;
             }

@@ -1,7 +1,7 @@
 ﻿/* ===================================================================
  License:
     DiscerningEye - FFXIV Gathering Companion App
-    MainWindowViewModel.cs
+    MainWindowViewModels.cs
 
 
     Copyright(C) 2015 - 2016  Christopher Whitley
@@ -22,8 +22,10 @@
 
 
 
+using DiscerningEye.DataAccess;
 using MahApps.Metro.Controls.Dialogs;
 using Prism.Commands;
+using Prism.Regions;
 using Squirrel;
 using System;
 using System.Windows;
@@ -31,8 +33,9 @@ using System.Windows;
 namespace DiscerningEye.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
-    {        
-        
+    {
+        private readonly IRegionManager _regionManager;
+
         private IUpdateManager updateManager;
 
         private bool _isGatheringDictionaryOpen;
@@ -141,6 +144,8 @@ namespace DiscerningEye.ViewModels
         /// </remarks>
         public DelegateCommand OpenSettingsCommand { get; private set; }
 
+        public DelegateCommand<string> NavigateCommand { get; set; }
+
 
 
 
@@ -153,9 +158,14 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Creates a new instance of MainWindowViewModel
         /// </summary>
-        public MainWindowViewModel()
+        public MainWindowViewModel(IRegionManager regionManager)
         {
-            //  Stup all of the delegate commands
+
+            _regionManager = regionManager;
+
+            //  Setup all of the delegate commands
+            this.NavigateCommand = new DelegateCommand<string>(Navigate);
+
             this.GitHubCommand = new DelegateCommand(() =>
             {
                 System.Diagnostics.Process.Start("https://github.com/dartvalince/DiscerningEye");
@@ -163,21 +173,31 @@ namespace DiscerningEye.ViewModels
 
             this.MinimalNotificationCommand = new DelegateCommand(() =>
             {
-                Properties.Settings.Default.EnableAlarms = true;
-                Properties.Settings.Default.EnableBallonTip = true;
-                Properties.Settings.Default.EnableEarlyWarning = true;
-                Properties.Settings.Default.EnableNotificationTone = false;
-                Properties.Settings.Default.EnableTextToSpeech = false;
+                //Properties.Settings.Default.EnableAlarms = true;
+                //Properties.Settings.Default.EnableBallonTip = true;
+                //Properties.Settings.Default.EnableEarlyWarning = true;
+                //Properties.Settings.Default.EnableNotificationTone = false;
+                //Properties.Settings.Default.EnableTextToSpeech = false;
+                UserSettingsRepository.Settings.EnableAlarms = true;
+                UserSettingsRepository.Settings.EnableBallonTip = true;
+                UserSettingsRepository.Settings.EnableEarlyWarning = true;
+                UserSettingsRepository.Settings.EnableNotificationTone = false;
+                UserSettingsRepository.Settings.EnableTextToSpeech = false;
             }, () => true);
 
 
             this.AllNotificationsCommand = new DelegateCommand(() =>
             {
-                Properties.Settings.Default.EnableAlarms = true;
-                Properties.Settings.Default.EnableBallonTip = true;
-                Properties.Settings.Default.EnableEarlyWarning = true;
-                Properties.Settings.Default.EnableNotificationTone = true;
-                Properties.Settings.Default.EnableTextToSpeech = true;
+                //Properties.Settings.Default.EnableAlarms = true;
+                //Properties.Settings.Default.EnableBallonTip = true;
+                //Properties.Settings.Default.EnableEarlyWarning = true;
+                //Properties.Settings.Default.EnableNotificationTone = true;
+                //Properties.Settings.Default.EnableTextToSpeech = true;
+                UserSettingsRepository.Settings.EnableAlarms = true;
+                UserSettingsRepository.Settings.EnableBallonTip = true;
+                UserSettingsRepository.Settings.EnableEarlyWarning = true;
+                UserSettingsRepository.Settings.EnableNotificationTone = true;
+                UserSettingsRepository.Settings.EnableTextToSpeech = true;
             }, () => true);
 
 
@@ -223,6 +243,12 @@ namespace DiscerningEye.ViewModels
         //================================================================
         //  Functions
         //================================================================
+        private void Navigate(string uri)
+        {
+            _regionManager.RequestNavigate("ContentRegion", uri);
+        }
+
+
         /// <summary>
         /// Utilizing the Squirrel.Windows framework, check for updates on GitHub for the applicaiton
         /// and download/install them if needed.
@@ -248,16 +274,19 @@ namespace DiscerningEye.ViewModels
                 MessageBox.Show(message);
             }
 
-            if(Properties.Settings.Default.AssemblyVersion != typeof(MainWindowViewModel).Assembly.GetName().Version.ToString())
+            //if(Properties.Settings.Default.AssemblyVersion != typeof(MainWindowViewModel).Assembly.GetName().Version.ToString())
+            if (UserSettingsRepository.Settings.AssemblyVersion != typeof(MainWindowViewModel).Assembly.GetName().Version.ToString())
             {
-                Properties.Settings.Default.AssemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version.ToString();
+                //Properties.Settings.Default.AssemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version.ToString();
+                UserSettingsRepository.Settings.AssemblyVersion = typeof(MainWindowViewModel).Assembly.GetName().Version.ToString();
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.AffirmativeButtonText = "View Changes On GitHub";
                 settings.NegativeButtonText = "Close";
                 settings.AnimateHide = true;
                 settings.AnimateShow = true;
                 settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                var result = await Views.MainWindow.View.ShowMessageAsync("Application Updated", string.Format("This application has been udpated to version {0}", Properties.Settings.Default.AssemblyVersion), MessageDialogStyle.AffirmativeAndNegative, settings);
+                //var result = await Views.MainWindow.View.ShowMessageAsync("Application Updated", string.Format("This application has been udpated to version {0}", Properties.Settings.Default.AssemblyVersion), MessageDialogStyle.AffirmativeAndNegative, settings);
+                var result = await Views.MainWindow.View.ShowMessageAsync("Application Updated", string.Format("This application has been udpated to version {0}", UserSettingsRepository.Settings.AssemblyVersion), MessageDialogStyle.AffirmativeAndNegative, settings);
                 if (result == MessageDialogResult.Affirmative)
                     System.Diagnostics.Process.Start("https://github.com/dartvalince/DiscerningEye/releases/latest");
 

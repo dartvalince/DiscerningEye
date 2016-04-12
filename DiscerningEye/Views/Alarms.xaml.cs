@@ -20,6 +20,7 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using DiscerningEye.Models.AlarmItem;
 using System.Windows.Controls;
 
 
@@ -28,31 +29,37 @@ namespace DiscerningEye.Views
     /// <summary>
     /// Interaction logic for AlarmsView.xaml
     /// </summary>
-    public partial class AlarmsView : UserControl
+    public partial class Alarms : UserControl
     {
-        public static AlarmsView View;
-        public AlarmsView()
+        public static Alarms View;
+        public Alarms()
         {
             InitializeComponent();
             View = this;
+            this.Loaded += Alarms_Loaded;
             
         }
 
-        private void AlarmViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        private void Alarms_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Model.AlarmItem i = e.Item as Model.AlarmItem;
+
+        }
+
+        private void BotanistViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+            AlarmItem i = e.Item as AlarmItem;
             if(i!= null)
             {
                 if ( !string.IsNullOrEmpty( ((ViewModels.AlarmsViewModel)this.DataContext).SearchText))
                 {
-                    e.Accepted = i.Name.ToLower().Contains(((ViewModels.AlarmsViewModel)this.DataContext).SearchText.ToLower());
+                    e.Accepted = i.Name.ToLower().Contains(((ViewModels.AlarmsViewModel)this.DataContext).SearchText.ToLower()) && i.Job == "Botanist";
                 }
             }
         }
 
         private void SetAlarmsViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
         {
-            Model.AlarmItem i = e.Item as Model.AlarmItem;
+            AlarmItem i = e.Item as AlarmItem;
             if (i != null)
             {
                     e.Accepted = i.IsSet == true;

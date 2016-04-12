@@ -22,10 +22,11 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace DiscerningEye.Model
+namespace DiscerningEye.Models.AlarmItem
 {
     [DataContract]
     public class AlarmItem : INotifyPropertyChanged
@@ -217,7 +218,20 @@ namespace DiscerningEye.Model
         [DataMember(EmitDefaultValue = true)]
         public string RedMaximum { get; set; }
 
+        [DataMember(EmitDefaultValue = true)]
+        public XIVDBSharp.ItemRoot XIVDBItemRoot { get; set; }
 
+        [DataMember(EmitDefaultValue = true)]
+        public string Id { get; set; }
+
+        [DataMember(EmitDefaultValue = true)]
+        public string LocationX { get; set; }
+
+        [DataMember(EmitDefaultValue = true)]
+        public string LocationY { get; set; }
+
+        [DataMember(EmitDefaultValue = true)]
+        public string LocationZ { get; set; }
 
 
         /// <summary>
@@ -233,6 +247,54 @@ namespace DiscerningEye.Model
                 OnPropertyChanged("NextSpawn");
             }
         }
+
+
+        private string _avaliableMessage;
+
+        public string AvaliableMessage
+        {
+            get { return _avaliableMessage; }
+            set
+            {
+                if (this._avaliableMessage == value) return;
+                this._avaliableMessage = value;
+                OnPropertyChanged("AvaliableMessage");
+            }
+        }
+
+        private System.Windows.Media.Brush _messageForegroundColor;
+        public System.Windows.Media.Brush MessageForegroundColor
+        {
+            get { return _messageForegroundColor; }
+            set
+            {
+                if (this._messageForegroundColor == value) return;
+                this._messageForegroundColor = value;
+                OnPropertyChanged("MessageForegroundColor");
+            }
+        }
+
+        private bool _highlightMessageText;
+
+        public bool HighlightMessageText
+        {
+            get { return _highlightMessageText; }
+            set
+            {
+                if (this._highlightMessageText == value) return;
+                this._highlightMessageText = value;
+                OnPropertyChanged("HighlightMessageText");
+            }
+        }
+
+
+
+        public List<Requirements> Requirment { get; set; }
+        public List<Locations> Location { get; set; }
+
+        
+
+
 
         //=======================================================
         //  Constructor

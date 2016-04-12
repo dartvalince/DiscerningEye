@@ -23,8 +23,9 @@
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using DiscerningEye.Models.AlarmItem;
 
-namespace DiscerningEye.Model
+namespace DiscerningEye.Models
 {
     public class AlarmSchedule
     {
@@ -40,7 +41,7 @@ namespace DiscerningEye.Model
         /// Gets or sets the List of AlarmItems
         /// </summary>
         [DataMember(EmitDefaultValue = true)]
-        public List<AlarmItem> Alarms { get; set; }
+        public List<AlarmItem.AlarmItem> Alarms { get; set; }
 
         /// <summary>
         /// Gets or sets the file path string of the saved schedule
@@ -57,7 +58,7 @@ namespace DiscerningEye.Model
         /// Creates a new instance of AlarmSchedule
         /// </summary>
         /// <param name="alarms"></param>
-        public AlarmSchedule(List<Model.AlarmItem> alarms)
+        public AlarmSchedule(List<AlarmItem.AlarmItem> alarms)
         {
             this.Alarms = alarms;
         }

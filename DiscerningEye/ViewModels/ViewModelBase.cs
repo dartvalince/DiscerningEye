@@ -20,6 +20,8 @@
     along with this program.If not, see<http://www.gnu.org/licenses/> .
   =================================================================== */
 
+using DiscerningEye.DataAccess;
+using DiscerningEye.Models;
 using Prism.Mvvm;
 using System;
 using System.ComponentModel;
@@ -28,6 +30,10 @@ namespace DiscerningEye.ViewModels
 {
     public abstract class ViewModelBase : BindableBase, IDisposable
     {
+
+
+        public UserSettingsModel UserSettings { get { return UserSettingsRepository.Settings; } }
+
         protected ViewModelBase()
         {
 

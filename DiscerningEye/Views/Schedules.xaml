@@ -1,0 +1,358 @@
+﻿<UserControl x:Class="DiscerningEye.Views.Schedules"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:prism ="http://prismlibrary.com/"
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:utils="clr-namespace:DiscerningEye.Utilities"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
+             prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:local="clr-namespace:DiscerningEye.Views"
+             xmlns:converters="clr-namespace:DiscerningEye.Converters"
+             xmlns:ac="clr-namespace:DiscerningEye.AlarmController"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="1280">
+
+    <UserControl.Resources>
+        
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        
+        <CollectionViewSource x:Key="ScheduledAlarmsViewSource"
+                              IsLiveFilteringRequested="True"
+                              IsLiveSortingRequested="True"
+                              Source="{Binding Source={x:Static ac:Controller.Master}, Path=AlarmItemCollection}"
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                              Filter="ScheduleAlarmsViewSource_Filter">
+            <CollectionViewSource.GroupDescriptions>
+                <dat:PropertyGroupDescription PropertyName="Job" />
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="Job" Direction="Ascending" />
+                <scm:SortDescription PropertyName="NextSpawn" Direction="Ascending" />
+                <scm:SortDescription PropertyName="Name" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+        <!-- Style for checkbox inside the ListView -->
+        <Style x:Key="CheckBoxSelectTypeStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
+            <Setter Property="Command" Value="{Binding DataContext.AlarmItemChecked, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+        </Style>
+
+
+    </UserControl.Resources>
+    
+    
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- Manage Schedules -->
+        <Expander Grid.Row="0"
+                  ExpandDirection="Down"
+                  Header="Manage Scheduels (click to expand)"
+                  IsExpanded="True">
+
+            <StackPanel Margin="5,5" 
+                        Orientation="Vertical">
+                <TextBlock Margin="0,5" 
+                           Text="Select schedule from dropdown or Create New Schedule"/>
+                <ComboBox Margin="0,5" 
+                          ItemsSource="{Binding Source={x:Static ac:Controller.Master}, Path=AlarmScheduleCollection}"
+                          SelectedValue="{Binding SelectedSchedule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"/>
+                <Grid Margin="0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Content="Load Selected Schedule" 
+                            Command="{Binding LoadScheduleCommand}"/>
+                    
+                    <Button Grid.Column="1"
+                            Margin="0,0,5,0" 
+                            Content="Save Schedule" 
+                            Command="{Binding CreateNewScheduleCommand}"/>
+
+                    <Button Grid.Column="2"
+                            Margin="0,0,5,0" 
+                            Content="Update Schedule"
+                            Command="{Binding UpdateScheduleCommand}"/>
+
+                    <Button Grid.Column="3" 
+                            Content="Delete Schedule" 
+                            Command="{Binding DeleteCurrentScheduleCommand}"/>
+                </Grid>
+
+            </StackPanel>
+        </Expander>
+
+
+
+        <!-- Schedule Alarms ListView-->
+        <GroupBox Grid.Row="1"
+                  Grid.Column="0"
+                      Header="Scheduled Alarms"
+                      Width="auto"
+                      Height="auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Remove All Alarms From Schedule"
+                        Command="{Binding RemoveAllAlarmsCommand}"/>
+
+
+                <ListView Grid.Column="0"
+                          Grid.Row="1"
+                          ItemsSource="{Binding Source={StaticResource ScheduledAlarmsViewSource}}"
+                          utils:GridViewSort.AutoSort="True">
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="" Width="auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" utils:GridViewSort.PropertyName="Name" />
+                            <GridViewColumn Header="Available In" Width="auto" utils:GridViewSort.PropertyName="NextSpawn">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text">
+                                                        <Setter.Value>
+                                                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                                                <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
+                                                            </MultiBinding>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSet}" Value="False">
+                                                            <Setter Property="Text" Value="{x:Null}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
+                        </GridView>
+                    </ListView.View>
+
+                </ListView>
+
+            </Grid>
+        </GroupBox>
+
+
+
+
+        <!-- Schedule Selection -->
+
+        <!--<GroupBox Grid.Row="0"
+                  Grid.Column ="0"
+                  Header="Alarm Schedules">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Grid.ColumnSpan="4"
+                           Text="Selecte schedule from dropdown to load"/>
+                <ComboBox Grid.Row="1"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="4"
+                          ItemsSource="{Binding AlarmScheduleCollection}"
+                          SelectedValue="{Binding SelectedSchedule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          DisplayMemberPath="Name"
+                          />
+
+                <Button Grid.Row="3"
+                        Grid.Column="0"
+                        Content="Load Selected Schedule" 
+                        Command="{Binding LoadScheduleCommand}"/>
+                <Button Grid.Row="3"
+                        Grid.Column="1"
+                        Margin="0,0,5,0" 
+                        Content="Save Schedule" 
+                        Command="{Binding CreateNewScheduleCommand}"/>
+
+                <Button Grid.Row="3"
+                        Grid.Column="2"
+                        Margin="0,0,5,0" 
+                        Content="Update Schedule"
+                        Command="{Binding UpdateScheduleCommand}"/>
+
+                <Button Grid.Row="3"
+                        Grid.Column="3" 
+                        Content="Delete Schedule" 
+                        Command="{Binding DeleteCurrentScheduleCommand}"/>
+            </Grid>
+        </GroupBox>-->
+        
+        
+        <!-- Schedules Alarms List -->
+
+        <!--<GroupBox Grid.Row="1"
+                  Grid.Column="0"
+                  Header="Scheduled Alarms">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Content="Remove All Alarms From Schedule"
+                        Command="{Binding RemoveAllAlarmsCommand}"/>
+
+
+                <ListView Grid.Column="0"
+                          Grid.Row="1"
+                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
+                          utils:GridViewSort.AutoSort="True">
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Margin" Value="0,0,0,5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="" Width="auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" utils:GridViewSort.PropertyName="Name" />
+                            <GridViewColumn Header="Available In" Width="auto" utils:GridViewSort.PropertyName="NextSpawn">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock TextAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="Text">
+                                                        <Setter.Value>
+                                                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
+                                                                <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
+                                                                <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
+                                                            </MultiBinding>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSet}" Value="False">
+                                                            <Setter Property="Text" Value="{x:Null}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
+                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
+                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
+                        </GridView>
+                    </ListView.View>
+
+                </ListView>
+
+            </Grid>
+        </GroupBox>-->
+                  
+    </Grid>
+</UserControl>
+
+    

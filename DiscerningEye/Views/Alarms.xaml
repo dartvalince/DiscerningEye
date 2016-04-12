@@ -20,321 +20,463 @@
   =================================================================== -->
 
 
-<UserControl x:Class="DiscerningEye.Views.AlarmsView"
+<UserControl x:Class="DiscerningEye.Views.Alarms"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:DiscerningEye.Converters"
              xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:p="clr-namespace:DiscerningEye.Properties"
              xmlns:local="clr-namespace:DiscerningEye.Views"
+             xmlns:ac="clr-namespace:DiscerningEye.AlarmController"
              xmlns:utils="clr-namespace:DiscerningEye.Utilities"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:AlarmController="clr-namespace:DiscerningEye.AlarmController"
              prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1280">
 
 
     <UserControl.Resources>
-        <CollectionViewSource x:Key="AlarmViewSource" 
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        <CollectionViewSource x:Key="BotanistViewSource" 
                               IsLiveFilteringRequested="True"
                               IsLiveSortingRequested="True"
-                              Source="{Binding AlarmItemCollection}"
+                              Source="{Binding Source={x:Static ac:Controller.Master}, Path=AlarmItemCollection}"
                               VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                              Filter="AlarmViewSource_Filter">
+                              Filter="BotanistViewSource_Filter">
             <CollectionViewSource.GroupDescriptions>
                 <dat:PropertyGroupDescription PropertyName="Job" />
             </CollectionViewSource.GroupDescriptions>
             <CollectionViewSource.SortDescriptions>
                 <scm:SortDescription PropertyName="Job" Direction="Ascending" />
-                <scm:SortDescription PropertyName="Name" Direction="Ascending" />
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-
-
-        <CollectionViewSource x:Key="SetAlarmsViewSource" 
-                              IsLiveFilteringRequested="True"
-                              IsLiveSortingRequested="True"
-                              Source="{Binding AlarmItemCollection}"
-                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                              Filter="SetAlarmsViewSource_Filter">
-            <CollectionViewSource.GroupDescriptions>
-                <dat:PropertyGroupDescription PropertyName="Job" />
-            </CollectionViewSource.GroupDescriptions>
-            <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="Job" Direction="Ascending" />
-                <scm:SortDescription PropertyName="NextSpawn" Direction="Ascending" />
                 <scm:SortDescription PropertyName="Name" Direction="Ascending" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
 
         <Style x:Key="CheckBoxSelectTypeStyle" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
-            <Setter Property="Command" Value="{Binding DataContext.RefreshSchedulViewCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+            <Setter Property="Command" Value="{Binding DataContext.AlarmItemChecked, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" />
+            <Setter Property="CommandParameter" Value="{Binding}" />
         </Style>
 
-    </UserControl.Resources>
+            <EllipseGeometry x:Key="Circle" Center="0,0" RadiusX="5" RadiusY="5" />    
 
+        
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="auto" MinWidth="470" />
+            <ColumnDefinition Width="419" />
         </Grid.ColumnDefinitions>
-        <GroupBox Grid.Row="0"
-                  Grid.Column="1"
-                  Header="Alarm Schedules">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           Grid.ColumnSpan="4"
-                           Text="Selecte schedule from dropdown to load"/>
-                <ComboBox Grid.Row="1"
-                          Grid.Column="0"
-                          Grid.ColumnSpan="4"
-                          ItemsSource="{Binding AlarmScheduleCollection}"
-                          SelectedValue="{Binding SelectedSchedule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          DisplayMemberPath="Name"
-                          />
+    
 
-                <Button Grid.Row="3"
-                        Grid.Column="0"
-                        Content="Load Selected Schedule" 
-                        Command="{Binding LoadScheduleCommand}"/>
-                <Button Grid.Row="3"
-                        Grid.Column="1"
-                        Margin="0,0,5,0" 
-                        Content="Save Schedule" 
-                        Command="{Binding CreateNewScheduleCommand}"/>
-
-                <Button Grid.Row="3"
-                        Grid.Column="2"
-                        Margin="0,0,5,0" 
-                        Content="Update Schedule"
-                        Command="{Binding UpdateScheduleCommand}"/>
-
-                <Button Grid.Row="3"
-                        Grid.Column="3" 
-                        Content="Delete Schedule" 
-                        Command="{Binding DeleteCurrentScheduleCommand}"/>
-            </Grid>
-        </GroupBox>
-
+        <!-- 
+        
+            Search Alarms 
+        
+        -->
         <GroupBox Grid.Row="0"
                   Grid.Column="0"
+                  Grid.ColumnSpan="2"
                   Header="Search Alarms">
+            <StackPanel Margin="5,5"
+                        Orientation="Vertical">
+                <TextBlock Text="Search for an item in the alarms list" />
+                <DockPanel LastChildFill="True"
+                           Margin="0,5">
+                    <Button DockPanel.Dock="Right"
+                            Margin="5,0,0,0"
+                            Content="Search"
+                            IsDefault="True"
+                            Command="{Binding SearchAlarmsCommand}" />
+                    <TextBox Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
+                             Controls:TextBoxHelper.ClearTextButton="True"
+                             AcceptsReturn="False"
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </DockPanel>
+            </StackPanel>
+        </GroupBox>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="10"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90*" />
-                    <ColumnDefinition Width="10*" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0"
-                         Grid.Column="0"
-                         Grid.ColumnSpan="2"
-                         Text="Search for an item in the alarms list" />
-                <TextBox Grid.Row="1"
-                         Grid.Column="0"
-                         Controls:TextBoxHelper.Watermark="Enter full or partial item name to search"
-                         Margin="0,0,5,0"
-                         Controls:TextBoxHelper.ClearTextButton="True"
-                         AcceptsReturn="False"
-                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Row="1"
-                        Grid.Column="1" Content="Search"
-                        IsDefault="True"
-                        Command="{Binding SearchAlarmsCommand}" />
-            </Grid>
+
+       
+        <!-- Alarms -->
+        <GroupBox Grid.Row="1"
+                  Grid.Column="0"
+                  Width="735"
+                  Height="auto"
+                  x:Name="grpAlarms"
+                  Header="Botany Alarms">
+            <DataGrid ItemsSource="{Binding BotanistView}"
+                      AutoGenerateColumns="False"
+                      SelectionMode="Single"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False"
+                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
+
+                <DataGrid.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </DataGrid.ItemsPanel>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Name" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
+
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                <Binding Path="LocationX" />
+                                <Binding Path="LocationY" />
+                                <Binding Path="LocationZ" />
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
+                </DataGrid.Columns>
+            </DataGrid>
         </GroupBox>
 
         <GroupBox Grid.Row="2"
                   Grid.Column="0"
-                      Header="Alarms"
-                      HeaderStringFormat="Alarms List"
-                      Width="auto"
-                      Height="auto">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <ListView Grid.Column="0"
-                          Grid.Row="0"
-                          ItemsSource="{Binding Source={StaticResource AlarmViewSource}}"
-                          utils:GridViewSort.AutoSort="True">
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.ContainerStyle>
-                                <Style TargetType="{x:Type GroupItem}">
-                                    <Setter Property="Margin" Value="0,0,0,5" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                <Expander IsExpanded="True">
-                                                    <Expander.Header>
-                                                        <DockPanel>
-                                                            <TextBlock Text="{Binding Path=Name}" />
-                                                        </DockPanel>
-                                                    </Expander.Header>
-                                                    <Expander.Content>
-                                                        <ItemsPresenter />
-                                                    </Expander.Content>
-                                                </Expander>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </GroupStyle.ContainerStyle>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="" Width="auto">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}"  utils:GridViewSort.PropertyName="Name" />
-                            <GridViewColumn Width="auto" Header="Start" DisplayMemberBinding="{Binding Path=StartTime}"  utils:GridViewSort.PropertyName="StartTime" />
-                            <GridViewColumn Width="auto" Header="End" DisplayMemberBinding="{Binding Path=EndTime}" utils:GridViewSort.PropertyName="EndTime" />
-                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
-                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
-                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
-                        </GridView>
-                    </ListView.View>
+                  Width="735"
+                  Height="auto"
+                  Header="Miner Alarms">
+            <DataGrid ItemsSource="{Binding MinerView}"
+                      AutoGenerateColumns="False"
+                      SelectionMode="Single"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.ScrollUnit="Pixel"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False"
+                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
 
-                </ListView>
+                <DataGrid.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </DataGrid.ItemsPanel>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Name" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
 
-            </Grid>
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                <Binding Path="LocationX" />
+                                <Binding Path="LocationY" />
+                                <Binding Path="LocationZ" />
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
+                </DataGrid.Columns>
+            </DataGrid>
         </GroupBox>
 
 
+
+
+
+
+
+        <!-- Alarms --><!--
         <GroupBox Grid.Row="2"
+                  Grid.Column="0"
+                  Width="auto"
+                  Height="auto"
+                  Header="Miner Alarms">
+            <DataGrid ItemsSource="{Binding MinerView}"
+                      AutoGenerateColumns="False"
+                      SelectionMode="Single"
+                      ScrollViewer.CanContentScroll="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      VirtualizingPanel.ScrollUnit="Item"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      CanUserAddRows="False"
+                      SelectedValue="{Binding SelectedAlarmItem, Mode=OneWayToSource}">
+
+                <DataGrid.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </DataGrid.ItemsPanel>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSet}" Style="{StaticResource CheckBoxSelectTypeStyle}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Name" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16">
+                                        <Rectangle.Fill>
+                                            <DrawingBrush>
+                                                <DrawingBrush.Drawing>
+                                                    <GeometryDrawing Brush="{Binding MessageForegroundColor}" Geometry="{StaticResource Circle}" />
+                                                </DrawingBrush.Drawing>
+                                            </DrawingBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                    <TextBlock Margin="5,0,0,0" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Start" Binding="{Binding Path=StartTime}"  />
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Zone" Binding="{Binding Path=Zone}" />
+
+                    <DataGridTextColumn IsReadOnly="True" Width="*" Header="Location (x,y,z)">
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                <Binding Path="LocationX" />
+                                <Binding Path="LocationY" />
+                                <Binding Path="LocationZ" />
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Availble In" IsReadOnly="True" Width="*" Binding="{Binding AvaliableMessage}" />
+                </DataGrid.Columns>
+                
+
+
+            </DataGrid>
+        </GroupBox>-->
+
+        <GroupBox Grid.Row="1"
                   Grid.Column="1"
-                      Header="Scheduled Alarms"
-                      Width="auto"
-                      Height="auto">
+                  Grid.RowSpan="2"
+                  Header="Selected Alarm Information (Select item from list to view info)">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Row="0"
-                        Grid.Column="0"
-                        Content="Remove All Alarms From Schedule"
-                        Command="{Binding RemoveAllAlarmsCommand}"/>
+
+                <GroupBox Grid.Row="0"
+                              Grid.Column="0"
+                              Grid.ColumnSpan="3"
+                              Header="Item Description">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Grid.Column="0"
+                           Grid.ColumnSpan="2"
+                       Grid.Row="0"
+                       Width="76"
+                       Height="76"
+                       Source="{Binding SelectedAlarmItem.XIVDBItemRoot.icon}"/>
+                            <Label Grid.Column="1"
+                       Grid.Row="0"
+                       VerticalAlignment="Center"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                           Margin="10,0"
+                       Content="{Binding SelectedAlarmItem.Name}"/>
 
 
-                <ListView Grid.Column="0"
-                          Grid.Row="1"
-                          ItemsSource="{Binding Source={StaticResource SetAlarmsViewSource}}"
-                          utils:GridViewSort.AutoSort="True">
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.ContainerStyle>
-                                <Style TargetType="{x:Type GroupItem}">
-                                    <Setter Property="Margin" Value="0,0,0,5" />
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type GroupItem}">
-                                                <Expander IsExpanded="True">
-                                                    <Expander.Header>
-                                                        <DockPanel>
-                                                            <TextBlock Text="{Binding Path=Name}" />
-                                                        </DockPanel>
-                                                    </Expander.Header>
-                                                    <Expander.Content>
-                                                        <ItemsPresenter />
-                                                    </Expander.Content>
-                                                </Expander>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </GroupStyle.ContainerStyle>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="" Width="auto">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Path=IsSet, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                                                  Style="{StaticResource CheckBoxSelectTypeStyle}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Name" DisplayMemberBinding="{Binding Path=Name}" utils:GridViewSort.PropertyName="Name" />
-                            <GridViewColumn Header="Available In" Width="auto" utils:GridViewSort.PropertyName="NextSpawn">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock TextAlignment="Center">
-                                            <TextBlock.Style>
-                                                <Style TargetType="{x:Type TextBlock}">
-                                                    <Setter Property="Text">
-                                                        <Setter.Value>
-                                                            <MultiBinding StringFormat="{}{0:00}:{1:00}:{2:00}">
-                                                                <Binding Path="NextSpawn.Hours" UpdateSourceTrigger="PropertyChanged" />
-                                                                <Binding Path="NextSpawn.Minutes" UpdateSourceTrigger="PropertyChanged" />
-                                                                <Binding Path="NextSpawn.Seconds" UpdateSourceTrigger="PropertyChanged" />
-                                                            </MultiBinding>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding IsSet}" Value="False">
-                                                            <Setter Property="Text" Value="{x:Null}" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Width="auto" Header="Region" DisplayMemberBinding="{Binding Path=Region}" utils:GridViewSort.PropertyName="Region" />
-                            <GridViewColumn Width="auto" Header="Zone" DisplayMemberBinding="{Binding Path=Zone}" utils:GridViewSort.PropertyName="Zone" />
-                            <GridViewColumn Width="auto" Header="Slot" DisplayMemberBinding="{Binding Path=Slot}" utils:GridViewSort.PropertyName="Slot" />
-                        </GridView>
-                    </ListView.View>
+                        </StackPanel>
+                        <Border Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Grid.Row="1"
+                        Height="75"
+                        BorderThickness="0,1,0,0"
+                        Margin="0,10">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource AccentColor}"/>
+                            </Border.BorderBrush>
+                            <TextBlock DockPanel.Dock="Top"
+                                           TextWrapping="Wrap"
+                                           FontSize="14"
+                                           Text="{Binding SelectedAlarmItem.XIVDBItemRoot.help}"/>
+                        </Border>
+                    </StackPanel>
 
-                </ListView>
+                </GroupBox>
+                <GroupBox Grid.Row="1"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="3"
+                          Header="Location Information">
+                    <DataGrid CanUserAddRows="False"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="False"
+                              CanUserResizeRows="False"
+                              CanUserSortColumns="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding SelectedAlarmItem.Location}"
+                              VerticalContentAlignment="Center"
+                              HorizontalContentAlignment="Center">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="*"
+                                                Header="Zone"
+                                                Binding="{Binding Zone}"/>
+
+                            <DataGridTextColumn Width="*"
+                                                Header="Location (x,y,z)">
+                                <DataGridTextColumn.Binding>
+                                    <MultiBinding StringFormat="{} ({0}, {1}, {2})">
+                                        <Binding Path="LocationX" />
+                                        <Binding Path="LocationY" />
+                                        <Binding Path="LocationZ" />
+                                    </MultiBinding>
+                                </DataGridTextColumn.Binding>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Width="*"
+                                                Header="Slot"
+                                                Binding="{Binding Slot}">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MetroDataGridColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MetroDataGridCell}">
+                                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+
+                </GroupBox>
+
+                <GroupBox Grid.Row="2"
+                          Grid.Column="0"
+                          Grid.ColumnSpan="3"
+                          Header="Requirments For Gathering">
+                    <DataGrid CanUserAddRows="False"
+                              CanUserReorderColumns="False"
+                              CanUserResizeColumns="False"
+                              CanUserResizeRows="False"
+                              CanUserSortColumns="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="True"
+                              AutoGenerateColumns="False"
+                              ItemsSource="{Binding SelectedAlarmItem.Requirment}"
+                              VerticalContentAlignment="Center"
+                              HorizontalContentAlignment="Center">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn TextBlock.TextAlignment="Center" Header="Min Gathering" Width="*" Binding="{Binding Gathering}">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MetroDataGridColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MetroDataGridCell}">
+                                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Min Perception" Width="*" Binding="{Binding Perception}">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MetroDataGridColumnHeader}">
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style TargetType="DataGridCell" BasedOn="{StaticResource MetroDataGridCell}">
+                                        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
 
             </Grid>
+
+
         </GroupBox>
-
-
-
+        
+        
+        
+        
+        
     </Grid>
 </UserControl>
