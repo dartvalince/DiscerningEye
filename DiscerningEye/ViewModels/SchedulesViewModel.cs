@@ -94,9 +94,8 @@ namespace DiscerningEye.ViewModels
         //=========================================================
         //  Constructor
         //=========================================================
-        public SchedulesViewModel(IEventAggregator eventAggregator)
+        public SchedulesViewModel()
         {
-            eventAggregator.GetEvent<AddAlarmEvent>().Subscribe(AddAlarm);
             this.AlarmItemChecked = new DelegateCommand<AlarmItem>(this.OnAlarmItemChecked);
             this.CreateNewScheduleCommand = new DelegateCommand(this.CreateNewSchedule, () => true);
             this.LoadScheduleCommand = new DelegateCommand(this.LoadSchedule, () => this.CanAdjustSelectedSchedule).ObservesProperty(() => this.SelectedSchedule);
