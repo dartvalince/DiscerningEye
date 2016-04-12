@@ -16,6 +16,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        <GroupBox Header="Application Information">
         <StackPanel>
             <TextBlock FontSize="20" FontWeight="DemiBold" Text="Discerning Eye" />
             <TextBlock FontSize="14" Text="Developed by: Christopher Whitley (FFXIV: Dart Val'ince)" />
@@ -34,6 +35,7 @@
             <TextBlock TextWrapping="WrapWithOverflow" FontSize="14" Text="Special Thanks: My Wife, Hashi, Bucket, Toga, Kartel (sumo), and everyone in Zantetsuken &lt;1HTKO&gt; FC" />
 
         </StackPanel>
+        </GroupBox>
         <Image Grid.Row="1" Source="pack://application:,,,/DiscerningEye;component/Resources/images/dart_on_gobwalker.png"/>
         
 

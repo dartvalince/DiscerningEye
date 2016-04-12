@@ -23,17 +23,21 @@
 
 
 using DiscerningEye.DataAccess;
+using DiscerningEye.Events;
 using DiscerningEye.Models;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using NAudio.Wave;
 using Prism.Commands;
+using Prism.Events;
+using System.IO;
 
 namespace DiscerningEye.ViewModels
 {
     public class SettingsViewModel : ViewModelBase
     {
-              
+
+        IEventAggregator _eventAggregator;
         
         private IWavePlayer _waveOutDevice;
         private AudioFileReader _audioFileReader;
@@ -105,8 +109,10 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Initilizes a new instance of the SettingViewModel class
         /// </summary>
-        public SettingsViewModel()
+        public SettingsViewModel(IEventAggregator eventAggregator)
         {
+            this._eventAggregator = eventAggregator;
+
             //  Setup the commands
             this.SelectFileCommand = new DelegateCommand(() =>
             {
@@ -120,30 +126,35 @@ namespace DiscerningEye.ViewModels
             }, () => true);
 
 
-            this.TestNotificationCommand = new DelegateCommand(async() =>
+            this.TestNotificationCommand = new DelegateCommand(() =>
             {
                 //if (string.IsNullOrWhiteSpace(Properties.Settings.Default.NotificationToneUri))
                 if (string.IsNullOrWhiteSpace(UserSettingsRepository.Settings.NotificationToneUri))
                 {
-                    MetroDialogSettings settings = new MetroDialogSettings();
-                    settings.AffirmativeButtonText = "Ok";
-                    settings.AnimateHide = true;
-                    settings.AnimateShow = true;
-                    settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    await Views.MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
+                    //MetroDialogSettings settings = new MetroDialogSettings();
+                    //settings.AffirmativeButtonText = "Ok";
+                    //settings.AnimateHide = true;
+                    //settings.AnimateShow = true;
+                    //settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    //await Views.MainWindow.View.ShowMessageAsync("Notification Path ", string.Format("Notification file path cannot be empty to test sound"), MessageDialogStyle.Affirmative, settings);
+                    this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("Notification file path cannot be empty to test sound"));
                     return;
                 }
 
                 if (_waveOutDevice.PlaybackState != PlaybackState.Playing)
                 {
-
-                    //_audioFileReader = new AudioFileReader(Properties.Settings.Default.NotificationToneUri);
-                    _audioFileReader = new AudioFileReader(UserSettingsRepository.Settings.NotificationToneUri);
-                    //_audioFileReader.Volume = (float)Properties.Settings.Default.NotificationToneVolume / 100.0f;
-                    _audioFileReader.Volume = (float)UserSettingsRepository.Settings.NotificationToneVolume / 100.0f;
-                    _waveOutDevice.Init(_audioFileReader);
-                    _waveOutDevice.Play();
-                    this.TestButtonText = "Cancel Test";
+                    if (File.Exists(UserSettingsRepository.Settings.NotificationToneUri))
+                    {
+                        _audioFileReader = new AudioFileReader(UserSettingsRepository.Settings.NotificationToneUri);
+                        _audioFileReader.Volume = (float)UserSettingsRepository.Settings.NotificationToneVolume / 100.0f;
+                        _waveOutDevice.Init(_audioFileReader);
+                        _waveOutDevice.Play();
+                        this.TestButtonText = "Cancel Test";
+                    }
+                    else
+                    {
+                        this._eventAggregator.GetEvent<PushStatusMessageEvent>().Publish(string.Format("\"{0}\" file does not exists, check filename in settings", UserSettingsRepository.Settings.NotificationToneUri));
+                    }
                 }
                 else
                 {

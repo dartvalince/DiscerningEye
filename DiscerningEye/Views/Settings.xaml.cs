@@ -32,7 +32,7 @@ namespace DiscerningEye.Views
         public Settings()
         {
             InitializeComponent();
-            this.DataContext = new DiscerningEye.ViewModels.SettingsViewModel();
+            //this.DataContext = new DiscerningEye.ViewModels.SettingsViewModel();
         }
     }
 }
