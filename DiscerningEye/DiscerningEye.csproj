@@ -230,12 +230,16 @@
     <Compile Include="Models\XIVDBSharp\Type.cs" />
     <Compile Include="Models\XIVDBSharp\Zone.cs" />
     <Compile Include="Utilities\ClockController.cs" />
+    <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\AlarmsViewModel.cs" />
     <Compile Include="ViewModels\GatheringDictionaryViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SchedulesViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="Views\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Alarms.xaml.cs">
       <DependentUpon>Alarms.xaml</DependentUpon>
     </Compile>
@@ -252,6 +256,10 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Page Include="Dictionaries\CustomDataGrid.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -415,6 +423,9 @@
     <Resource Include="Resources\images\Gathering_Log.png" />
     <Resource Include="Resources\images\Miner_Icon_9.png" />
     <Resource Include="Resources\images\Timers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\images\dart_on_gobwalker.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
