@@ -45,11 +45,6 @@ namespace DiscerningEye.ViewModels
     public class AlarmsViewModel : ViewModelBase
     {
         //=========================================================
-        //  Private fields
-        //=========================================================
-        private IEventAggregator _eventAggregator;
-
-        //=========================================================
         //  Properties (some with backing private fields)
         //=========================================================
         /// <summary>
@@ -153,9 +148,8 @@ namespace DiscerningEye.ViewModels
         /// <summary>
         /// Creates a new instance of AlarmsViewModel
         /// </summary>
-        public AlarmsViewModel(IEventAggregator eventAggregator)
+        public AlarmsViewModel()
         {
-            _eventAggregator = eventAggregator;
             this.SearchAlarmsCommand = new DelegateCommand(this.SearchAlarms, () => !string.IsNullOrEmpty(this.SearchText) && !string.IsNullOrWhiteSpace(this.SearchText)).ObservesProperty(() => this.SearchText);
             this.AlarmItemChecked = new DelegateCommand<AlarmItem>(this.OnAlarmItemChecked);
             
