@@ -29,7 +29,7 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d" 
-             d:DesignHeight="1500" d:DesignWidth="400">
+             d:DesignHeight="1500" d:DesignWidth="800">
     <Grid>
         <ScrollViewer>
             <StackPanel>
@@ -207,26 +207,18 @@
                         <TextBlock TextWrapping="WrapWithOverflow"
                                    Text="Enter the file location of a .mp3 you would like to use as the notification tone." 
                                    Margin="5,0,0,10"/>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="10" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="250"/>
-                                <ColumnDefinition Width="20"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Row="0"
-                                 Grid.Column="0"
-                                     Text="{Binding UserSettings.NotificationToneUri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <Button Grid.Row="0"
-                                    Grid.Column="2"
-                                    Content="Browse" 
-                                    Command="{Binding SelectFileCommand}"/>
-                            <StackPanel Grid.Row="2"
-                                        Grid.Column="0"
+                        <StackPanel Orientation="Vertical">
+
+                            <DockPanel Margin="5,5"
+                                       LastChildFill="True">
+                                <Button Margin="5,0" DockPanel.Dock="Right"
+                                            Content="Browse" 
+                                            Command="{Binding SelectFileCommand}"/>
+                                <TextBox Text="{Binding UserSettings.NotificationToneUri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            </DockPanel>
+
+                            <StackPanel Margin="5,5"
                                         Orientation="Horizontal">
                                 <Controls:NumericUpDown Minimum="0"
                                                     Maximum="100"
@@ -237,13 +229,11 @@
                                            VerticalAlignment="Center"
                                            Text="Notification Tone Volume"
                                        Margin="5,0"/>
+                                <Button Content="{Binding TestButtonText}"
+                                            Command="{Binding TestNotificationCommand}"/>
                             </StackPanel>
-                            <Button Grid.Row="2"
-                                    Grid.Column="2"
-                                    Content="{Binding TestButtonText}"
-                                    Command="{Binding TestNotificationCommand}"/>
-                        </Grid>
 
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
