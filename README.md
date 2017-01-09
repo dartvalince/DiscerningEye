@@ -1,3 +1,7 @@
+##Please Read##
+I am no longer activly working on this project. The code and files are avaialble for anyone to use, but will no longer be updated.  I have quit playing FFXIV for the forseeable future and will be moving on to other projects. Thank you all who used (still use) this application, and the support you gave when I was developing and after initial release.  Please fill free to use the code if you are capable.  I wish you all the best. 
+
+
 # DiscerningEye
 Gathering Companion App For FFXIV
 
